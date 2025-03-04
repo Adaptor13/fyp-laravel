@@ -4,7 +4,7 @@
 
 > git add . 
 ~ OR
-> git add filename
+> git add filename (yours)
 
 > git commit -m 
 
