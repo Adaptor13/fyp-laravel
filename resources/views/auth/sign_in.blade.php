@@ -58,7 +58,7 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="text-center text-lg-start">
-                                                Don't Have Your Account yet? <a href="{{route('sign_up')}}"
+                                                Don't Have Your Account yet? <a href="{{ route('sign_up') }}"
                                                     class="link-primary text-decoration-underline"> Sign up</a>
                                             </div>
                                         </div>
@@ -93,6 +93,6 @@
 
     <!-- Bootstrap js-->
     <script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{asset('assets/js/formvalidation.js')}}"></script>
+    <script src="{{ asset('assets/js/formvalidation.js') }}"></script>
 
 @endsection
