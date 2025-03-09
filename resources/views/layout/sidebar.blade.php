@@ -1,7 +1,7 @@
 <!-- Menu Navigation starts -->
 <nav class="dark-sidebar">
     <div class="app-logo">
-        <a class="logo d-inline-block" href="{{ route('index') }}">
+        <a class="logo d-inline-block" href="#">
             <img src="{{asset('../assets/images/logo/dark.png')}}" alt="#" class="dark-logo">
             <img src="{{asset('../assets/images/logo/1.png')}}" alt="#" class="light-logo">
         </a>
@@ -10,7 +10,7 @@
           <i class="ti ti-chevrons-right f-s-20"></i>
         </span>
     </div>
-    <div class="app-nav" id="app-simple-bar">
+    {{-- <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
             <li class="menu-title">
                 <span>dashboard</span>
@@ -355,7 +355,7 @@
 
 
         </ul>
-    </div>
+    </div> --}}
 
     <div class="menu-navs">
         <span class="menu-previous"><i class="ti ti-chevron-left"></i></span>

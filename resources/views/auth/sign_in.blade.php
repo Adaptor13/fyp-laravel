@@ -52,8 +52,8 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <a href="" role="button" class="btn btn-primary w-100">Sign
-                                                    In</a>
+                                                <a href="{{ route('admin_index') }}" role="button" class="btn btn-primary w-100">Sign In</a>
+                                                    
                                             </div>
                                         </div>
                                         <div class="col-12">

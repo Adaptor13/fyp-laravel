@@ -119,7 +119,7 @@
                                                     <div class="card-body">
                                                         <div class="row row-cols-3">
                                                             <div class="d-flex-center text-center mb-3">
-                                                                <a href="{{ route('product') }}">
+                                                                <a href="#">
                                                                     <span
                                                                         class="text-light-success h-60 w-60 d-flex-center b-r-100">
                                                                         <i class="ti ti-shopping-bag f-s-26"></i>
@@ -128,7 +128,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="d-flex-center text-center mb-3">
-                                                                <a href="{{ route('email') }}">
+                                                                <a href="#">
                                                                     <span
                                                                         class="text-light-primary h-60 w-60 d-flex-center b-r-100">
                                                                         <i class="ti ti-mail f-s-26"></i>
@@ -137,7 +137,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="d-flex-center text-center mb-3">
-                                                                <a href="{{ route('chat') }}">
+                                                                <a href="#">
                                                                     <span
                                                                         class="text-light-info h-60 w-60 d-flex-center b-r-100">
                                                                         <i class="ti ti-brand-hipchat f-s-26"></i>
@@ -146,7 +146,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="d-flex-center text-center">
-                                                                <a href="{{ route('project_app') }}">
+                                                                <a href="#">
                                                                     <span
                                                                         class="text-light-warning h-60 w-60 d-flex-center b-r-100">
                                                                         <i class="ti ti-presentation f-s-26"></i>
@@ -155,7 +155,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="d-flex-center text-center">
-                                                                <a href="{{ route('invoice') }}">
+                                                                <a href="#">
                                                                     <span
                                                                         class="text-light-secondary h-60 w-60 d-flex-center b-r-100">
                                                                         <i class="ti ti-file-dollar f-s-26"></i>
@@ -207,7 +207,7 @@
                                                                     class="h-50 me-2 bg-light-secondary p-1 b-r-100">
                                                                 <div class="flex-grow-1">
                                                                     <a class="mb-0 text-dark f-w-500"
-                                                                        href="{{ route('product_details') }}">
+                                                                        href="#">
                                                                         Headphone
                                                                     </a>
                                                                     <p class="text-muted">$95 x 2</p>
@@ -232,7 +232,7 @@
                                                                     class="h-50 object-fit-cover me-2 bg-light-dark p-1 b-r-100">
                                                                 <div class="flex-grow-1">
                                                                     <a class="mb-0 text-dark f-w-500"
-                                                                        href="{{ route('product_details') }}"> Smart
+                                                                        href="#"> Smart
                                                                         Watch</a>
                                                                     <p class="text-muted">$50.00</p>
                                                                 </div>
@@ -256,7 +256,7 @@
                                                                     class="h-50 object-fit-cover me-2 bg-light-dark p-1 b-r-100">
                                                                 <div class="flex-grow-1">
                                                                     <a class="mb-0 text-dark f-w-500"
-                                                                        href="{{ route('product_details') }}">Shoes
+                                                                        href="#">Shoes
                                                                         Black</a>
                                                                     <p class="text-muted">$150.00</p>
                                                                 </div>
@@ -281,7 +281,7 @@
                                                                     class="h-50 object-fit-cover me-2 bg-light-dark p-1 b-r-100">
                                                                 <div class="flex-grow-1">
                                                                     <a class="mb-0 text-dark f-w-500"
-                                                                        href="{{ route('product_details') }}"> Sports
+                                                                        href="#"> Sports
                                                                         shoes</a>
                                                                     <p class="text-muted">$200.00</p>
                                                                 </div>
@@ -309,7 +309,7 @@
                                                                     <p class="text-secondary mb-0">Add some items :)
                                                                     </p>
                                                                     <a class="btn btn-light-primary btn-xs mt-2"
-                                                                        href="{{ route('product_details') }}">Shop
+                                                                        href="#">Shop
                                                                         Now</a>
                                                                 </div>
                                                             </div>
@@ -466,7 +466,7 @@
 
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('profile') }}">
+                                                    <a class="dropdown-item" href="#">
                                                         <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Detaiils
                                                     </a>
                                                 </li>
@@ -488,14 +488,14 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('pricing') }}">
+                                                    <a class="dropdown-item" href="#">
                                                         <i class="ti ti-currency-dollar pe-1 f-s-18"></i> Pricing
                                                     </a>
                                                 </li>
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li class="btn-light-danger b-r-5">
                                                     <a class="dropdown-item mb-0 text-danger"
-                                                        href="{{ route('sign_in') }}">
+                                                        href="#">
                                                         <i class="ti ti-logout pe-1 f-s-18 text-danger"></i> Log Out
                                                     </a>
                                                 </li>
