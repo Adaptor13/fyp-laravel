@@ -20,5 +20,7 @@ Route::get('/sign_up', [AuthController::class, 'signUp'])->name('sign_up');
 
 
 //Admins
-Route::get('/', [AdminController::class, 'index'])->name('admin_index');
+Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
 
+//Users
+Route::get('/',[UserController::class, 'landing'])->name('landing');

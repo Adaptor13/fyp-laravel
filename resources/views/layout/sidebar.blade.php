@@ -2,19 +2,20 @@
 <nav class="dark-sidebar">
     <div class="app-logo">
         <a class="logo d-inline-block" href="#">
-            <img src="{{asset('../assets/images/logo/dark.png')}}" alt="#" class="dark-logo">
-            <img src="{{asset('../assets/images/logo/1.png')}}" alt="#" class="light-logo">
+            <img src="{{ asset('../assets/images/logo/dark.png') }}" alt="#" class="dark-logo">
+            <img src="{{ asset('../assets/images/logo/1.png') }}" alt="#" class="light-logo">
         </a>
 
         <span class="bg-light-light toggle-semi-nav">
-          <i class="ti ti-chevrons-right f-s-20"></i>
+            <i class="ti ti-chevrons-right f-s-20"></i>
         </span>
     </div>
-    <div class="app-nav" id="app-simple-bar">
+    {{-- <div class="app-nav" id="app-simple-bar"> --}}
         {{-- <ul class="main-nav p-0 mt-2">
             <li class="menu-title">
-                <span>dashboard</span>
+                <span>Dashboard</span>
             </li>
+
             <li>
                 <a class="" data-bs-toggle="collapse" href="#dashboard" aria-expanded="false">
                 <i class="ti ti-home"></i>
@@ -22,35 +23,65 @@
                     <span class="badge text-bg-success badge-notification ms-2">4</span>
                 </a>
                 <ul class="collapse" id="dashboard">
-                    <li><a href="{{ route('index') }}">Analytics</a></li>
-                    <li><a href="{{ route('project_dashboard') }}">Project</a></li>
-                    <li><a href="{{ route('ecommerce_dashboard') }}">Ecommerce</a></li>
-                    <li><a href="{{ route('education_dashboard') }}">Education</a></li>
+                    <li><a href="">Analytics</a></li>
+                    <li><a href="">Project</a></li>
+                    <li><a href="">Ecommerce</a></li>
+                    <li><a href="">Education</a></li>
                 </ul>
             </li>
+
             <li>
                 <a class="" data-bs-toggle="collapse" href="#apps" aria-expanded="false">
                 <i class="ti ti-server"></i>
                     Apps
                 </a>
                 <ul class="collapse" id="apps">
-                    <li><a href="{{route('calendar')}}">Calender</a></li>
-                    <li><a href="{{route('invoice')}}">Invoice</a></li>
-                    <li><a href="{{route('kanban_board')}}">Kanban board</a></li>
-                    <li><a href="{{route('profile')}}">Profile</a></li>
-                    <li><a href="{{route('timeline')}}">Timeline</a></li>
-                    <li><a href="{{route('faq')}}">FAQ</a></li>
-                    <li><a href="{{route('pricing')}}">Pricing</a></li>
-                    <li><a href="{{route('gallery')}}">Gallery</a></li>
-                    <li><a href="{{route('team')}}">Team</a></li>
-                    <li><a href="{{route('chat')}}">Chat</a></li>
+                    <li><a href="">Calender</a></li>
+                    <li><a href="">Invoice</a></li>
+                    <li><a href="">Kanban board</a></li>
+                    <li><a href="">Profile</a></li>
+                    <li><a href="">Timeline</a></li>
+                    <li><a href="">FAQ</a></li>
+                    <li><a href="">Pricing</a></li>
+                    <li><a href="">Gallery</a></li>
+                    <li><a href="">Team</a></li>
+                    <li><a href="">Chat</a></li>
                     <li class="another-level">
                         <a class="" data-bs-toggle="collapse" href="#email-page" aria-expanded="false">
                             Email Page
                         </a>
                         <ul class="collapse" id="email-page">
-                            <li><a href="{{route('email')}}"> Email</a></li>
-                            <li><a href="{{route('read_email')}}">Read Email</a></li>
+                            <li><a href=""> Email</a></li>
+                            <li><a href="">Read Email</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+            </li>
+
+            <li>
+                <a class="" data-bs-toggle="collapse" href="#apps" aria-expanded="false">
+                <i class="ti ti-server"></i>
+                    Apps
+                </a>
+                <ul class="collapse" id="apps">
+                    <li><a href="">Calender</a></li>
+                    <li><a href="">Invoice</a></li>
+                    <li><a href="">Kanban board</a></li>
+                    <li><a href="">Profile</a></li>
+                    <li><a href="">Timeline</a></li>
+                    <li><a href="">FAQ</a></li>
+                    <li><a href="">Pricing</a></li>
+                    <li><a href="">Gallery</a></li>
+                    <li><a href="">Team</a></li>
+                    <li><a href="">Chat</a></li>
+                    <li class="another-level">
+                        <a class="" data-bs-toggle="collapse" href="#email-page" aria-expanded="false">
+                            Email Page
+                        </a>
+                        <ul class="collapse" id="email-page">
+                            <li><a href=""> Email</a></li>
+                            <li><a href="">Read Email</a></li>
                         </ul>
                     </li>
                     <li class="another-level">
@@ -92,6 +123,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="no-sub">
                 <a class="" href="{{route('widget')}}">
                 <i class="ti ti-chart-treemap"></i> Widgets
@@ -349,12 +381,40 @@
 
             <li class="no-sub">
                 <a class="" href="mailto:teqlathemes@gmail.com.">
-                <i class="ti ti-headset"></i> Support
+                    <i class="ti ti-headset"></i> Support
                 </a>
             </li>
 
 
         </ul> --}}
+    {{-- </div> --}}
+
+    <div class="app-nav" id="app-simple-bar">
+        <ul class="main-nav p-0 mt-2">
+            <li class="menu-title">
+                <span>Dashboard</span>
+            </li>
+            <li>
+                <a class="" data-bs-toggle="collapse" href="#caseManagement" aria-expanded="false">
+                    <i class="ti ti-settings"></i>
+                    Cases
+                </a>
+                <ul class="collapse" id="caseManagement">
+                    <li><a href="#">View Cases</a></li>
+                    <li><a href="#">Case History</a></li>
+                </ul>
+            </li>
+            <li>
+                <a class="" data-bs-toggle="collapse" href="#userManagement" aria-expanded="false">
+                    <i class="ti ti-settings"></i>
+                    Users
+                </a>
+                <ul class="collapse" id="userManagement">
+                    <li><a href="#">Manage User</a></li>
+                    <li><a href="#">Case History</a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
 
     <div class="menu-navs">

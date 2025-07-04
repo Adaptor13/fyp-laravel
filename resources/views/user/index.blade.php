@@ -1,1 +1,0 @@
-<th>user here</th>

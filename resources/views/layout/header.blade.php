@@ -51,7 +51,7 @@
                                         </div>
                                     </li>
 
-                                    <li class="header-language">
+                                    {{-- <li class="header-language">
                                         <div id="lang_selector" class="flex-shrink-0 dropdown">
                                             <a href="#" class="d-block head-icon ps-0" data-bs-toggle="dropdown"
                                                 aria-expanded="false">
@@ -80,7 +80,7 @@
                                                     <span class="d-flex align-items-center">
                                                         <i
                                                             class="flag-icon flag-icon-fra flag-icon-squared b-r-50 f-s-22"></i>
-                                                        <span class="ps-2 text-secondary">Fracnce</span>
+                                                        <span class="ps-2 text-secondary">France</span>
                                                     </span>
                                                 </li>
                                                 <li class="lang lang-es dropdown-item p-2" title="UK">
@@ -100,16 +100,15 @@
                                             </ul>
                                         </div>
 
-                                    </li>
+                                    </li> --}}
 
-                                    <li class="header-apps">
+                                    {{-- <li class="header-apps">
                                         <div class="flex-shrink-0 app-dropdown">
                                             <a href="#" class="d-block head-icon" data-bs-toggle="dropdown"
                                                 data-bs-auto-close="true" aria-expanded="false">
                                                 <i class="ti ti-apps"></i>
                                             </a>
-                                            <div
-                                                class="dropdown-menu headerapp-dropdown dropdown-menu-center bg-transparent border-0">
+                                            <div class="dropdown-menu headerapp-dropdown dropdown-menu-center bg-transparent border-0">
                                                 <div class="card">
                                                     <div class="card-header bg-primary">
                                                         <h5 class="text-white">Shortcut
@@ -182,9 +181,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </li>
+                                    </li> --}}
 
-                                    <li class="header-cart d-none d-sm-block">
+                                    {{-- <li class="header-cart d-none d-sm-block">
                                         <div class="flex-shrink-0 app-dropdown">
                                             <a href="#" class="d-block head-icon position-relative"
                                                 data-bs-toggle="dropdown" data-bs-auto-close="outside"
@@ -327,7 +326,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </li>
+                                    </li> --}}
 
                                     <li class="header-dark head-icon">
                                         <div class="sun-logo">

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function landing()
     {
-        return view('user.index');
+        return view('user.landing');
     }
 }
