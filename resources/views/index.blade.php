@@ -723,7 +723,7 @@
 </div>
 
 <!-- modal -->
-<div class="modal" tabindex="-1" id="welcomeCard" data-bs-backdrop="static">
+{{-- <div class="modal" tabindex="-1" id="welcomeCard" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content welcome-image">
 
@@ -771,7 +771,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection
 
 @section('script')

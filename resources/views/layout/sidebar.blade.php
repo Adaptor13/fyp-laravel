@@ -10,8 +10,8 @@
           <i class="ti ti-chevrons-right f-s-20"></i>
         </span>
     </div>
-    {{-- <div class="app-nav" id="app-simple-bar">
-        <ul class="main-nav p-0 mt-2">
+    <div class="app-nav" id="app-simple-bar">
+        {{-- <ul class="main-nav p-0 mt-2">
             <li class="menu-title">
                 <span>dashboard</span>
             </li>
@@ -354,8 +354,8 @@
             </li>
 
 
-        </ul>
-    </div> --}}
+        </ul> --}}
+    </div>
 
     <div class="menu-navs">
         <span class="menu-previous"><i class="ti ti-chevron-left"></i></span>
