@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LandingController;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+
 use App\Http\Controllers\AdminController;
 
 
@@ -22,5 +24,7 @@ Route::get('/sign_up', [AuthController::class, 'signUp'])->name('sign_up');
 //Admins
 Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
 
-//Users
-Route::get('/',[UserController::class, 'landing'])->name('landing');
+//Landing Page
+Route::get('/',[LandingController::class, 'landing'])->name('landing');
+Route::get('/report',[LandingController::class, 'report'])->name('report');
+
