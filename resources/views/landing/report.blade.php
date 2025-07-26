@@ -1,6 +1,6 @@
 @extends('layout.landing')
 
-@section('title', 'Report Abuse | SinDA')
+@section('title', 'Report')
 
 @section('content')
     <div class="col-12 col-md-10 col-lg-8 mx-auto my-4">

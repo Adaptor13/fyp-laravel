@@ -1,6 +1,6 @@
 @extends('layout.landing')
 
-@section('title', 'Landing | SinDA')
+@section('title', 'Landing')
 
 @section('content')
     
@@ -15,7 +15,7 @@
 
                             <!-- Action buttons -->
                             <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
-                                <a href="/report" class="btn btn-light btn-lg px-4">Report Anonymously</a>
+                                <a href="{{ route('report') }}" class="btn btn-light btn-lg px-4">Report Anonymously</a>
                                 <a href="/sign_in" class="btn btn-outline-light btn-lg px-4">Login to Track My Report</a>
                             </div>
                         </div>

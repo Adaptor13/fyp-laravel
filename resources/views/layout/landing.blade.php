@@ -5,7 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Landing |SinDa</title>
+        <title>@yield('title') | SinDA</title>
+        <link rel="icon" href="{{('../assets/images/logo/sinda01.png')}}" type="image/x-icon">
+        <link rel="shortcut icon" href="{{('../assets/images/logo/sinda01.png')}}" type="image/x-icon">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /> 
         <link href="{{ asset('assets/css/userstyles.css') }}" rel="stylesheet" rel="stylesheet">
     </head>
@@ -13,7 +15,9 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" href="/">SinDa</a>
+                <a class="navbar-brand" href="{{ route('landing') }}">
+                    <img src="{{ asset('assets/images/logo/sinda.png') }}" alt="SinDa" class="img-fluid" style="max-height: 40px;">
+                </a>
 
                 <!-- Hamburger toggle button for mobile -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
@@ -24,26 +28,27 @@
                 <!-- Collapsible menu -->
                 <div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
                     <ul class="navbar-nav w-100 text-center text-lg-start justify-content-lg-end">
-                        <li class="nav-item border-bottom">
-                            <a class="nav-link py-2" href="#about">About</a>
+
+                        @if (!request()->routeIs('report'))
+                            <li class="nav-item border-bottom me-3">
+                                <a class="nav-link py-2" href="#about">About</a>
+                            </li>
+                            <li class="nav-item border-bottom me-3">
+                                <a class="nav-link py-2" href="#how-it-works">How It Works</a>
+                            </li>
+                        @endif
+
+                        <li class="nav-item border-bottom me-3">
+                            <a class="nav-link py-2" href="{{ route('report') }}">Report</a>
                         </li>
-                        <li class="nav-item border-bottom">
-                            <a class="nav-link py-2" href="#how-it-works">How It Works</a>
+
+                        <li class="nav-item border-bottom me-3">
+                            <a class="nav-link py-2  fw-bold" href="{{ route('sign_in') }}">Login</a>
                         </li>
-                        <li class="nav-item border-bottom">
-                            <a class="nav-link py-2" href="#report">Report Abuse</a>
-                        </li>
-                        <li class="nav-item border-bottom">
-                            <a class="nav-link py-2 text-primary fw-bold" href="/sign_in">Login</a>
-                        </li>
-                            <li class="nav-item">
-                            <!-- Uncomment one of the below lines based on your need -->
-                            
+                        <li class="nav-item">
                             <!-- For guest (default) -->
                             <span class="nav-link text-muted">(Guest)</span>
                             
-                            <!-- For static logged-in email simulation -->
-                            <!-- <a class="nav-link fw-semibold text-primary text-decoration-underline" href="/profile">justin@example.com</a> -->
                         </li>
                     </ul>
                 </div>
@@ -67,7 +72,7 @@
                             <li class="list-inline-item">⋅</li>
                             <li class="list-inline-item"><a href="#!">Privacy Policy</a></li>
                         </ul>
-                        <p class="text-muted small mb-4 mb-lg-0">&copy; Your Website 2023. All Rights Reserved.</p>
+                        <p class="text-muted small mb-4 mb-lg-0">&copy; SinDa 2025. All Rights Reserved.</p>
                     </div>
                     <div class="col-lg-6 h-100 text-center text-lg-end my-auto">
                         <ul class="list-inline mb-0">
