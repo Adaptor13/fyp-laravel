@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ReportController;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 
 
@@ -27,4 +28,4 @@ Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
 //Landing Page
 Route::get('/',[LandingController::class, 'landing'])->name('landing');
 Route::get('/report',[LandingController::class, 'report'])->name('report');
-
+Route::post('/report', [ReportController::class, 'store'])->name('report.store');

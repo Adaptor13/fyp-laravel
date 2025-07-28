@@ -22,7 +22,7 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="mb-5 text-center text-lg-start">
-                                                <h2 class="text-primary f-w-600">Welcome To SentraDx! </h2>
+                                                <h2 class="text-primary f-w-600">Welcome To SinDa! </h2>
                                                 <p>Sign in with your data that you entered during your registration.</p>
                                             </div>
                                         </div>
@@ -62,10 +62,11 @@
                                                     class="link-primary text-decoration-underline"> Sign up</a>
                                             </div>
                                         </div>
-                                        <div class="app-divider-v justify-content-center">
+
+                                        {{-- <div class="app-divider-v justify-content-center">
                                             <p>Or sign in with</p>
-                                        </div>
-                                        <div class="col-12">
+                                        </div> --}}
+                                        {{-- <div class="col-12">
                                             <div class="text-center">
                                                 <button type="button" class="btn btn-facebook icon-btn b-r-22 m-1"><i
                                                         class="ti ti-brand-facebook text-white"></i></button>
@@ -74,7 +75,7 @@
                                                 <button type="button" class="btn btn-github icon-btn b-r-22 m-1"><i
                                                         class="ti ti-brand-github text-white"></i></button>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </form>
                             </div>

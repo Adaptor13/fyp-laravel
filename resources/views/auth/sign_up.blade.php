@@ -26,39 +26,38 @@
                                                 <p>Get Started For Free Today!</p>
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="username" class="form-label">Username</label>
-                                                <input type="text" class="form-control"
-                                                    placeholder="Enter Your Username" id="username" required>
+                                                <input type="text" class="form-control" placeholder="Enter Your Username" id="username" required>
+                                                   
                                             </div>
                                         </div>
+                                        
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="username" class="form-label">Email</label>
-                                                <input type="email" class="form-control"
-                                                    placeholder="Enter Your Email" id="email" required>
+                                                <input type="email" class="form-control" placeholder="Enter Your Email" id="email" required>
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Password</label>
-                                                <input type="password" class="form-control"
-                                                    placeholder="Enter Your Password" id="password" required>
+                                                <input type="password" class="form-control" placeholder="Enter Your Password" id="password" required>
+                                                   
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Confirm Password</label>
-                                                <input type="password" class="form-control"
-                                                    placeholder="Enter Your Password" id="password1" required>
+                                                <input type="password" class="form-control" placeholder="Enter Your Password" id="password1" required>
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <div class="d-flex justify-content-between gap-3">
                                                 <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="checkDefault">
+                                                    <input class="form-check-input" type="checkbox" value="" id="checkDefault">
                                                     <label class="form-check-label text-secondary" for="checkDefault">
                                                         Accept Terms & Conditions
                                                     </label>
@@ -78,9 +77,11 @@
                                                     Sign in</a>
                                             </div>
                                         </div>
+
                                         <div class="app-divider-v justify-content-center">
                                             <p>Or sign up with</p>
                                         </div>
+                                        
                                         <div class="col-12">
                                             <div class="text-center">
                                                 <button type="button" class="btn btn-facebook icon-btn b-r-22 m-1"><i
@@ -91,6 +92,7 @@
                                                         class="ti ti-brand-github text-white"></i></button>
                                             </div>
                                         </div>
+
                                     </div>
                                 </form>
                             </div>
