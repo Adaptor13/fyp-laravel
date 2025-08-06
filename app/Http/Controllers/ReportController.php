@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -34,6 +35,9 @@ class ReportController extends Controller
         }
 
         Report::create([
+            'id' => Str::uuid(), // Generate UUID
+            'user_id' => auth()->check() ? auth()->id() : null, // Link if logged in
+
             'reporter_name' => $validated['reporter_name'] ?? null,
             'reporter_email' => $validated['reporter_email'] ?? null,
             'reporter_phone' => $validated['reporter_phone'] ?? null,
@@ -46,6 +50,10 @@ class ReportController extends Controller
             'suspected_abuser' => $validated['suspected_abuser'] ?? null,
             'evidence' => json_encode($filePaths),
             'confirmed_truth' => true,
+
+            // Optional: tracking defaults
+            'report_status' => 'Submitted',
+            'priority_level' => 'Medium',
         ]);
 
         return redirect()->back()->with('success', 'Your report has been submitted successfully.');

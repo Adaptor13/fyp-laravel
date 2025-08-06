@@ -78,7 +78,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="app-divider-v justify-content-center">
+                                        {{-- <div class="app-divider-v justify-content-center">
                                             <p>Or sign up with</p>
                                         </div>
                                         
@@ -91,7 +91,7 @@
                                                 <button type="button" class="btn btn-github icon-btn b-r-22 m-1"><i
                                                         class="ti ti-brand-github text-white"></i></button>
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                     </div>
                                 </form>

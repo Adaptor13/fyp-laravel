@@ -10,9 +10,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+
+            // Optional link to a registered user (null for guests)
+            $table->uuid('user_id')->nullable(); 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+
             $table->string('reporter_name')->nullable();
-            $table->string('reporter_email')->nullable();
+            $table->string('reporter_aaemail')->nullable();
             $table->string('reporter_phone')->nullable();
 
             $table->string('victim_age')->nullable();
@@ -36,6 +41,7 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
     }
 
     /**
