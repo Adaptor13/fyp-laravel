@@ -18,7 +18,9 @@
                         </div>
                         <div class="col-lg-5 col-xl-4 p-0 bg-white">
                             <div class="form-container">
-                                <form class="app-form">
+                                <form class="register-form" method="POST" action="{{ route('register') }}">
+                                    @csrf
+
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="mb-5 text-center text-lg-start">
@@ -30,54 +32,57 @@
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="username" class="form-label">Username</label>
-                                                <input type="text" class="form-control" placeholder="Enter Your Username" id="username" required>
-                                                   
+                                                <input type="text" class="form-control" name="name" id="username" placeholder="Enter Your Username" value="{{ old('name') }}" required>
+                                                @error('name') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <label for="username" class="form-label">Email</label>
-                                                <input type="email" class="form-control" placeholder="Enter Your Email" id="email" required>
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Your Email" value="{{ old('email') }}" required>
+                                                @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Password</label>
-                                                <input type="password" class="form-control" placeholder="Enter Your Password" id="password" required>
-                                                   
+                                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter Your Password" required>
+                                                @error('password') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <label for="password" class="form-label">Confirm Password</label>
-                                                <input type="password" class="form-control" placeholder="Enter Your Password" id="password1" required>
+                                                <label for="password1" class="form-label">Confirm Password</label>
+                                                <input type="password" class="form-control" name="password_confirmation" id="password1" placeholder="Confirm Your Password" required>
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="d-flex justify-content-between gap-3">
                                                 <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="checkbox" value="" id="checkDefault">
+                                                    <input class="form-check-input" type="checkbox" id="checkDefault" required>
                                                     <label class="form-check-label text-secondary" for="checkDefault">
                                                         Accept Terms & Conditions
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <a href="" role="button" class="btn btn-primary w-100">Sign
-                                                    Up</a>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="text-center text-lg-start">
-                                                Already Have A Account? <a href="{{ route('sign_in') }}"
-                                                    class="link-primary text-decoration-underline">
-                                                    Sign in</a>
+                                                <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                                             </div>
                                         </div>
 
+                                        <div class="col-12">
+                                            <div class="text-center text-lg-start">
+                                                Already Have An Account? <a href="{{ route('sign_in') }}" class="link-primary text-decoration-underline">
+                                                    Sign in</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

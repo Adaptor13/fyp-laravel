@@ -20,6 +20,10 @@ use App\Http\Controllers\AdminController;
 //Authentication
 Route::get('/sign_in', [AuthController::class, 'signIn'])->name('sign_in');
 Route::get('/sign_up', [AuthController::class, 'signUp'])->name('sign_up');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 
 //Admins

@@ -18,65 +18,62 @@
                         </div>
                         <div class="col-lg-5 col-xl-4 p-0 bg-white">
                             <div class="form-container">
-                                <form class="app-form needs-validation" novalidate>
+                                <form class="login-form" method="POST" action="{{ route('login') }}">
+                                    @csrf
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="mb-5 text-center text-lg-start">
-                                                <h2 class="text-primary f-w-600">Welcome To SinDa! </h2>
-                                                <p>Sign in with your data that you entered during your registration.</p>
+                                                <h2 class="text-primary f-w-600">Welcome Back to SinDa!</h2>
+                                                <p>Sign in with your credentials below.</p>
+                                                    @if(session('success'))
+                                                        <div id="session-alert" class="alert alert-success">
+                                                            {{ session('success') }}
+                                                        </div>
+                                                    @endif
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>
-                                                <input type="email" class="form-control" placeholder="Enter Your Email" id="email">
+                                                <input type="email" class="form-control @error('email') is-invalid @enderror"name="email" id="email" placeholder="Enter Your Email"value="{{ old('email') }}" required>
+                                                @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Password</label>
-                                                <a href="" class="link-primary float-end">Forgot Password ?</a>
-                                                <input type="password" class="form-control"
-                                                    placeholder="Enter Your Password" id="password">
+                                                <a href="" class="link-primary float-end">Forgot Password?</a>
+                                                <input type="password" class="form-control @error('password') is-invalid @enderror"name="password" id="password" placeholder="Enter Your Password" required>
+                                                @error('password') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="form-check mb-3">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="checkDefault">
-                                                <label class="form-check-label text-secondary" for="checkDefault">
+                                                <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                                                <label class="form-check-label text-secondary" for="remember">
                                                     Remember me
                                                 </label>
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <a href="{{ route('admin_index') }}" role="button" class="btn btn-primary w-100">Sign In</a>
-                                                    
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="text-center text-lg-start">
-                                                Don't Have Your Account yet? <a href="{{ route('sign_up') }}"
-                                                    class="link-primary text-decoration-underline"> Sign up</a>
+                                                <button type="submit" class="btn btn-primary w-100">Sign In</button>
                                             </div>
                                         </div>
 
-                                        {{-- <div class="app-divider-v justify-content-center">
-                                            <p>Or sign in with</p>
-                                        </div> --}}
-                                        {{-- <div class="col-12">
-                                            <div class="text-center">
-                                                <button type="button" class="btn btn-facebook icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-facebook text-white"></i></button>
-                                                <button type="button" class="btn btn-gmail icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-google text-white"></i></button>
-                                                <button type="button" class="btn btn-github icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-github text-white"></i></button>
+                                        <div class="col-12">
+                                            <div class="text-center text-lg-start">
+                                                Don’t Have an Account?
+                                                <a href="{{ route('sign_up') }}" class="link-primary text-decoration-underline">Sign Up</a>
                                             </div>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                 </form>
+
                             </div>
                         </div>
                     </div>
@@ -94,5 +91,22 @@
     <!-- Bootstrap js-->
     <script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/formvalidation.js') }}"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alertBox = document.getElementById('session-alert');
+        if (alertBox) {
+            setTimeout(() => {
+                alertBox.classList.add('fade');
+                alertBox.style.transition = 'opacity 0.5s ease-out';
+                alertBox.style.opacity = '0';
+                setTimeout(() => {
+                    alertBox.remove();
+                }, 500);
+            }, 3000); // 3 seconds before it fades
+        }
+    });
+</script>
+
 
 @endsection
