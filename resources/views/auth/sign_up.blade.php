@@ -78,21 +78,6 @@
                                             </div>
                                         </div>
 
-                                        {{-- <div class="app-divider-v justify-content-center">
-                                            <p>Or sign up with</p>
-                                        </div>
-                                        
-                                        <div class="col-12">
-                                            <div class="text-center">
-                                                <button type="button" class="btn btn-facebook icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-facebook text-white"></i></button>
-                                                <button type="button" class="btn btn-gmail icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-google text-white"></i></button>
-                                                <button type="button" class="btn btn-github icon-btn b-r-22 m-1"><i
-                                                        class="ti ti-brand-github text-white"></i></button>
-                                            </div>
-                                        </div> --}}
-
                                     </div>
                                 </form>
                             </div>

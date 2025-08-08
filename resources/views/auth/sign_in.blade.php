@@ -29,8 +29,7 @@
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>
-                                                <input type="email" class="form-control"
-                                                    placeholder="Enter Your Email" id="email">
+                                                <input type="email" class="form-control" placeholder="Enter Your Email" id="email">
                                             </div>
                                         </div>
                                         <div class="col-12">
