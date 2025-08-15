@@ -58,34 +58,48 @@ class AuthController extends Controller
             'password.required' => 'Password is required.',
         ]);
 
-        $remember = $request->has('remember'); 
+        $remember = $request->has('remember'); // Remember Me checkbox
 
+        // Attempt login
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
-            $request->session()->regenerate();
+            $request->session()->regenerate(); // Prevent session fixation
 
-            $role = Auth::user()->role->name;
+            // Store role in session for quick access (optional)
+            session(['role' => Auth::user()->role->name]);
 
+            // Redirect based on role
             if (Auth::user()->role->name === 'public_user') {
-                return redirect()->route('landing');
+        // dd(Auth::check(), Auth::user());
+
+                return redirect()->route('landing'); // Public user homepage
             }
 
-            return redirect()->route('admin_index');
+            return redirect()->route('admin_index'); // Admin dashboard
         }
-
+        // If login fails
         return back()->withErrors([
-            'email' => 'Invalid login credentials.',
-        ])->onlyInput('email');
+            'email' => 'The provided credentials do not match our records.',
+        ])->withInput();
     }
 
     public function logout(Request $request)
     {
+        // Get the role before logging out
+        $role = Auth::check() ? Auth::user()->role->name : null;
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('sign_in');
+        // Redirect based on role
+        if ($role === 'public_user') {
+            return redirect()->route('landing');
+        } else {
+            return redirect()->route('sign_in');
+        }
     }
+
 
 
 

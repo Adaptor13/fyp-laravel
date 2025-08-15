@@ -15,10 +15,12 @@ class RoleSeeder extends Seeder
             'law_enforcement',
             'gov_official',
             'healthcare',
+            'admin',
         ];
 
-        foreach ($roles as $role) {
-            Role::create(['name' => $role]);
+       foreach ($roles as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
         }
+
     }
 }

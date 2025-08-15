@@ -21,18 +21,25 @@
                                 <form class="login-form" method="POST" action="{{ route('login') }}">
                                     @csrf
                                     <div class="row">
+                                        @if(session('success'))
+                                        <div id="session-alert" class="alert alert-success">
+                                            {{ session('success') }}
+                                        </div>
+                                        @endif
                                         <div class="col-12">
+                                            <div class="mb-3">
+                                                <a href="{{ route('landing') }}" class="link-primary">
+                                                    ← Back to Home
+                                                </a>
+                                            </div>
+
                                             <div class="mb-5 text-center text-lg-start">
                                                 <h2 class="text-primary f-w-600">Welcome Back to SinDa!</h2>
                                                 <p>Sign in with your credentials below.</p>
-                                                    @if(session('success'))
-                                                        <div id="session-alert" class="alert alert-success">
-                                                            {{ session('success') }}
-                                                        </div>
-                                                    @endif
+                                                    
                                             </div>
                                         </div>
-
+                                        
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>

@@ -19,7 +19,6 @@
                     <img src="{{ asset('assets/images/logo/sinda.png') }}" alt="SinDa" class="img-fluid" style="max-height: 40px;">
                 </a>
 
-                <!-- Hamburger toggle button for mobile -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                     aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -29,7 +28,8 @@
                 <div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
                     <ul class="navbar-nav w-100 text-center text-lg-start justify-content-lg-end">
 
-                        @if (!request()->routeIs('report'))
+                        @if (!request()->routeIs('report') && !request()->routeIs('profile.edit'))
+
                             <li class="nav-item border-bottom me-3">
                                 <a class="nav-link py-2" href="#about">About</a>
                             </li>
@@ -43,15 +43,34 @@
                         </li>
 
                         <li class="nav-item border-bottom me-3">
-                            <a class="nav-link py-2  fw-bold" href="{{ route('sign_in') }}">Login</a>
+                            @auth
+                                <a class="nav-link py-2 fw-bold" href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    Logout
+                                </a>
+                            @else
+                                <a class="nav-link py-2 fw-bold" href="{{ route('sign_in') }}">Login</a>
+                            @endauth
                         </li>
+
+                        {{-- User email -> Profile, or Guest --}}
                         <li class="nav-item">
-                            <!-- For guest (default) -->
-                            <span class="nav-link text-muted">(Guest)</span>
-                            
+                            @auth
+                                <a class="nav-link text-success" href="{{ route('profile.edit') }}">
+                                    ({{ Auth::user()->email }})
+                                </a>
+                            @else
+                                <span class="nav-link text-muted">(Guest)</span>
+                            @endauth
                         </li>
+
+                        {{-- Hidden logout form --}}
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+                            @csrf
+                        </form>
                     </ul>
                 </div>
+
 
             </div>
         </nav>
@@ -91,9 +110,24 @@
             </div>
         </footer>
 
-        <!-- Bootstrap core JS-->
+        <!-- Bootstrap core JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- jQuery (needed for mask plugin) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+        <!-- jQuery Mask Plugin -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+        <!-- Your site scripts -->
         <script src="js/scripts.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $('#phone').mask('000-000-0000');
+            });
+        </script>
+
     </body>
 
 <html>

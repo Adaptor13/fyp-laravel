@@ -53,4 +53,41 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+       public function profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id', 'id');
+    }
+
+    // Public user profile (public_user_profiles.user_id)
+    public function publicUserProfile()
+    {
+        return $this->hasOne(PublicUserProfile::class, 'user_id', 'id');
+    }
+
+    // Social worker profile (social_worker_profiles.user_id)
+    public function socialWorkerProfile()
+    {
+        return $this->hasOne(SocialWorkerProfile::class, 'user_id', 'id');
+    }
+
+    // Healthcare profile (healthcare_profiles.user_id)
+    public function healthcareProfile()
+    {
+        return $this->hasOne(HealthcareProfile::class, 'user_id', 'id');
+    }
+
+    // Law enforcement profile (law_enforcement_profiles.user_id)
+    public function lawEnforcementProfile()
+    {
+        return $this->hasOne(LawEnforcementProfile::class, 'user_id', 'id');
+    }
+
+    // Government official profile (gov_official_profiles.user_id)
+    public function govOfficialProfile()
+    {
+        return $this->hasOne(GovOfficialProfile::class, 'user_id', 'id');
+    }
+
+
 }

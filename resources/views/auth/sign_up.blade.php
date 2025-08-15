@@ -23,6 +23,11 @@
 
                                     <div class="row">
                                         <div class="col-12">
+                                            <div class="mb-3">
+                                                <a href="{{ route('landing') }}" class="link-primary">
+                                                    ← Back to Home
+                                                </a>
+                                            </div>
                                             <div class="mb-5 text-center text-lg-start">
                                                 <h2 class="text-primary f-w-600">Create Account</h2>
                                                 <p>Get Started For Free Today!</p>
