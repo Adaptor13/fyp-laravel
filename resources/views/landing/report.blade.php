@@ -35,25 +35,32 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="reporter_name" class="form-label">Your Name (Optional)</label>
-                                <input type="text" name="reporter_name" id="reporter_name" class="form-control" placeholder="Enter Your Name">
+                                <input type="text"name="reporter_name"id="reporter_name" class="form-control"placeholder="Enter Your Name" value="{{ old('reporter_name', $prefillName) }}" >
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="reporter_email" class="form-label">Your Email (Optional)</label>
-                                <input type="email" name="reporter_email" id="reporter_email" class="form-control" placeholder="Enter Your Email">
+                               <input type="email" name="reporter_email" id="reporter_email" class="form-control" placeholder="Enter Your Email" value="{{ old('reporter_email', $prefillEmail) }}" {{ $readonlyEmail ? 'readonly' : '' }}>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="reporter_phone" class="form-label">Your Contact Number (Optional)</label>
-                                <input type="tel" name="reporter_phone" id="reporter_phone" class="form-control" placeholder="Enter Your Phone">
+                                <input
+  type="tel"
+  name="reporter_phone"
+  id="reporter_phone"
+  class="form-control"
+  placeholder="Enter Your Phone"
+  value="{{ old('reporter_phone', $prefillPhone) }}"
+  {{ $readonlyPhone ? 'readonly' : '' }}
+>
                             </div>
                         </div>
 
-                        <!-- Victim Information -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="victim_age" class="form-label">Victim's Approximate Age</label>
@@ -73,7 +80,6 @@
                             </div>
                         </div>
 
-                        <!-- Incident Details -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="abuse_types" class="form-label">Type of Abuse</label>

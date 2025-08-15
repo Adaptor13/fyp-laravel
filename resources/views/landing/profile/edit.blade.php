@@ -44,7 +44,14 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
-                                <input name="phone"  class="form-control" id="phone" value="{{ old('phone', $user->profile && $user->profile->phone ? preg_replace('/(\d{3})(\d{3})(\d{4})/', '$1-$2-$3', $user->profile->phone) : '') }}">
+                                <input
+  type="tel"
+  name="reporter_phone"
+  id="reporter_phone"
+  class="form-control"
+  placeholder="Enter Your Phone"
+  value="{{ old('reporter_phone', $prefillPhone) }}"
+>
                             </div>
 
                             <div class="mb-3">
@@ -67,7 +74,7 @@
                                     <label class="form-label">Postcode</label>
                                     <input name="postcode" inputmode="numeric" pattern="\d{5}" maxlength="5" class="form-control" value="{{ old('postcode', $user->profile->postcode ?? '') }}">
                                 </div>
-                                
+
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">State</label>
                                     @php

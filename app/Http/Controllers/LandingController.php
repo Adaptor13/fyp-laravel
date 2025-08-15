@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LandingController extends Controller
 {
@@ -12,9 +13,35 @@ class LandingController extends Controller
     }
 
     public function report()
-    {
-        return view('landing.report');
+{
+    $prefillName   = null;
+    $prefillEmail  = null;
+    $prefillPhone  = null;
+
+    $readonlyEmail = false;
+    $readonlyPhone = false; // define it here
+
+    if (Auth::check()) {
+        $user = Auth::user()->loadMissing('publicUserProfile', 'profile');
+
+        $prefillName  = optional($user->publicUserProfile)->display_name ?: $user->name;
+        $prefillEmail = $user->email;
+        $prefillPhone = optional($user->profile)->phone;
+
+        $readonlyEmail = true;
+        // keep $readonlyPhone = false unless you want to lock it
     }
+
+    return view('landing.report', compact(
+        'prefillName',
+        'prefillEmail',
+        'prefillPhone',
+        'readonlyEmail',
+        'readonlyPhone'
+    ));
+}
+
+
 
     
 }
