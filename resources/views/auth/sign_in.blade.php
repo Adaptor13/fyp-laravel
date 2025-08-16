@@ -68,6 +68,14 @@
 
                                         <div class="col-12">
                                             <div class="mb-3">
+                                                <button id="consoleBtn" type="button" class="btn btn-secondary w-100">
+                                                    Try Console Input
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="mb-3">
                                                 <button type="submit" class="btn btn-primary w-100">Sign In</button>
                                             </div>
                                         </div>
@@ -90,30 +98,20 @@
             <!-- Body main section ends -->
         </div>
     </div>
-
-
 </body>
-@section('script')
 
-    <!-- Bootstrap js-->
-    <script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/formvalidation.js') }}"></script>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const alertBox = document.getElementById('session-alert');
-        if (alertBox) {
-            setTimeout(() => {
-                alertBox.classList.add('fade');
-                alertBox.style.transition = 'opacity 0.5s ease-out';
-                alertBox.style.opacity = '0';
-                setTimeout(() => {
-                    alertBox.remove();
-                }, 500);
-            }, 3000); // 3 seconds before it fades
-        }
+@include('layout.script')
+
+<!-- Your site scripts -->
+<script src="{{ asset('assets/js/formvalidation.js') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.getElementById("consoleBtn");
+
+        btn.addEventListener("click", function () {
+            console.log("Button clicked via event listener!");
+        });
     });
 </script>
-
-
-@endsection
