@@ -62,6 +62,8 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+
+        // dd($request->only(['name', 'phone']));
         $user = Auth::user()->load('role');
         $role = $user->role?->name ?? 'public_user';
 

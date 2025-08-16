@@ -44,14 +44,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
-                                <input
-  type="tel"
-  name="reporter_phone"
-  id="reporter_phone"
-  class="form-control"
-  placeholder="Enter Your Phone"
-  value="{{ old('reporter_phone', $prefillPhone) }}"
->
+                                <input type="tel" name="phone" id="phone" class="form-control" placeholder="Enter Your Phone" value="{{ old('phone', $user->profile->phone ?? '') }}">
                             </div>
 
                             <div class="mb-3">

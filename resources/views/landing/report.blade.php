@@ -48,16 +48,14 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="reporter_phone" class="form-label">Your Contact Number (Optional)</label>
+                                <label for="phone" class="form-label">Your Contact Number (Optional)</label>
                                 <input
-  type="tel"
-  name="reporter_phone"
-  id="reporter_phone"
-  class="form-control"
-  placeholder="Enter Your Phone"
-  value="{{ old('reporter_phone', $prefillPhone) }}"
-  {{ $readonlyPhone ? 'readonly' : '' }}
->
+                                    type="tel"
+                                    name="reporter_phone"
+                                    id="phone"
+                                    class="form-control"
+                                    placeholder="Enter Your Phone"
+                                    value="{{ old('reporter_phone', $prefillPhone) }}">
                             </div>
                         </div>
 
