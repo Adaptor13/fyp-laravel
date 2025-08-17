@@ -1,13 +1,3 @@
-//  -----------------------------------------------------------------------------------
-
-//     Template Name: AdminX Admin
-//     Template URI: https://phpstack-959325-3347777.cloudwaysapps.com/laadmin/template/landing.html
-//     Description: This is Admin theme
-//     Author: la-themes
-//     Author URI: https://themeforest.net/user/la-themes
-
-// -----------------------------------------------------------------------------------
-
 
 // 01 Flag  Icon Js
 // 02. copy js

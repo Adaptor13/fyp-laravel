@@ -21,11 +21,34 @@
                                 <form class="login-form" method="POST" action="{{ route('login') }}">
                                     @csrf
                                     <div class="row">
+
+                                        @if (session('status'))
+                                        <div class="alert alert-success mb-3" role="alert">
+                                            {{ session('status') }}
+                                        </div>
+                                        @endif
+
+                                        @if ($errors->hasBag('passwordReset'))
+                                        <div class="alert alert-danger mb-3" role="alert">
+                                            {{-- show a concise message; you can show the first error or list them --}}
+                                            {{ $errors->passwordReset->first('email') }}
+                                        </div>
+                                        @endif
+
+
                                         @if(session('success'))
                                         <div id="session-alert" class="alert alert-success">
                                             {{ session('success') }}
                                         </div>
                                         @endif
+
+                                        @if (session('error'))
+                                        <div class="alert alert-danger">
+                                            {{ session('error') }}
+                                        </div>
+                                        @endif
+                                                                                
+                                        
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <a href="{{ route('landing') }}" class="link-primary">
@@ -51,7 +74,7 @@
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Password</label>
-                                                <a href="" class="link-primary float-end">Forgot Password?</a>
+                                                <a href="#" class="link-primary float-end" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot Password?</a>
                                                 <input type="password" class="form-control @error('password') is-invalid @enderror"name="password" id="password" placeholder="Enter Your Password" required>
                                                 @error('password') <small class="text-danger">{{ $message }}</small> @enderror
                                             </div>
@@ -63,14 +86,6 @@
                                                 <label class="form-check-label text-secondary" for="remember">
                                                     Remember me
                                                 </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="mb-3">
-                                                <button id="consoleBtn" type="button" class="btn btn-secondary w-100">
-                                                    Try Console Input
-                                                </button>
                                             </div>
                                         </div>
 
@@ -95,23 +110,46 @@
                 </div>
                 <!-- sign in end -->
             </main>
-            <!-- Body main section ends -->
+
+            <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 id="forgotPasswordLabel" class="modal-title text-white">Reset your password</h5>
+                            <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <form method="POST" action="{{ route('password.email') }}">
+                            @csrf
+                            <div class="modal-body">
+                            <p class="mb-3">Enter your account email. We’ll send a password reset link.</p>
+
+                            <label for="resetEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control"  id="resetEmail" name="email" placeholder="name@example.com" required></div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Send reset link</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>
 
-
-@include('layout.script')
-
-<!-- Your site scripts -->
-<script src="{{ asset('assets/js/formvalidation.js') }}"></script>
+{{-- <script src="{{ asset('assets/js/formvalidation.js') }}"></script> --}}
+<script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btn = document.getElementById("consoleBtn");
-
-        btn.addEventListener("click", function () {
-            console.log("Button clicked via event listener!");
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+    const hasPwErr = {!! json_encode($errors->hasBag('passwordReset') ? $errors->passwordReset->any() : false) !!};
+    if (hasPwErr) {
+      const el = document.getElementById('forgotPasswordModal');
+      if (el) new bootstrap.Modal(el).show();
+    }
+  });
 </script>
+

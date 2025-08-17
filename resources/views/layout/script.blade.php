@@ -7,7 +7,6 @@
 <!-- Simple bar js-->
 <script src="{{asset('assets/vendor/simplebar/simplebar.js')}}"></script>
 
-
 <!-- Customizer js-->
 <script src="{{asset('assets/js/customizer.js')}}"></script>
 
