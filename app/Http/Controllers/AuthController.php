@@ -63,7 +63,6 @@ class AuthController extends Controller
 
         $remember = $request->has('remember'); // Remember Me checkbox
 
-        // Attempt login
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
             $request->session()->regenerate(); // Prevent session fixation
 
@@ -72,7 +71,6 @@ class AuthController extends Controller
 
             // Redirect based on role
             if (Auth::user()->role->name === 'public_user') {
-        // dd(Auth::check(), Auth::user());
 
                 return redirect()->route('landing'); // Public user homepage
             }

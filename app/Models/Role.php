@@ -31,4 +31,17 @@ class Role extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function getPrettyNameAttribute()
+    {
+        return match ($this->name) {
+            'admin'            => 'Administrator',
+            'social_worker'    => 'Social Worker',
+            'public_user'      => 'Public User',
+            'healthcare'       => 'Healthcare Worker',
+            'law_enforcement'  => 'Law Enforcement',
+            'gov_official'     => 'Government Official',
+            default            => ucfirst(str_replace('_', ' ', $this->name)),
+        };
+    }
 }

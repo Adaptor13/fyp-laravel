@@ -84,5 +84,11 @@ class User extends Authenticatable
         return $this->hasOne(GovOfficialProfile::class, 'user_id', 'id');
     }
 
+    public function adminUserProfile()
+    {
+       
+        return $this->hasOne(AdminUserProfile::class, 'user_id', 'id');
+    }
+
 
 }
