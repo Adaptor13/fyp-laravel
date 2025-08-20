@@ -43,8 +43,31 @@ Route::middleware('web')->group(function () {
 
     // Admin-only
     Route::middleware(['auth', 'role:admin'])->group(function () {
+
+        //Users Pages
         Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
-        // add more admin routes here later
+        Route::get('/users/admins',        [UserController::class, 'admins'])->name('users.admins');
+        Route::get('/users/public-users',  [UserController::class, 'publicUsers'])->name('users.public');
+        Route::get('/users/social-workers',[UserController::class, 'socialWorkers'])->name('users.social');
+        Route::get('/users/law-enforcement',[UserController::class, 'lawEnforcement'])->name('users.law');
+        Route::get('/users/gov-officials', [UserController::class, 'govOfficials'])->name('users.gov');
+        Route::get('/users/healthcare',    [UserController::class, 'healthcare'])->name('users.health');
+
+        //Datatable for Public User
+        Route::get('/users/public-users/data', [UserController::class, 'publicUsersData'])
+            ->name('users.public.data');
+
+        Route::post('/users/public-users', [UserController::class, 'storePublic'])
+            ->name('users.public.store');
+
+        Route::put('/users/public-users/{id}', [UserController::class, 'updatePublicUser'])
+            ->name('users.public.update');
+
+        Route::delete('/users/public-users/{id}', [UserController::class, 'destroyPublicUser'])
+            ->name('users.public.destroy');
+
+        
+
     });
 
     // Landing Page
