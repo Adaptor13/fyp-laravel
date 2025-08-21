@@ -53,7 +53,7 @@ Route::middleware('web')->group(function () {
         Route::get('/users/gov-officials', [UserController::class, 'govOfficials'])->name('users.gov');
         Route::get('/users/healthcare',    [UserController::class, 'healthcare'])->name('users.health');
 
-        //Datatable for Public User
+        //Public User
         Route::get('/users/public-users/data', [UserController::class, 'publicUsersData'])
             ->name('users.public.data');
 
@@ -65,6 +65,20 @@ Route::middleware('web')->group(function () {
 
         Route::delete('/users/public-users/{id}', [UserController::class, 'destroyPublicUser'])
             ->name('users.public.destroy');
+
+        // Social Worker
+        Route::get('/users/social-workers/data', [UserController::class, 'socialWorkersData'])
+            ->name('users.social.data');
+
+        Route::post('/users/social-workers', [UserController::class, 'storeSocialWorker'])
+            ->name('users.social.store');
+
+        Route::put('/users/social-workers/{id}', [UserController::class, 'updateSocialWorker'])
+            ->name('users.social.update');
+
+        Route::delete('/users/social-workers/{id}', [UserController::class, 'destroySocialWorker'])
+            ->name('users.social.destroy');
+
 
         
 

@@ -323,7 +323,7 @@
 
     <script>
         $('#editUserModal').on('show.bs.modal', function () {
-            $('#phone').mask('000-000-0000');
+            $('#phone').mask('000-0000000');
         });
 
         $(function() {

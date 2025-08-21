@@ -14,7 +14,7 @@
 <script src="{{asset('assets/vendor/prism/prism.min.js')}}"></script>
 
 <!--phone mask-->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 <!-- App js-->
 <script src="{{asset('assets/js/script.js')}}"></script>

@@ -2,7 +2,7 @@
   const pondInput = FilePond.create(
     document.querySelector('#id'),
     {
-      labelIdle: `<i class="ti ti-cloud-upload fs-4"></i> <div class="filepond--label-action text-decoration-none">Upload Your Deparment Images</div>`,
+      labelIdle: `<i class="ti ti-cloud-upload fs-4"></i> <div class="filepond--label-action text-decoration-none">Upload Your Images</div>`,
     }
   );
   

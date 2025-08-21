@@ -10,6 +10,8 @@ use App\Models\PublicUserProfile;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -182,16 +184,144 @@ class UserController extends Controller
         }
     }
 
-
     
     //Public User End -------------------------------------------------------
 
-
-
+    //Social Worker
     public function socialWorkers() 
     {
         $users = $this->getUsersByRole('social_worker');
         return view('admin.users.social.index', compact('users'));
+    }
+
+    public function socialWorkersData()
+    {
+        $socialRoleId = Role::where('name', 'social_worker')->value('id');
+
+        $users = User::with(['profile', 'socialWorkerProfile'])
+            ->where('role_id', $socialRoleId)
+            ->latest('users.created_at')
+            ->get()
+            ->map(function ($u) {
+                $avatarPath = optional($u->profile)->avatar_path;
+                $avatarUrl = $avatarPath
+                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    : asset('assets/images/icons/logo14.png');
+
+                return [
+                    'id'                  => (string) $u->id,
+                    'name'                => $u->name ?? '',
+                    'email'               => $u->email ?? '',
+                    'created_at'          => optional($u->created_at)->toIso8601String(),
+
+                    'phone'               => optional($u->profile)->phone ?? '',
+                    'address_line1'       => optional($u->profile)->address_line1 ?? '',
+                    'address_line2'       => optional($u->profile)->address_line2 ?? '',
+                    'city'                => optional($u->profile)->city ?? '',
+                    'state'               => optional($u->profile)->state ?? '',
+                    'postcode'            => optional($u->profile)->postcode ?? '',
+                    'avatar_url'          => $avatarUrl,
+
+                    'staff_id'            => optional($u->socialWorkerProfile)->staff_id ?? '',
+                    'agency_name'         => optional($u->socialWorkerProfile)->agency_name ?? '',
+                    'agency_code'         => optional($u->socialWorkerProfile)->agency_code ?? '',
+                    'placement_state'     => optional($u->socialWorkerProfile)->placement_state ?? '',
+                    'placement_district'  => optional($u->socialWorkerProfile)->placement_district ?? '',
+                    'profile_updated_at'  => optional(optional($u->socialWorkerProfile)->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values(); // ensure a clean zero-based array
+
+        return response()->json(['data' => $users]);
+    }
+
+
+    public function storeSocialWorker(Request $request)
+    {
+        $validated = $request->validate([
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|email:rfc,dns|unique:users,email',
+            'password'              => 'required|min:8|confirmed',
+            'avatar'                => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'staff_id'              => 'required|string|max:50',
+            'agency_name'           => 'required|string|max:255',
+            'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
+            'agency_code'           => 'nullable|string|max:10', // keep short
+            'placement_state'       => 'nullable|string|max:100',
+            'placement_district'    => 'nullable|string|max:100',
+
+            'phone'                 => 'nullable|string|max:30',
+            'address_line1'         => 'nullable|string|max:255',
+            'address_line2'         => 'nullable|string|max:255',
+            'city'                  => 'nullable|string|max:120',
+            'postcode'              => 'nullable|string|max:20',
+            'state'                 => 'nullable|string|max:120',
+        ], [
+            'agency_name_other.required_if' => 'Please enter the agency name when "Other" is chosen.',
+        ]);
+
+        $agencyName = $validated['agency_name'] === 'Other'
+            ? $validated['agency_name_other']
+            : $validated['agency_name'];
+
+        $roleId = Role::where('name', 'social_worker')->value('id');
+        if (!$roleId) {
+            return back()
+                ->withErrors(['role' => 'The "social_worker" role is not configured.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () use ($request, $validated, $roleId, $agencyName) {
+
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make($validated['password']),
+                    'role_id'           => $roleId,
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->socialWorkerProfile()->create([
+                    'staff_id'           => $validated['staff_id'],
+                    'agency_name'        => $agencyName,
+                    'agency_code'        => $validated['agency_code'] ?? null,
+                    'placement_state'    => $validated['placement_state'] ?? null,
+                    'placement_district' => $validated['placement_district'] ?? null,
+                ]);
+
+                 $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profileData = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,
+                ];
+
+                if ($request->hasFile('avatar')) {
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profileData['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profileData
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to create social worker. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Social worker created.');
     }
 
     public function lawEnforcement() 
