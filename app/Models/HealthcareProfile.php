@@ -13,7 +13,7 @@ class HealthcareProfile extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'mmc_number',
+        'profession',       
         'apc_expiry',
         'facility_name',
         'moh_facility_code',

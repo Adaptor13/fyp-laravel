@@ -185,42 +185,46 @@
                             <div class="col-12">
                                 <div class="d-flex justify-content-center mb-3">
                                     <div class="avatar-upload">
-                                        <div class="avatar-edit">
-                                            <input type="file" id="imageUpload" name="avatar" accept=".png, .jpg, .jpeg">
-                                            <label for="imageUpload"><i class="ti ti-photo-heart"></i></label>
-                                        </div>
-                                        <div class="avatar-preview">
-                                            <div id="imgPreview"></div>
-                                        </div>
-                                    </div>
+                        <div class="avatar-edit">
+                            <input type="file"
+                                id="imageUploadAdd"
+                                name="avatar"
+                                accept=".png,.jpg,.jpeg"
+                                data-preview="#imgPreviewAdd">
+                            <label for="imageUploadAdd"><i class="ti ti-photo-heart"></i></label>
+                        </div>
+                        <div class="avatar-preview">
+                            <div id="imgPreviewAdd"></div>
+                        </div>
+                        </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input id= "name" name="name" type="text" class="form-control" value="{{ old('name') }}" placeholder="Name" required>
+                                <label for="add_name" class="form-label">Name</label>
+                                <input id= "add_name" name="name" type="text" class="form-control" value="{{ old('name') }}" placeholder="Name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input id="email" name="email" type="email" class="form-control"  value="{{ old('email') }}" placeholder="example@gmail.com" required>
+                                <label for="add_email" class="form-label">Email</label>
+                                <input id="add_email" name="email" type="email" class="form-control"  value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="add_password" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <input id="password" name="password" type="password" class="form-control" placeholder="Password (8 minimum)" minlength="8" required>
-                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password">
+                                    <input id="add_password" name="password" type="password" class="form-control" placeholder="Password (8 minimum)" minlength="8" required>
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password">
                                         <i class="ti ti-eye"></i>
                                     </button>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_password_confirmation" class="form-label">Confirm Password</label>
                                 <div class="input-group">
-                                    <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" minlength="8" placeholder="Re-enter Password" required>
-                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password_confirmation">
+                                    <input id="add_password_confirmation" name="password_confirmation" type="password" class="form-control" minlength="8" placeholder="Re-enter Password" required>
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password_confirmationww">
                                         <i class="ti ti-eye"></i>
                                     </button>
                                 </div>
@@ -233,13 +237,13 @@
                         <h6 class="mb-3">Social Worker Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="staff_id" class="form-label">Staff ID</label>
-                                <input id="staff_id" name="staff_id" id="staff_id" type="text" class="form-control" value="{{ old('staff_id') }}" placeholder="Staff ID" required>
+                                <label for="add_staff_id" class="form-label">Staff ID</label>
+                                <input name="staff_id" id="add_staff_id" type="text" class="form-control" value="{{ old('staff_id') }}" placeholder="Staff ID" required>
                             </div>
 
                             <div class="col-md-6 mb-3 floating">
-                                <label for="agencyDropdown" class="form-label">Agency Name</label>
-                                <select id="agencyDropdown" name="agency_name" class="form-select" required>
+                                <label for="add_agencyDropdown" class="form-label">Agency Name</label>
+                                <select id="add_agencyDropdown" name="agency_name" class="form-select" required>
                                     <option value="" data-code="">Select Agency</option>
                                     <option value="Jabatan Kebajikan Masyarakat" data-code="JKM" {{ old('agency_name')==='Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
                                     Jabatan Kebajikan Masyarakat (JKM)
@@ -257,22 +261,22 @@
                             </div>
                         </div>
 
-                        <input type="text" id="otherAgencyInput" name="agency_name_other" class="form-control mb-2" placeholder="Enter Agency Name" style="display:none;" value="{{ old('agency_name_other') }}">
+                        <input type="text" id="add_otherAgencyInput" name="agency_name_other" class="form-control mb-2" placeholder="Enter Agency Name" style="display:none;" value="{{ old('agency_name_other') }}">
   
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="agencyCodeInput" class="form-label">Agency Code</label>
-                                <input  id="agencyCodeInput" name="agency_code" type="text" class="form-control" value="{{ old('agency_code') }}" placeholder="Agency Code" required>
+                                <label for="add_agencyCodeInput" class="form-label">Agency Code</label>
+                                <input  id="add_agencyCodeInput" name="agency_code" type="text" class="form-control" value="{{ old('agency_code') }}" placeholder="Agency Code" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="placement_state" class="form-label">Placement State</label>
-                                <input id="placement_state" name="placement_state" type="text" class="form-control" value="{{ old('placement_state') }}" placeholder="State" required>
+                                <label for="add_placement_state" class="form-label">Placement State</label>
+                                <input id="add_placement_state" name="placement_state" type="text" class="form-control" value="{{ old('placement_state') }}" placeholder="State" required>
                             </div>
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="placement_district" class="form-label">Placement District</label>
-                            <input name="placement_district" id="placement_district" type="text" class="form-control" value="{{ old('placement_district') }}" placeholder="District" required>
+                            <label for="add_placement_district" class="form-label">Placement District</label>
+                            <input name="placement_district" id="add_placement_district" type="text" class="form-control" value="{{ old('placement_district') }}" placeholder="District" required>
                         </div>
 
                         <hr>
@@ -281,39 +285,39 @@
                         <h6 class="mb-3">Contact Information (Optional)</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone</label>
-                                <input id="phone" name="phone" type="text" class="form-control" 
+                                <label for="add_phone" class="form-label">Phone</label>
+                                <input id="add_phone" name="phone" type="text" class="form-control" 
                                     value="{{ old('phone') }}" placeholder="e.g. 012-3456789">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="address_line1" class="form-label">Address Line 1</label>
-                                <input id="address_line1" name="address_line1" type="text" class="form-control" 
+                                <label for="add_address_line1" class="form-label">Address Line 1</label>
+                                <input id="add_address_line1" name="address_line1" type="text" class="form-control" 
                                     value="{{ old('address_line1') }}" placeholder="Street, Apartment, etc.">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="address_line2" class="form-label">Address Line 2</label>
-                                <input id="address_line2" name="address_line2" type="text" class="form-control" 
+                                <label for="add_address_line2" class="form-label">Address Line 2</label>
+                                <input id="add_address_line2" name="address_line2" type="text" class="form-control" 
                                     value="{{ old('address_line2') }}" placeholder="Unit, Suite">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">City</label>
-                                <input id="city" name="city" type="text" class="form-control" 
+                                <label for="add_city" class="form-label">City</label>
+                                <input id="add_city" name="city" type="text" class="form-control" 
                                     value="{{ old('city') }}" placeholder="City">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="postcode" class="form-label">Postcode</label>
-                                <input id="postcode" name="postcode" type="text" class="form-control" 
+                                <label for="add_postcode" class="form-label">Postcode</label>
+                                <input id="add_postcode" name="postcode" type="text" class="form-control" 
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="state" class="form-label">State</label>
-                                <input id="state" name="state" type="text" class="form-control" 
+                                <label for="add_state" class="form-label">State</label>
+                                <input id="add_state" name="state" type="text" class="form-control" 
                                     value="{{ old('state') }}" placeholder="State">
                             </div>
                         </div>
@@ -328,74 +332,355 @@
         </div>
     </div>
 
-    {{-- 
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <form id="editUserForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
+    {{-- <div class="modal fade" id="editSocialWorker" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('users.social.update', '__ID__') }}" data-action-template="{{ route('users.social.update', '__ID__') }}"
+                    enctype="multipart/form-data">
+                   
+                    @csrf
+                    @method('PUT')
+
                     <div class="modal-header bg-primary">
-                        <h5 class="modal-title  text-white">Edit Public User</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title text-white">Edit Social Worker</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
-                        <input type="hidden" id="edit_id">
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <input class="form-control" name="name" id="edit_name" required placeholder="John Doe">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input class="form-control" name="email" id="edit_email" type="email" disabled placeholder="johndoe@example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Display Name</label>
-                            <input class="form-control" name="display_name" id="edit_display_name" placeholder="Johnny">
-                        </div>
-
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="phone" id="phone" placeholder="012-3456789">
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                {{ $errors->first() }}
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Postcode</label>
-                                <input class="form-control" name="postcode" id="edit_postcode" placeholder="12345">
+                        @endif
+
+                        <h6 class="mb-3">Account Details</h6>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="avatar-upload">
+                                        <div class="avatar-edit">
+                                            <input type="file"
+                                                id="imageUploadEdit"
+                                                name="avatar"
+                                                accept=".png,.jpg,.jpeg"
+                                                data-preview="#imgPreviewEdit">
+                                            <label for="imageUploadEdit"><i class="ti ti-photo-heart"></i></label>
+                                        </div>
+                                        <div class="avatar-preview">
+                                            <div id="imgPreviewEdit"
+                                                style="background-image:url('{{ $socialWorker->avatar_url ?? '' }}');"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_name" class="form-label">Name</label>
+                                <input id="edit_name" name="name" type="text" class="form-control"
+                                    value="{{ old('name') }}" placeholder="Name" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_email" class="form-label">Email</label>
+                                <input id="edit_email" name="email" type="email" class="form-control"
+                                    value="{{ old('email') }}" readonly>
                             </div>
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label">Address Line 1</label>
-                            <input class="form-control" name="address_line1" id="edit_address_line1" placeholder="123 Example Street">
-                        </div>
+                        <hr>
 
-                        <div class="mb-2">
-                            <label class="form-label">Address Line 2</label>
-                            <input class="form-control" name="address_line2" id="edit_address_line2" placeholder="Suite 456">
-                        </div>
-
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <label class="form-label">City</label>
-                                <input class="form-control" name="city" id="edit_city" placeholder="Exampleville">
+                        <h6 class="mb-3">Social Worker Profile</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_staff_id" class="form-label">Staff ID</label>
+                                <input id="edit_staff_id" name="staff_id" type="text" class="form-control"
+                                    value="{{ old('staff_id') }}"
+                                    placeholder="Staff ID" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">State</label>
-                                <input class="form-control" name="state" id="edit_state" placeholder="Example State">
+
+                            <div class="col-md-6 mb-3 floating">
+                                <label for="edit_agencyDropdown" class="form-label">Agency Name</label>
+                                @php
+                                    $agencyName = old('agency_name', '');
+                                @endphp
+                                <select id="edit_agencyDropdown" name="agency_name" class="form-select" required>
+                                    <option value="" data-code="">Select Agency</option>
+
+                                    <option value="Jabatan Kebajikan Masyarakat" data-code="JKM"
+                                        {{ $agencyName==='Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
+                                        Jabatan Kebajikan Masyarakat (JKM)
+                                    </option>
+
+                                    <option value="Women’s Aid Organisation" data-code="WAO"
+                                        {{ $agencyName==='Women’s Aid Organisation' ? 'selected' : '' }}>
+                                        Women’s Aid Organisation (WAO)
+                                    </option>
+
+                                    <option value="Malaysian Social Workers Association" data-code="MSWA"
+                                        {{ $agencyName==='Malaysian Social Workers Association' ? 'selected' : '' }}>
+                                        Malaysian Social Workers Association (MSWA)
+                                    </option>
+
+                                    <option value="Other" data-code=""
+                                        {{ $agencyName==='Other' ? 'selected' : '' }}>
+                                        Other
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        @php
+                            $agencyOther = old('agency_name_other', '');
+                            $isOther = $agencyName === 'Other';
+                        @endphp
+
+                        <input type="text" id="edit_otherAgencyInput" name="agency_name_other" class="form-control mb-2"
+                            placeholder="Enter Agency Name"
+                            style="{{ $isOther ? '' : 'display:none;' }}"
+                            value="{{ $agencyOther }}">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_agencyCodeInput" class="form-label">Agency Code</label>
+                                <input id="edit_agencyCodeInput" name="agency_code" type="text" class="form-control"
+                                    value="{{ old('agency_code') }}"
+                                    placeholder="Agency Code" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_placement_state" class="form-label">Placement State</label>
+                                <input id="edit_placement_state" name="placement_state" type="text" class="form-control"
+                                    value="{{ old('placement_state') }}"
+                                    placeholder="State" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="edit_placement_district" class="form-label">Placement District</label>
+                            <input id="edit_placement_district" name="placement_district" type="text" class="form-control"
+                                value="{{ old('placement_district') }}"
+                                placeholder="District" required>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="mb-3">Contact Information (Optional)</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_phone" class="form-label">Phone</label>
+                                <input id="edit_phone" name="phone" type="text" class="form-control"
+                                    value="{{ old('phone') }}"
+                                    placeholder="e.g. 012-3456789">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_address_line1" class="form-label">Address Line 1</label>
+                                <input id="edit_address_line1" name="address_line1" type="text" class="form-control"
+                                    value="{{ old('address_line1') }}"
+                                    placeholder="Street, Apartment, etc.">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_address_line2" class="form-label">Address Line 2</label>
+                                <input id="edit_address_line2" name="address_line2" type="text" class="form-control"
+                                    value="{{ old('address_line2') }}"
+                                    placeholder="Unit, Suite">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_city" class="form-label">City</label>
+                                <input id="edit_city" name="city" type="text" class="form-control"
+                                    value="{{ old('city') }}"
+                                    placeholder="City">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_postcode" class="form-label">Postcode</label>
+                                <input id="edit_postcode" name="postcode" type="text" class="form-control"
+                                    value="{{ old('postcode') }}"
+                                    placeholder="Postcode">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_state" class="form-label">State</label>
+                                <input id="edit_state" name="state" type="text" class="form-control"
+                                    value="{{ old('state') }}"
+                                    placeholder="State">
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-light-primary">Save Changes</button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+        </div>
+    </div> --}}
+
+    <div class="modal fade" id="editSocialWorker" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('users.social.update', '__ID__') }}" 
+                    data-action-template="{{ route('users.social.update', '__ID__') }}"
+                    enctype="multipart/form-data">
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title text-white">Edit Social Worker</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
+                        <h6 class="mb-3">Account Details</h6>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="avatar-upload">
+                                        <div class="avatar-edit">
+                                            <input type="file"
+                                                id="imageUploadEdit"
+                                                name="avatar"
+                                                accept=".png,.jpg,.jpeg"
+                                                data-preview="#imgPreviewEdit">
+                                            <label for="imageUploadEdit"><i class="ti ti-photo-heart"></i></label>
+                                        </div>
+                                        <div class="avatar-preview">
+                                            <div id="imgPreviewEdit"
+                                                style="background-image:url('{{ $socialWorker->avatar_url ?? '' }}');"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_name" class="form-label">Name</label>
+                                <input id="edit_name" name="name" type="text" class="form-control"
+                                    placeholder="Name" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_email" class="form-label">Email</label>
+                                <input id="edit_email" name="email" type="email" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="mb-3">Social Worker Profile</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_staff_id" class="form-label">Staff ID</label>
+                                <input id="edit_staff_id" name="staff_id" type="text" class="form-control"
+                                    placeholder="Staff ID" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3 floating">
+                                <label for="edit_agencyDropdown" class="form-label">Agency Name</label>
+                                <select id="edit_agencyDropdown" name="agency_name" class="form-select" required>
+                                    <option value="" data-code="">Select Agency</option>
+                                    <option value="Jabatan Kebajikan Masyarakat" data-code="JKM">Jabatan Kebajikan Masyarakat (JKM)</option>
+                                    <option value="Women’s Aid Organisation" data-code="WAO">Women’s Aid Organisation (WAO)</option>
+                                    <option value="Malaysian Social Workers Association" data-code="MSWA">Malaysian Social Workers Association (MSWA)</option>
+                                    <option value="Other" data-code="">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <input type="text" id="edit_otherAgencyInput" name="agency_name_other" 
+                            class="form-control mb-2"
+                            placeholder="Enter Agency Name"
+                            style="display:none;">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_agencyCodeInput" class="form-label">Agency Code</label>
+                                <input id="edit_agencyCodeInput" name="agency_code" type="text" class="form-control"
+                                    placeholder="Agency Code" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_placement_state" class="form-label">Placement State</label>
+                                <input id="edit_placement_state" name="placement_state" type="text" class="form-control"
+                                    placeholder="State" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="edit_placement_district" class="form-label">Placement District</label>
+                            <input id="edit_placement_district" name="placement_district" type="text" class="form-control"
+                                placeholder="District" required>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="mb-3">Contact Information (Optional)</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_phone" class="form-label">Phone</label>
+                                <input id="edit_phone" name="phone" type="text" class="form-control"
+                                    placeholder="e.g. 012-3456789">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_address_line1" class="form-label">Address Line 1</label>
+                                <input id="edit_address_line1" name="address_line1" type="text" class="form-control"
+                                    placeholder="Street, Apartment, etc.">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_address_line2" class="form-label">Address Line 2</label>
+                                <input id="edit_address_line2" name="address_line2" type="text" class="form-control"
+                                    placeholder="Unit, Suite">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_city" class="form-label">City</label>
+                                <input id="edit_city" name="city" type="text" class="form-control"
+                                    placeholder="City">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_postcode" class="form-label">Postcode</label>
+                                <input id="edit_postcode" name="postcode" type="text" class="form-control"
+                                    placeholder="Postcode">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="edit_state" class="form-label">State</label>
+                                <input id="edit_state" name="state" type="text" class="form-control"
+                                    placeholder="State">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-light-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+
 
     <form id="deleteForm" method="POST" action="{{ route('users.public.destroy', '__id__') }}" class="d-none">
         @csrf
@@ -423,7 +708,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
 @endsection
 
@@ -439,39 +724,92 @@
     <script src="{{asset('assets/js/ready_to_use_form.js')}}"></script>
 
     <script>
-        function handleAgencyChange(selectEl) {
-            const selectedOption = selectEl.options[selectEl.selectedIndex];
-            const otherInput = document.getElementById('otherAgencyInput');
-            const codeInput  = document.getElementById('agencyCodeInput');
+       function updateAgencyFields(modalEl) {
+            if (!modalEl) return;
 
-            if (!otherInput || !codeInput) return; // guard
+            const sel        = modalEl.querySelector('#add_agencyDropdown');
+            const otherInput = modalEl.querySelector('#add_otherAgencyInput');
+            const codeInput  = modalEl.querySelector('#add_agencyCodeInput');
+            if (!sel || !otherInput || !codeInput) return;
 
-            if (selectEl.value === 'Other') {
+            // Handle "incoming" prefill values (edit mode / validation errors)
+            const incoming = (sel.getAttribute('data-incoming') || '').trim();
+            const incomingOther = (sel.getAttribute('data-incoming-other') || '').trim();
+
+            if (sel.selectedIndex === -1 && incoming) {
+                const norm = s => s.toLowerCase();
+                let matched = '';
+
+                for (const opt of sel.options) {
+                    if (!opt.value || opt.value === 'Other') continue;
+                    if (norm(opt.value) === norm(incoming)) {
+                        matched = opt.value;
+                        break;
+                    }
+                }
+
+                if (matched) {
+                    sel.value = matched;
+                } else {
+                    sel.value = 'Other';
+                    otherInput.style.display = 'block';
+                    otherInput.required = true;
+                    otherInput.value = incomingOther || incoming;
+                }
+            }
+
+            const selectedOption = sel.options[sel.selectedIndex];
+
+            if (sel.value === 'Other') {
+                // Show custom agency field
                 otherInput.style.display = 'block';
                 otherInput.required = true;
+
+                // Clear and unlock agency code
                 codeInput.value = '';
-                codeInput.readOnly = false; 
-            } else {
-                otherInput.style.display = 'none';
-                otherInput.required = false;
-                codeInput.value = selectedOption.dataset.code || '';
-                codeInput.readOnly = !!selectedOption.dataset.code; 
-            }
+                codeInput.readOnly = false;
+                return;
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
-            const sel = document.getElementById('agencyDropdown');
+            // Predefined agency branch
+            otherInput.style.display = 'none';
+            otherInput.required = false;
+
+            const code = (selectedOption?.dataset?.code || '').trim();
+            if (code) {
+                codeInput.value = code;
+                codeInput.readOnly = true;
+            } else {
+                codeInput.value = '';
+                codeInput.readOnly = false;
+            }
+        }
+
+        function initAgencyHandlers(modalSelector) {
+            const modalEl = document.querySelector(modalSelector);
+            if (!modalEl) return;
+
+            const sel = modalEl.querySelector('#add_agencyDropdown');
             if (!sel) return;
 
-            handleAgencyChange(sel);
-
-            sel.addEventListener('change', function (e) {
-                handleAgencyChange(e.target);
+            sel.addEventListener('change', function () {
+                updateAgencyFields(modalEl);
             });
+
+            modalEl.addEventListener('shown.bs.modal', function () {
+                updateAgencyFields(modalEl);
+            });
+
+            updateAgencyFields(modalEl);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initAgencyHandlers('#addSocialWorker');
+            // initAgencyHandlers('#editSocialWorker');
         });
 
-        $('#addSocialWorker').on('show.bs.modal', function () {
-            $('#phone').mask('000-0000000');
+        $('#addSocialWorker, #editSocialWorker').on('show.bs.modal', function () {
+            $('#add_phone, #edit_phone').mask('000-0000000');
         });
 
         $(function () {
@@ -528,7 +866,10 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li>
-                            <button type="button" class="dropdown-item edit-btn" data-id="${row.id}">
+                           <button type="button" class="dropdown-item edit-btn" 
+                                    data-id="${row.id}" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editSocialWorker">
                                 <i class="ti ti-edit text-success"></i> Edit
                             </button>
                             </li>
@@ -547,7 +888,7 @@
                 ],
                 responsive: true
             });
-            });
+        });
 
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
@@ -562,10 +903,8 @@
         }, 4000);
     </script>
 
+    <script>
 
-    {{-- <script>
-
-        // Toggle password visibility
         document.querySelectorAll('.toggle-password').forEach(btn => {
             btn.addEventListener('click', function() {
                 const target = document.querySelector(this.getAttribute('data-target'));
@@ -582,5 +921,136 @@
                 }
             });
         });
-    </script> --}}
+    </script>
+
+
+
+    <script>
+    (function () {
+        // 1) Change handler: toggle the "Other" input and auto-fill Agency Code from option data-code
+        function bindAgencyHandlers($modal) {
+            const $agency = $modal.find('#edit_agencyDropdown');
+            const $other  = $modal.find('#edit_otherAgencyInput');
+            const $code   = $modal.find('input[name="agency_code"]');
+
+            // Ensure we only bind once per modal
+            if ($agency.data('bound-change')) return;
+            $agency.data('bound-change', true);
+
+            $agency.on('change', function () {
+                const val = $(this).val();
+                const $opt = $(this).find('option:selected');
+                const code = ($opt.data('code') ?? '').toString();
+
+                // Only overwrite agency code if the selected option actually has a code
+                if (code) $code.val(code);
+
+                // Toggle "Other" textbox
+                const isOther = val === 'Other';
+                $other.toggle(isOther);
+                $other.prop('required', isOther);
+
+                // If leaving Other, clear free-text to avoid accidentally submitting stale text
+                if (!isOther) $other.val('');
+            });
+        }
+
+        // 2) Helper to set agency from rowData: choose known option or switch to Other
+        function setAgencyFromRow($modal, rowData) {
+            const $agency = $modal.find('#edit_agencyDropdown');
+            const $other  = $modal.find('#edit_otherAgencyInput');
+
+            const incomingName  = (rowData.agency_name || '').trim();
+            const incomingOther = (rowData.agency_name_other || '').trim();
+
+            // Gather selectable values from the dropdown
+            const options = $agency.find('option').map(function () {
+                return ($(this).val() || '').trim();
+            }).get();
+
+            // If the saved name matches one of the options, use it
+            if (incomingName && options.includes(incomingName)) {
+                $agency.val(incomingName).trigger('change');
+                // If it's "Other" specifically, put the custom name into the textbox
+                if (incomingName === 'Other') {
+                    $other.val(incomingOther || '');
+                }
+                return;
+            }
+
+            // If the saved name does NOT match any option, treat it as a custom value → select Other
+            if (incomingName && !options.includes(incomingName)) {
+                $agency.val('Other').trigger('change');
+                // Prefer agency_name_other if present, otherwise fall back to agency_name
+                $other.val(incomingOther || incomingName);
+                return;
+            }
+
+            // If nothing saved, reset to blank
+            $agency.val('').trigger('change');
+            $other.val('');
+        }
+
+        // 3) Main click handler
+        $(document).on('click', '#socialWorkersTable .edit-btn', function () {
+        
+            const table   = $('#socialWorkersTable').DataTable();
+            const rowData = table.row($(this).closest('tr')).data();
+            if (!rowData) return;
+
+            const $modal = $('#editSocialWorker');
+            const $form  = $modal.find('form');
+    // Now it's safe to log
+    console.log('rowData.id =', rowData.id, 'type =', typeof rowData.id);
+
+            // Wire once
+            bindAgencyHandlers($modal);
+
+            // Set action URL with ID
+            const actionTemplate = $form.attr('data-action-template') || $form.attr('action');
+            if (actionTemplate) {
+                $form.attr('action', actionTemplate.replace('__ID__', rowData.id));
+            }
+
+            // Fill common fields
+            $modal.find('input[name="name"]').val(rowData.name ?? '');
+            $modal.find('input[name="email"]').val(rowData.email ?? '');
+            $modal.find('input[name="staff_id"]').val(rowData.staff_id ?? '');
+
+            $modal.find('input[name="agency_code"]').val(rowData.agency_code ?? '');
+            $modal.find('input[name="placement_state"]').val(rowData.placement_state ?? '');
+            $modal.find('input[name="placement_district"]').val(rowData.placement_district ?? '');
+
+            $modal.find('input[name="phone"]').val(rowData.phone ?? '');
+            $modal.find('input[name="address_line1"]').val(rowData.address_line1 ?? '');
+            $modal.find('input[name="address_line2"]').val(rowData.address_line2 ?? '');
+            $modal.find('input[name="city"]').val(rowData.city ?? '');
+            $modal.find('input[name="postcode"]').val(rowData.postcode ?? '');
+            $modal.find('input[name="state"]').val(rowData.state ?? '');
+
+            // Avatar preview
+            const avatarUrl = rowData.avatar_url || rowData.profile?.avatar_url || '';
+            $modal.find('#imgPreviewEdit').css('background-image', avatarUrl ? `url('${avatarUrl}')` : '');
+
+            // Set agency select + other textbox correctly
+            setAgencyFromRow($modal, rowData);
+
+            // Show modal
+            $modal.modal('show');
+        });
+
+        // 4) Live preview for avatar (optional but handy)
+        $(document).on('change', '#imageUploadEdit', function () {
+            const input = this;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imgPreviewEdit').css('background-image', `url('${e.target.result}')`);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        });
+    })();
+</script>
+
 @endsection

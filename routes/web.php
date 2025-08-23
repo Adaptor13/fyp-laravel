@@ -73,7 +73,8 @@ Route::middleware('web')->group(function () {
         Route::post('/users/social-workers', [UserController::class, 'storeSocialWorker'])
             ->name('users.social.store');
 
-        Route::put('/users/social-workers/{id}', [UserController::class, 'updateSocialWorker'])
+        
+        Route::put('/users/social-workers/{user}', [UserController::class, 'updateSocialWorker'])
             ->name('users.social.update');
 
         Route::delete('/users/social-workers/{id}', [UserController::class, 'destroySocialWorker'])

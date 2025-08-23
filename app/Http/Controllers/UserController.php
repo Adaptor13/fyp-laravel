@@ -235,7 +235,6 @@ class UserController extends Controller
         return response()->json(['data' => $users]);
     }
 
-
     public function storeSocialWorker(Request $request)
     {
         $validated = $request->validate([
@@ -323,6 +322,108 @@ class UserController extends Controller
 
         return back()->with('success', 'Social worker created.');
     }
+
+    public function updateSocialWorker(Request $request, string $id)
+    {
+        // Fetch the user together with relations you’re about to update
+        $user = User::with(['socialWorkerProfile', 'profile'])->findOrFail($id);
+ 
+        $validated = $request->validate([
+            'name'                  => 'required|string|max:255',
+
+            'avatar'                => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'staff_id'              => 'required|string|max:50',
+            'agency_name'           => 'required|string|max:255',
+            'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
+            'agency_code'           => 'nullable|string|max:10',
+            'placement_state'       => 'nullable|string|max:100',
+            'placement_district'    => 'nullable|string|max:100',
+
+            'phone'                 => 'nullable|string|max:30',
+            'address_line1'         => 'nullable|string|max:255',
+            'address_line2'         => 'nullable|string|max:255',
+            'city'                  => 'nullable|string|max:120',
+            'postcode'              => 'nullable|string|max:20',
+            'state'                 => 'nullable|string|max:120',
+
+            // If you add a “remove avatar” checkbox in the UI:
+            'remove_avatar'         => 'nullable|boolean',
+        ], [
+            'agency_name_other.required_if' => 'Please enter the agency name when "Other" is chosen.',
+        ]);
+
+        $agencyName = $validated['agency_name'] === 'Other'
+            ? ($validated['agency_name_other'] ?? null)
+            : $validated['agency_name'];
+
+        try {
+            DB::transaction(function () use ($request, $validated, $user, $agencyName) {
+
+                // Update basic user fields; email is intentionally not touched
+                $user->update([
+                    'name' => $validated['name'],
+                ]);
+
+                // Ensure socialWorkerProfile exists, then update
+                $sw = $user->socialWorkerProfile ?: $user->socialWorkerProfile()->make();
+                $sw->staff_id            = $validated['staff_id'];
+                $sw->agency_name         = $agencyName;
+                $sw->agency_code         = $validated['agency_code'] ?? null;
+                $sw->placement_state     = $validated['placement_state'] ?? null;
+                $sw->placement_district  = $validated['placement_district'] ?? null;
+                $sw->save();
+
+                // Normalize phone and prepare profile payload
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profilePayload = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,
+                ];
+
+                // Handle avatar removal or replacement
+                $profile = $user->profile ?: $user->profile()->make();
+
+                // If you added a remove-avatar checkbox in the form
+                if ($request->boolean('remove_avatar') && !empty($profile->avatar_path)) {
+                    Storage::disk('public')->delete($profile->avatar_path);
+                    $profilePayload['avatar_path'] = null;
+                }
+
+                if ($request->hasFile('avatar')) {
+                    // Delete old file if exists
+                    if (!empty($profile->avatar_path)) {
+                        Storage::disk('public')->delete($profile->avatar_path);
+                    }
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profilePayload['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profilePayload
+                );
+            });
+
+        } catch (\Throwable $e) {
+            // You can log the error for debugging
+            // \Log::error('Update social worker failed', ['id' => $id, 'e' => $e]);
+            return back()
+                ->withErrors(['general' => 'Failed to update social worker. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Social worker updated.');
+    }
+
+    //
 
     public function lawEnforcement() 
     {
