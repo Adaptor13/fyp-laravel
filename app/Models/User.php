@@ -85,10 +85,9 @@ class User extends Authenticatable
         return $this->hasOne(GovOfficialProfile::class, 'user_id', 'id');
     }
 
-    public function adminUserProfile()
+    public function adminProfile()        // matches ->with(['adminProfile'])
     {
-       
-        return $this->hasOne(AdminUserProfile::class, 'user_id', 'id');
+        return $this->hasOne(AdminProfile::class, 'user_id', 'id');
     }
 
 

@@ -43,7 +43,7 @@
                     <li><a href="{{ route('users.public') }}"><i class="ti ti-user"></i> Public Users</a></li>
                     <li><a href="{{ route('users.social') }}"><i class="ti ti-id-badge"></i> Social Workers</a></li>
                     <li><a href="{{ route('users.law') }}"><i class="ti ti-target"></i> Law Enforcement</a></li>
-                    <li><a href="{{ route('users.gov') }}"><i class="ti ti-building"></i> Child Welfare Officers</a></li>
+                    <li><a href="{{ route('users.cwo') }}"><i class="ti ti-building"></i> Child Welfare Officers</a></li>
                     <li><a href="{{ route('users.health') }}"><i class="ti ti-stethoscope"></i> Healthcare Professionals</a></li>
                 </ul>
             </li>

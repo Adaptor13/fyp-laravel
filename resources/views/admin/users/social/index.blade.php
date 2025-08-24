@@ -682,7 +682,7 @@
 
 
 
-    <form id="deleteForm" method="POST" action="{{ route('users.public.destroy', '__id__') }}" class="d-none">
+    <form id="deleteForm" method="POST" action="{{ route('users.social.destroy', '__id__') }}" class="d-none">
         @csrf
         @method('DELETE')
     </form>
@@ -710,6 +710,7 @@
         </div>
     </div>
 
+
 @endsection
 
 @section('script')
@@ -724,7 +725,7 @@
     <script src="{{asset('assets/js/ready_to_use_form.js')}}"></script>
 
     <script>
-       function updateAgencyFields(modalEl) {
+        function updateAgencyFields(modalEl) {
             if (!modalEl) return;
 
             const sel        = modalEl.querySelector('#add_agencyDropdown');
@@ -761,7 +762,6 @@
             const selectedOption = sel.options[sel.selectedIndex];
 
             if (sel.value === 'Other') {
-                // Show custom agency field
                 otherInput.style.display = 'block';
                 otherInput.required = true;
 
@@ -771,7 +771,6 @@
                 return;
             }
 
-            // Predefined agency branch
             otherInput.style.display = 'none';
             otherInput.required = false;
 
@@ -805,7 +804,6 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             initAgencyHandlers('#addSocialWorker');
-            // initAgencyHandlers('#editSocialWorker');
         });
 
         $('#addSocialWorker, #editSocialWorker').on('show.bs.modal', function () {
@@ -888,6 +886,26 @@
                 ],
                 responsive: true
             });
+
+            let deleteId = null;
+            const deleteModalEl = document.getElementById('deleteModal');
+            const deleteModal = new bootstrap.Modal(deleteModalEl);
+            const deleteUserLabelEl = document.getElementById('deleteUserLabel');
+
+            // Open modal
+            $(document).on('click', '.delete-btn', function() {
+                deleteId = $(this).data('id');
+                const label = $(this).data('label') || `ID ${deleteId}`;
+                deleteUserLabelEl.textContent = label;
+                deleteModal.show();
+            });
+
+            $('#confirmDeleteBtn').on('click', function() {
+                if (!deleteId) return;
+                const form = document.getElementById('deleteForm');
+                form.action = "{{ route('users.social.destroy', '__id__') }}".replace('__id__', deleteId);
+                form.submit();
+            });
         });
 
         @if ($errors->any())
@@ -923,11 +941,8 @@
         });
     </script>
 
-
-
     <script>
     (function () {
-        // 1) Change handler: toggle the "Other" input and auto-fill Agency Code from option data-code
         function bindAgencyHandlers($modal) {
             const $agency = $modal.find('#edit_agencyDropdown');
             const $other  = $modal.find('#edit_otherAgencyInput');
@@ -942,20 +957,15 @@
                 const $opt = $(this).find('option:selected');
                 const code = ($opt.data('code') ?? '').toString();
 
-                // Only overwrite agency code if the selected option actually has a code
                 if (code) $code.val(code);
-
-                // Toggle "Other" textbox
                 const isOther = val === 'Other';
                 $other.toggle(isOther);
                 $other.prop('required', isOther);
 
-                // If leaving Other, clear free-text to avoid accidentally submitting stale text
                 if (!isOther) $other.val('');
             });
         }
 
-        // 2) Helper to set agency from rowData: choose known option or switch to Other
         function setAgencyFromRow($modal, rowData) {
             const $agency = $modal.find('#edit_agencyDropdown');
             const $other  = $modal.find('#edit_otherAgencyInput');
@@ -963,35 +973,28 @@
             const incomingName  = (rowData.agency_name || '').trim();
             const incomingOther = (rowData.agency_name_other || '').trim();
 
-            // Gather selectable values from the dropdown
             const options = $agency.find('option').map(function () {
                 return ($(this).val() || '').trim();
             }).get();
 
-            // If the saved name matches one of the options, use it
             if (incomingName && options.includes(incomingName)) {
                 $agency.val(incomingName).trigger('change');
-                // If it's "Other" specifically, put the custom name into the textbox
                 if (incomingName === 'Other') {
                     $other.val(incomingOther || '');
                 }
                 return;
             }
 
-            // If the saved name does NOT match any option, treat it as a custom value → select Other
             if (incomingName && !options.includes(incomingName)) {
                 $agency.val('Other').trigger('change');
-                // Prefer agency_name_other if present, otherwise fall back to agency_name
                 $other.val(incomingOther || incomingName);
                 return;
             }
 
-            // If nothing saved, reset to blank
             $agency.val('').trigger('change');
             $other.val('');
         }
 
-        // 3) Main click handler
         $(document).on('click', '#socialWorkersTable .edit-btn', function () {
         
             const table   = $('#socialWorkersTable').DataTable();
@@ -1000,19 +1003,14 @@
 
             const $modal = $('#editSocialWorker');
             const $form  = $modal.find('form');
-    // Now it's safe to log
-    console.log('rowData.id =', rowData.id, 'type =', typeof rowData.id);
-
-            // Wire once
+   
             bindAgencyHandlers($modal);
 
-            // Set action URL with ID
             const actionTemplate = $form.attr('data-action-template') || $form.attr('action');
             if (actionTemplate) {
                 $form.attr('action', actionTemplate.replace('__ID__', rowData.id));
             }
 
-            // Fill common fields
             $modal.find('input[name="name"]').val(rowData.name ?? '');
             $modal.find('input[name="email"]').val(rowData.email ?? '');
             $modal.find('input[name="staff_id"]').val(rowData.staff_id ?? '');
@@ -1028,18 +1026,13 @@
             $modal.find('input[name="postcode"]').val(rowData.postcode ?? '');
             $modal.find('input[name="state"]').val(rowData.state ?? '');
 
-            // Avatar preview
             const avatarUrl = rowData.avatar_url || rowData.profile?.avatar_url || '';
             $modal.find('#imgPreviewEdit').css('background-image', avatarUrl ? `url('${avatarUrl}')` : '');
-
-            // Set agency select + other textbox correctly
             setAgencyFromRow($modal, rowData);
 
-            // Show modal
             $modal.modal('show');
         });
 
-        // 4) Live preview for avatar (optional but handy)
         $(document).on('change', '#imageUploadEdit', function () {
             const input = this;
             if (input.files && input.files[0]) {

@@ -6,11 +6,15 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\SocialWorkerProfile;
 use App\Models\LawEnforcementProfile;
+use App\Models\GovOfficialProfile;
 use App\Models\PublicUserProfile;
+use App\Models\HealthcareProfile;
+
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Http\Request;
 
@@ -20,6 +24,220 @@ class UserController extends Controller
     {
         $users = $this->getUsersByRole('admin');
         return view('admin.users.admins.index', compact('users'));
+    }
+
+    public function adminData()
+    {
+        $adminRoleId = Role::where('name', 'admin')->value('id');
+
+        $users = User::with(['profile', 'adminProfile'])
+            ->where('role_id', $adminRoleId)
+            ->latest('users.created_at')
+            ->get()
+            ->map(function ($u) {
+                $avatarPath = optional($u->profile)->avatar_path;
+                $avatarUrl = $avatarPath
+                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    : asset('assets/images/icons/logo14.png');
+
+                return [
+                    'id'            => (string) $u->id,
+                    'name'          => $u->name ?? '',
+                    'email'         => $u->email ?? '',
+                    'created_at'    => optional($u->created_at)->toIso8601String(),
+
+                    // user_profiles (contact info)
+                    'phone'         => optional($u->profile)->phone ?? '',
+                    'address_line1' => optional($u->profile)->address_line1 ?? '',
+                    'address_line2' => optional($u->profile)->address_line2 ?? '',
+                    'city'          => optional($u->profile)->city ?? '',
+                    'state_profile' => optional($u->profile)->state ?? '',
+                    'postcode'      => optional($u->profile)->postcode ?? '',
+                    'avatar_url'    => $avatarUrl,
+
+                    'department'    => optional($u->adminProfile)->department ?? '',
+                    'position'      => optional($u->adminProfile)->position ?? '',
+                    'profile_created_at' =>
+                        optional(optional($u->adminProfile)->created_at)->toIso8601String(),
+                    'profile_updated_at' =>
+                        optional(optional($u->adminProfile)->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $users]);
+    }
+
+    public function storeAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            // account
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email:rfc,dns|unique:users,email',
+            'password'    => 'required|min:8|confirmed',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            // admin_profiles
+            'department'  => 'required|string|max:150',
+            'position'    => 'required|string|max:150',
+
+            // user_profiles (contact info)
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state'         => 'nullable|string|max:120',
+        ]);
+
+        $roleId = Role::where('name', 'admin')->value('id');
+        if (!$roleId) {
+            return back()
+                ->withErrors(['role' => 'The "admin" role is not configured.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () use ($request, $validated, $roleId) {
+                // create user
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make($validated['password']),
+                    'role_id'           => $roleId,
+                    'email_verified_at' => now(),
+                ]);
+
+                // create admin profile
+                $user->adminProfile()->create([
+                    'department' => $validated['department'],
+                    'position'   => $validated['position'],
+                ]);
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profileData = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,
+                ];
+
+                if ($request->hasFile('avatar')) {
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profileData['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profileData
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to create admin user. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Admin user created.');
+    }
+
+    public function updateAdmin(Request $request, string $id)
+    {
+        $user = User::with(['adminProfile','profile'])->findOrFail($id);
+
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'avatar'        => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'department'    => 'required|string|max:150',
+            'position'      => 'required|string|max:150',
+
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state'         => 'nullable|string|max:120',
+
+            'remove_avatar' => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $validated, $user) {
+                // user
+                $user->update(['name' => $validated['name']]);
+
+                // admin profile
+                $ap = $user->adminProfile ?: $user->adminProfile()->make();
+                $ap->department = $validated['department'];
+                $ap->position   = $validated['position'];
+                $ap->save();
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profilePayload = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,
+                ];
+
+                $profile = $user->profile ?: $user->profile()->make();
+
+                if ($request->boolean('remove_avatar') && !empty($profile->avatar_path)) {
+                    Storage::disk('public')->delete($profile->avatar_path);
+                    $profilePayload['avatar_path'] = null;
+                }
+
+                if ($request->hasFile('avatar')) {
+                    if (!empty($profile->avatar_path)) {
+                        Storage::disk('public')->delete($profile->avatar_path);
+                    }
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profilePayload['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profilePayload
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to update admin user. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Admin user updated.');
+    }
+
+    public function destroyAdmin(User $user)
+    {
+        DB::transaction(function () use ($user) {
+            if ($user->profile && $user->profile->avatar_path) {
+                Storage::disk('public')->delete($user->profile->avatar_path);
+            }
+
+            $user->adminProfile()?->delete();  // admin_profiles
+            $user->profile()?->delete();       // user_profiles
+
+            $user->delete();
+        });
+
+        return back()->with('success', 'Admin deleted.');
     }
 
     //Public User Start ----------------------------------------------------
@@ -184,7 +402,6 @@ class UserController extends Controller
         }
     }
 
-    
     //Public User End -------------------------------------------------------
 
     //Social Worker
@@ -423,7 +640,24 @@ class UserController extends Controller
         return back()->with('success', 'Social worker updated.');
     }
 
-    //
+    public function destroySocialWorker(User $user)
+    {
+        // dd($user->id);
+        DB::transaction(function () use ($user) {
+            if ($user->profile && $user->profile->avatar_path) {
+                Storage::disk('public')->delete($user->profile->avatar_path);
+            }
+
+            $user->socialWorkerProfile()?->delete();
+            $user->profile()?->delete();
+
+            $user->delete();   
+        });
+
+        return back()->with('success', 'Social worker deleted.');
+    }
+
+    //Social Wroerkr End
 
     public function lawEnforcement() 
     {
@@ -431,16 +665,706 @@ class UserController extends Controller
         return view('admin.users.law.index', compact('users'));
     }
 
-    public function govOfficials() 
+    public function lawEnforcementData()
     {
-        $users = $this->getUsersByRole('gov_official');
-        return view('admin.users.gov.index', compact('users'));
+        // Adjust the role name if your seed uses something else (e.g., 'police')
+        $lawRoleId = Role::where('name', 'law_enforcement')->value('id');
+
+        $users = User::with(['profile', 'lawEnforcementProfile'])
+            ->where('role_id', $lawRoleId)
+            ->latest('users.created_at')
+            ->get()
+            ->map(function ($u) {
+                $avatarPath = optional($u->profile)->avatar_path;
+                $avatarUrl = $avatarPath
+                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    : asset('assets/images/icons/logo14.png');
+
+                return [
+                    'id'            => (string) $u->id,
+                    'name'          => $u->name ?? '',
+                    'email'         => $u->email ?? '',
+                    'created_at'    => optional($u->created_at)->toIso8601String(),
+
+                    // user_profiles (contact info)
+                    'phone'         => optional($u->profile)->phone ?? '',
+                    'address_line1' => optional($u->profile)->address_line1 ?? '',
+                    'address_line2' => optional($u->profile)->address_line2 ?? '',
+                    'city'          => optional($u->profile)->city ?? '',
+                    'state'         => optional($u->profile)->state ?? '',
+                    'postcode'      => optional($u->profile)->postcode ?? '',
+                    'avatar_url'    => $avatarUrl,
+
+                    // law_enforcement_profiles
+                    'agency'        => optional($u->lawEnforcementProfile)->agency ?? '',
+                    'badge_number'  => optional($u->lawEnforcementProfile)->badge_number ?? '',
+                    'rank'          => optional($u->lawEnforcementProfile)->rank ?? '',
+                    'station'       => optional($u->lawEnforcementProfile)->station ?? '',
+                    'le_state'      => optional($u->lawEnforcementProfile)->state ?? '',
+                    'profile_updated_at' =>
+                        optional(optional($u->lawEnforcementProfile)->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $users]);
     }
 
+    public function storeLawEnforcement(Request $request)
+    {
+        $validated = $request->validate([
+            // account
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email:rfc,dns|unique:users,email',
+            'password'    => 'required|min:8|confirmed',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            // LE profile (avoid collision with user_profiles.state)
+            'agency'       => ['required','string','max:50', Rule::in(['PDRM','AADK'])],
+            'badge_number' => [
+                'required','string','max:50',
+                Rule::unique('law_enforcement_profiles', 'badge_number')
+                    ->where(fn($q) => $q->where('agency', $request->agency)),
+            ],
+            'rank'         => 'nullable|string|max:100',
+            'station'      => 'nullable|string|max:150',
+            'le_state'     => 'required|string|max:100',   // <-- renamed
+
+            // user_profiles (contact info) — DB column is also "state"
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state'         => 'nullable|string|max:120',  // <-- profile state
+        ]);
+
+        $roleId = Role::where('name', 'law_enforcement')->value('id');
+        if (!$roleId) {
+            return back()
+                ->withErrors(['role' => 'The "law_enforcement" role is not configured.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () use ($request, $validated, $roleId) {
+
+                // create user
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make($validated['password']),
+                    'role_id'           => $roleId,
+                    'email_verified_at' => now(),
+                ]);
+
+                // create law enforcement profile
+                $user->lawEnforcementProfile()->create([
+                    'agency'       => $validated['agency'],
+                    'badge_number' => $validated['badge_number'],
+                    'rank'         => $validated['rank'] ?? null,
+                    'station'      => $validated['station'] ?? null,
+                    'state'        => $validated['le_state'], // <-- map from le_state
+                ]);
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profileData = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,   // <-- user_profiles.state
+                ];
+
+                if ($request->hasFile('avatar')) {
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profileData['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profileData
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to create law enforcement user. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Law enforcement user created.');
+    }
+
+    public function updateLawEnforcement(Request $request, string $id)
+    {
+        $user = User::with(['lawEnforcementProfile','profile'])->findOrFail($id);
+
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'avatar'        => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'agency'        => ['required','string','max:50', Rule::in(['PDRM','AADK'])],
+            'badge_number'  => [
+                'required','string','max:50',
+                Rule::unique('law_enforcement_profiles', 'badge_number')
+                    ->where(fn($q) => $q->where('agency', $request->agency))
+                    ->ignore($user->id, 'user_id'),
+            ],
+            'rank'          => 'nullable|string|max:100',
+            'station'       => 'nullable|string|max:150',
+            'le_state'      => 'required|string|max:100',
+
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state'         => 'nullable|string|max:120',   // profile state
+
+            'remove_avatar' => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $validated, $user) {
+                // user
+                $user->update(['name' => $validated['name']]);
+
+                // LE profile
+                $lp = $user->lawEnforcementProfile ?: $user->lawEnforcementProfile()->make();
+                $lp->agency       = $validated['agency'];
+                $lp->badge_number = $validated['badge_number'];
+                $lp->rank         = $validated['rank'] ?? null;
+                $lp->station      = $validated['station'] ?? null;
+                $lp->state        = $validated['le_state'];   // <-- from le_state
+                $lp->save();
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profilePayload = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,   // <-- user_profiles.state
+                ];
+
+                $profile = $user->profile ?: $user->profile()->make();
+
+                if ($request->boolean('remove_avatar') && !empty($profile->avatar_path)) {
+                    Storage::disk('public')->delete($profile->avatar_path);
+                    $profilePayload['avatar_path'] = null;
+                }
+
+                if ($request->hasFile('avatar')) {
+                    if (!empty($profile->avatar_path)) {
+                        Storage::disk('public')->delete($profile->avatar_path);
+                    }
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profilePayload['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profilePayload
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to update law enforcement user. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Law enforcement user updated.');
+    }
+
+    public function destroyLawEnforcement(User $user)
+    {
+        DB::transaction(function () use ($user) {
+            if ($user->profile && $user->profile->avatar_path) {
+                Storage::disk('public')->delete($user->profile->avatar_path);
+            }
+
+            // delete related rows
+            $user->lawEnforcementProfile()?->delete(); 
+            $user->profile()?->delete();           
+
+            $user->delete();
+        });
+
+        return back()->with('success', 'Law Officer deleted.');
+    }
+
+    //cwo
+    public function cwo()
+    {
+        $users = $this->getUsersByRole('gov_official');
+        return view('admin.users.cwo.index', compact('users'));
+    }
+
+    public function childWelfareOfficerData()
+    {
+        $cwoRoleId = Role::where('name', 'gov_official')->value('id');
+
+        $users = User::with(['profile', 'govOfficialProfile'])
+            ->where('role_id', $cwoRoleId)
+            ->latest('users.created_at')
+            ->get()
+            ->map(function ($u) {
+                $avatarPath = optional($u->profile)->avatar_path;
+                $avatarUrl = $avatarPath
+                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    : asset('assets/images/icons/logo14.png');
+
+                return [
+                    'id'            => (string) $u->id,
+                    'name'          => $u->name ?? '',
+                    'email'         => $u->email ?? '',
+                    'created_at'    => optional($u->created_at)->toIso8601String(),
+
+                    // user_profiles (contact info)
+                    'phone'         => optional($u->profile)->phone ?? '',
+                    'address_line1' => optional($u->profile)->address_line1 ?? '',
+                    'address_line2' => optional($u->profile)->address_line2 ?? '',
+                    'city'          => optional($u->profile)->city ?? '',
+                    'state_profile' => optional($u->profile)->state ?? '',
+                    'postcode'      => optional($u->profile)->postcode ?? '',
+                    'avatar_url'    => $avatarUrl,
+
+                    // gov_official_profiles (CWO-specific fields)
+                    'ministry'        => optional($u->govOfficialProfile)->ministry ?? '',
+                    'department'      => optional($u->govOfficialProfile)->department ?? '',
+                    'service_scheme'  => optional($u->govOfficialProfile)->service_scheme ?? '',
+                    'grade'           => optional($u->govOfficialProfile)->grade ?? '',
+                    'cwo_state'       => optional($u->govOfficialProfile)->state ?? '',
+                    'profile_updated_at' =>
+                        optional(optional($u->govOfficialProfile)->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $users]);
+    }
+
+    public function storeCwo(Request $request)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email:rfc,dns|unique:users,email',
+            'password'    => 'required|min:8|confirmed',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'ministry'        => 'required|string|max:150',
+            'department'      => 'required|string|max:150',
+            'service_scheme'  => 'nullable|string|max:150',
+            'grade'           => 'nullable|string|max:50',
+            'cwo_state'       => 'required|string|max:100',  
+
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state'         => 'nullable|string|max:120',   
+        ]);
+
+        $roleId = Role::where('name', 'gov_official')->value('id');
+        if (!$roleId) {
+            return back()
+                ->withErrors(['role' => 'The "gov_official" role is not configured.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () use ($request, $validated, $roleId) {
+
+                // create user
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make($validated['password']),
+                    'role_id'           => $roleId,
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->govOfficialProfile()->create([
+                    'ministry'        => $validated['ministry'],
+                    'department'      => $validated['department'],
+                    'service_scheme'  => $validated['service_scheme'] ?? null,
+                    'grade'           => $validated['grade'] ?? null,
+                    'state'           => $validated['cwo_state'], // <-- map from cwo_state
+                ]);
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profileData = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,   // <-- user_profiles.state
+                ];
+
+                if ($request->hasFile('avatar')) {
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profileData['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profileData
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to create Child Welfare Officer. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Child Welfare Officer created.');
+    }
+
+    public function updateCwo(Request $request, string $id)
+    {
+        $user = User::with(['govOfficialProfile','profile'])->findOrFail($id);
+
+        $validated = $request->validate([
+            // account
+            'name'           => 'required|string|max:255',
+            'avatar'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            // gov_official_profiles (CWO)
+            'ministry'       => 'required|string|max:150',
+            'department'     => 'required|string|max:150',
+            'service_scheme' => 'nullable|string|max:150',
+            'grade'          => 'nullable|string|max:50',
+            'cwo_state'      => 'required|string|max:100',
+
+            // user_profiles (contact info)
+            'phone'          => 'nullable|string|max:30',
+            'address_line1'  => 'nullable|string|max:255',
+            'address_line2'  => 'nullable|string|max:255',
+            'city'           => 'nullable|string|max:120',
+            'postcode'       => 'nullable|string|max:20',
+            'state'          => 'nullable|string|max:120',  // profile state
+
+            'remove_avatar'  => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $validated, $user) {
+                // user
+                $user->update(['name' => $validated['name']]);
+
+                // CWO profile
+                $gp = $user->govOfficialProfile ?: $user->govOfficialProfile()->make();
+                $gp->ministry       = $validated['ministry'];
+                $gp->department     = $validated['department'];
+                $gp->service_scheme = $validated['service_scheme'] ?? null;
+                $gp->grade          = $validated['grade'] ?? null;
+                $gp->state          = $validated['cwo_state'];   // map from cwo_state
+                $gp->save();
+
+                // contact profile
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profilePayload = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state'] ?? null,  // user_profiles.state
+                ];
+
+                $profile = $user->profile ?: $user->profile()->make();
+
+                if ($request->boolean('remove_avatar') && !empty($profile->avatar_path)) {
+                    Storage::disk('public')->delete($profile->avatar_path);
+                    $profilePayload['avatar_path'] = null;
+                }
+
+                if ($request->hasFile('avatar')) {
+                    if (!empty($profile->avatar_path)) {
+                        Storage::disk('public')->delete($profile->avatar_path);
+                    }
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profilePayload['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profilePayload
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to update Child Welfare Officer. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Child Welfare Officer updated.');
+    }
+
+    public function destroyCwo(User $user)
+    {
+        DB::transaction(function () use ($user) {
+            // remove stored avatar if any
+            if ($user->profile && $user->profile->avatar_path) {
+                Storage::disk('public')->delete($user->profile->avatar_path);
+            }
+
+            // delete related rows
+            $user->govOfficialProfile()?->delete(); // gov_official_profiles
+            $user->profile()?->delete();            // user_profiles
+
+            // finally delete the user
+            $user->delete();
+        });
+
+        return back()->with('success', 'Child Welfare Officer deleted.');
+    }
+
+    //Health care
     public function healthcare() 
     {
         $users = $this->getUsersByRole('healthcare');
         return view('admin.users.healthcare.index', compact('users'));
+    }
+
+    public function healthcareData()
+    {
+        $healthcareRoleId = Role::where('name', 'healthcare')->value('id');
+
+        $users = User::with(['profile', 'healthcareProfile'])
+            ->where('role_id', $healthcareRoleId)
+            ->latest('users.created_at')
+            ->get()
+            ->map(function ($u) {
+                $avatarPath = optional($u->profile)->avatar_path;
+                $avatarUrl = $avatarPath
+                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    : asset('assets/images/icons/logo14.png');
+
+                return [
+                    'id'            => (string) $u->id,
+                    'name'          => $u->name ?? '',
+                    'email'         => $u->email ?? '',
+                    'created_at'    => optional($u->created_at)->toIso8601String(),
+
+                    // user_profiles table (contact info)
+                    'phone'         => optional($u->profile)->phone ?? '',
+                    'address_line1' => optional($u->profile)->address_line1 ?? '',
+                    'address_line2' => optional($u->profile)->address_line2 ?? '',
+                    'city'          => optional($u->profile)->city ?? '',
+                    'state'         => optional($u->profile)->state ?? '',
+                    'postcode'      => optional($u->profile)->postcode ?? '',
+                    'avatar_url'    => $avatarUrl,
+
+                    // healthcare_profiles table
+                    'profession'    => optional($u->healthcareProfile)->profession ?? '',
+                    'apc_expiry'    => optional($u->healthcareProfile)->apc_expiry 
+                                        ? $u->healthcareProfile->apc_expiry->toDateString()
+                                        : '',
+                    'facility_name' => optional($u->healthcareProfile)->facility_name ?? '',
+                    'hc_state'      => optional($u->healthcareProfile)->state ?? '',
+                    'profile_updated_at' => optional(optional($u->healthcareProfile)->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values(); // clean zero-based array
+
+        return response()->json(['data' => $users]);
+    }
+
+    public function storeHealthcare(Request $request)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email:rfc,dns|unique:users,email',
+            'password'    => 'required|min:8|confirmed',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'profession'    => ['required','string','max:100', Rule::in(['Doctor','Nurse'])],
+            'apc_expiry'    => 'nullable|date',
+            'facility_name' => 'required|string|max:255',
+            'state'         => 'required|string|max:100',
+
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state_profile' => 'nullable|string|max:120',
+        ]);
+
+        $roleId = Role::where('name','healthcare')->value('id');
+        if (!$roleId) {
+            return back()
+                ->withErrors(['role' => 'The "healthcare" role is not configured.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () use ($request, $validated, $roleId) {
+
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make($validated['password']),
+                    'role_id'           => $roleId,
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->healthcareProfile()->create([
+                    'profession'    => $validated['profession'],
+                    'apc_expiry'    => $validated['apc_expiry'] ?? null,
+                    'facility_name' => $validated['facility_name'],
+                    'state'         => $validated['state'],
+                ]);
+
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profileData = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state_profile'] ?? null,
+                ];
+
+                if ($request->hasFile('avatar')) {
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profileData['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profileData
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to create healthcare professional. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Healthcare professional created.');
+    }
+
+    public function updateHealthcare(Request $request, string $id)
+    {
+        $user = User::with(['healthcareProfile','profile'])->findOrFail($id);
+
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'profession'    => ['required','string','max:100', Rule::in(['Doctor','Nurse'])],
+            'apc_expiry'    => 'nullable|date',
+            'facility_name' => 'required|string|max:255',
+            'state'         => 'required|string|max:100',
+
+            'phone'         => 'nullable|string|max:30',
+            'address_line1' => 'nullable|string|max:255',
+            'address_line2' => 'nullable|string|max:255',
+            'city'          => 'nullable|string|max:120',
+            'postcode'      => 'nullable|string|max:20',
+            'state_profile' => 'nullable|string|max:120',
+
+            'remove_avatar' => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $validated, $user) {
+
+                $user->update(['name' => $validated['name']]);
+
+                $hp = $user->healthcareProfile ?: $user->healthcareProfile()->make();
+                $hp->profession    = $validated['profession'];
+                $hp->apc_expiry    = $validated['apc_expiry'] ?? null;
+                $hp->facility_name = $validated['facility_name'];
+                $hp->state         = $validated['state'];
+                $hp->save();
+
+                $cleanPhone = !empty($validated['phone'])
+                    ? preg_replace('/\D/', '', $validated['phone'])
+                    : null;
+
+                $profilePayload = [
+                    'phone'         => $cleanPhone,
+                    'address_line1' => $validated['address_line1'] ?? null,
+                    'address_line2' => $validated['address_line2'] ?? null,
+                    'city'          => $validated['city'] ?? null,
+                    'postcode'      => $validated['postcode'] ?? null,
+                    'state'         => $validated['state_profile'] ?? null,
+                ];
+
+                $profile = $user->profile ?: $user->profile()->make();
+
+                if ($request->boolean('remove_avatar') && !empty($profile->avatar_path)) {
+                    Storage::disk('public')->delete($profile->avatar_path);
+                    $profilePayload['avatar_path'] = null;
+                }
+
+                if ($request->hasFile('avatar')) {
+                    if (!empty($profile->avatar_path)) {
+                        Storage::disk('public')->delete($profile->avatar_path);
+                    }
+                    $path = $request->file('avatar')->store('avatars', 'public');
+                    $profilePayload['avatar_path'] = $path;
+                }
+
+                $user->profile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $profilePayload
+                );
+            });
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => 'Failed to update healthcare professional. Please try again.'])
+                ->withInput();
+        }
+
+        return back()->with('success', 'Healthcare professional updated.');
+    }
+
+    public function destroyHealthcare(User $user)
+    {
+        DB::transaction(function () use ($user) {
+            if ($user->profile && $user->profile->avatar_path) {
+                Storage::disk('public')->delete($user->profile->avatar_path);
+            }
+
+            $user->healthcareProfile()?->delete();
+            $user->profile()?->delete();
+
+            $user->delete();   
+        });
+
+        return back()->with('success', 'Healthcare Professional deleted.');
     }
 
     private function getUsersByRole(string $roleName)

@@ -4,23 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HealthcareProfile extends Model
+class AdminProfile extends Model
 {
-    protected $table = 'healthcare_profiles';
+    protected $table = 'admin_profiles';
 
     protected $primaryKey = 'user_id';
     public $incrementing = false;
-    protected $keyType = 'string';
+    protected $keyType = 'string'; // or 'int' if user.id is int
 
     protected $fillable = [
-        'profession',       
-        'apc_expiry',
-        'facility_name',
-        'state',
-    ];
-
-    protected $casts = [
-        'apc_expiry' => 'date',
+        'department',
+        'position',
     ];
 
     public function user()

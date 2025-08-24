@@ -456,6 +456,8 @@
             $('#editUserForm input[name="email"]').val(rowData.email);
             $('#editUserForm input[name="display_name"]').val(rowData.display_name);
             $('#editUserForm [name="phone"]').val(rowData.phone ?? '');
+
+            
             $('#editUserForm [name="address_line1"]').val(rowData.address_line1 ?? '');
             $('#editUserForm [name="address_line2"]').val(rowData.address_line2 ?? '');
             $('#editUserForm [name="city"]').val(rowData.city ?? '');
