@@ -16,7 +16,18 @@
                             <!-- Action buttons -->
                             <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                                 <a href="{{ route('report') }}" class="btn btn-light btn-lg px-4">Report Anonymously</a>
-                                <a href="/sign_in" class="btn btn-outline-light btn-lg px-4">Login to Track My Report</a>
+
+                                @auth
+                                    <!-- If logged in -->
+                                    <a href="{{ route('reports.track') }}" class="btn btn-outline-light btn-lg px-4">
+                                        Track My Report
+                                    </a>
+                                @else
+                                    <!-- If not logged in -->
+                                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg px-4">
+                                        Login to Track My Report
+                                    </a>
+                                @endauth
                             </div>
                         </div>
                     </div>

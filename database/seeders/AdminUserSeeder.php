@@ -11,15 +11,11 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1) Ensure the 'admin' role exists
-        // If your Role model also auto-generates UUIDs, you can drop the 'id' here.
         $adminRole = Role::firstOrCreate(
             ['name' => 'admin'],
             ['id' => (string) Str::uuid()]
         );
 
-        // 2) Create or fetch the admin user
-        // Your User model will auto-UUID the 'id' and auto-hash 'password'.
         $user = User::firstOrCreate(
             ['email' => 'admin@sinda.local'],
             [

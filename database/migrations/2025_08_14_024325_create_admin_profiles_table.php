@@ -8,8 +8,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('admin_profiles', function (Blueprint $table) {
             $table->uuid('user_id')->primary(); // Matches users.id
-
-            // Admin-specific fields
+            $table->string('display_name');
             $table->string('department', 255)->nullable(); // e.g. IT Department
             $table->string('position', 255)->nullable();   // e.g. System Administrator
 

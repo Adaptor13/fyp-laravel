@@ -8,42 +8,43 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = $request->user();
 
-        // Ensure the user and role relation exist
+        // Guest → send to sign in (preserve intended URL)
         if (!$user) {
-            return redirect()->route('sign_in')
+            return redirect()->guest(route('sign_in'))
                 ->withErrors(['auth' => 'Please sign in first.']);
         }
 
-        // If you have a belongsTo Role relation on User: public function role() { return $this->belongsTo(Role::class); }
-        $user->loadMissing('role');
+        // Load role(s) only if missing
+        $user->loadMissing('role');           // for belongsTo
+        // $user->loadMissing('roles');       // uncomment if you move to many-to-many
 
-        // Normalize roles passed from middleware declaration (e.g., admin or admin,social_worker)
-        // $roles will be an array like ['admin'] or ['admin', 'social_worker']
+        // Normalize allowed roles (support "admin,social_worker" or multiple args)
         $allowed = collect($roles)
-            ->flatMap(fn ($r) => explode(',', $r))   // handle 'admin,social_worker'
-            ->map(fn ($r) => trim($r))
+            ->flatMap(fn ($r) => explode(',', $r))
+            ->map(fn ($r) => strtolower(trim($r)))
             ->filter()
             ->values();
 
-        $userRole = optional($user->role)->name;
+        // Current user role name(s)
+        $userRole = optional($user->role)->name; // belongsTo
+        $userRole = $userRole ? strtolower($userRole) : null;
 
-        if (!$userRole || !$allowed->contains($userRole)) {
-            // For API/JSON requests you may want to return 403 instead
-            if ($request->expectsJson()) {
-                abort(403, 'You are not authorized to access that page.');
+        // If you later use many-to-many, switch to:
+        // $userRoles = optional($user->roles)->pluck('name')->map(fn($n)=>strtolower($n));
+        // $authorized = $userRoles?->intersect($allowed)->isNotEmpty();
+
+        $authorized = $userRole && $allowed->contains($userRole);
+
+        if (!$authorized) {
+            // JSON/AJAX (e.g. DataTables) → 403 JSON; normal page → 403 view
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['message' => 'Forbidden'], 403);
             }
-
-            return redirect()->route('sign_in')
-                ->withErrors(['auth' => 'You are not authorized to access that page.']);
+            abort(403, 'You are not authorized to access that page.');
         }
 
         return $next($request);

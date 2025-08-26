@@ -7,11 +7,13 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CaseController;
+
+
 
 
 Route::middleware('web')->group(function () {
 
-    // Authentication
     Route::get('/sign_in', [AuthController::class, 'signIn'])->name('sign_in');
     Route::get('/sign_up', [AuthController::class, 'signUp'])->name('sign_up');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -140,8 +142,26 @@ Route::middleware('web')->group(function () {
         Route::delete('/users/healthcare/{user}', [UserController::class, 'destroyHealthcare'])
             ->name('users.healthcare.destroy');
 
+    });
 
 
+    Route::middleware(['auth', 'role:admin,social_worker,law_enforcement,healthcare,gov_official'])
+        ->group(function () {
+         Route::get('/cases/data', [CaseController::class, 'reportData'])->name('cases.data');
+
+        // View Cases + Case Details + inline actions (notes/status)
+        Route::get('/cases', [CaseController::class, 'index'])->name('cases.index');
+        Route::get('/cases/{report}', [CaseController::class, 'show'])->name('cases.show');
+        Route::post('/cases/{report}/note', [CaseController::class, 'addNote'])->name('cases.note');
+        Route::post('/cases/{report}/status',[CaseController::class, 'updateStatus'])->name('cases.status');
+
+        Route::get('/cases-history', [CaseHistoryController::class, 'index'])->name('cases.history');
+    });
+
+    Route::middleware(['auth', 'role:admin,gov_official'])
+        ->group(function () {
+        Route::get('/cases/assign', [AssignmentController::class, 'create'])->name('cases.assign');
+        Route::post('/cases/{report}/assign',[AssignmentController::class, 'store'])->name('cases.assign.store');
     });
 
     // Landing Page

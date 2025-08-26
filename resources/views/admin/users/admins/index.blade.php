@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Public User')
+@section('title', 'Admin')
 @section('css')
 
 
