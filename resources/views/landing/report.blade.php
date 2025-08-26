@@ -62,7 +62,15 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="victim_age" class="form-label">Victim's Approximate Age</label>
-                                <input type="number" name="victim_age" id="victim_age" class="form-control" min="0" max="17" required>
+                                <input type="number"
+                                    name="victim_age"
+                                    id="victim_age"
+                                    class="form-control"
+                                    min="0"
+                                    max="17"
+                                    required
+                                    oninvalid="this.setCustomValidity('Please enter an age between 0 and 17.')"
+                                    oninput="this.setCustomValidity('')">
                             </div>
                         </div>
 

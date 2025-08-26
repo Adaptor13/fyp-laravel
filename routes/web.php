@@ -9,9 +9,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaseController;
 
-
-
-
 Route::middleware('web')->group(function () {
 
     Route::get('/sign_in', [AuthController::class, 'signIn'])->name('sign_in');
@@ -94,7 +91,6 @@ Route::middleware('web')->group(function () {
         Route::delete('/users/cwo/{user}', [UserController::class, 'destroyCwo'])
             ->name('users.cwo.destroy');
 
-
         //Public User
         Route::get('/users/public-users',  [UserController::class, 'publicUsers'])->name('users.public');
 
@@ -155,18 +151,24 @@ Route::middleware('web')->group(function () {
         Route::post('/cases/{report}/note', [CaseController::class, 'addNote'])->name('cases.note');
         Route::post('/cases/{report}/status',[CaseController::class, 'updateStatus'])->name('cases.status');
 
-        Route::get('/cases-history', [CaseHistoryController::class, 'index'])->name('cases.history');
+        // Route::get('/cases-history', [CaseHistoryController::class, 'index'])->name('cases.history');
     });
 
-    Route::middleware(['auth', 'role:admin,gov_official'])
-        ->group(function () {
-        Route::get('/cases/assign', [AssignmentController::class, 'create'])->name('cases.assign');
-        Route::post('/cases/{report}/assign',[AssignmentController::class, 'store'])->name('cases.assign.store');
-    });
+    // Route::middleware(['auth', 'role:admin,gov_official'])
+    //     ->group(function () {
+    //     Route::get('/cases/assign', [AssignmentController::class, 'create'])->name('cases.assign');
+    //     Route::post('/cases/{report}/assign',[AssignmentController::class, 'store'])->name('cases.assign.store');
+    // });
 
     // Landing Page
     Route::get('/', [LandingController::class, 'landing'])->name('landing');
     Route::get('/report', [LandingController::class, 'report'])->name('report');
     Route::post('/report', [ReportController::class, 'store'])->name('report.store');
+    
+    // My Reports route for logged-in users
+    Route::middleware('auth')->group(function () {
+        Route::get('/my-reports', [ReportController::class, 'myReports'])->name('reports.track');
+        Route::get('/my-reports/{report}/export', [ReportController::class, 'export'])->name('reports.export');
+    });
 
 });

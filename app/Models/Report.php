@@ -34,6 +34,11 @@ class Report extends Model
         'suspected_abuser',
         'evidence',
         'confirmed_truth',
+        'report_status',
+        'priority_level',
+        'assigned_to',
+        'last_updated_by',
+        'status_updated_at',
     ];
 
     public function user()

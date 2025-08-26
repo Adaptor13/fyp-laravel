@@ -27,8 +27,8 @@
                 </a>
                 <ul class="collapse" id="caseManagement">
                     <li><a href="{{ route('cases.index') }}"><i class="ti ti-list"></i> View Cases</a></li>
-                    <li><a href="{{ route('cases.history') }}"><i class="ti ti-history"></i> Case History</a></li>
-                    <li><a href="{{ route('cases.assign') }}"><i class="ti ti-user-check"></i> Assign Cases</a></li>
+                    <li><a href=""><i class="ti ti-history"></i> Case History</a></li>
+                    <li><a href=""><i class="ti ti-user-check"></i> Assign Cases</a></li>
                 </ul>
             </li>
 

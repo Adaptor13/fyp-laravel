@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\User;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,46 @@ class CaseController extends Controller
 {
     public function index()
     {
-        return view('admin.cases.index');
+        // Get case statistics
+        $stats = $this->getCaseStatistics();
+        return view('admin.cases.index', compact('stats'));
+    }
+
+    private function getCaseStatistics()
+    {
+        $user = auth()->user();
+        $role = strtolower(optional($user->role)->name);
+
+        // Base query
+        $query = Report::query();
+
+        // Visibility by role
+        if (!in_array($role, ['admin','gov_official'])) {
+            if (in_array($role, ['social_worker','law_enforcement','healthcare'])) {
+                $query->where('assigned_to', $user->id);
+            } else {
+                $query->whereRaw('1=0'); // blocks public_user or unknown roles
+            }
+        }
+
+        // Total cases
+        $totalCases = $query->count();
+
+        // Open cases (not closed or resolved)
+        $openCases = (clone $query)->whereNotIn('report_status', ['Closed', 'Resolved'])->count();
+
+        // Closed cases
+        $closedCases = (clone $query)->whereIn('report_status', ['Closed', 'Resolved'])->count();
+
+        // New cases this week
+        $newThisWeek = (clone $query)->where('created_at', '>=', Carbon::now()->startOfWeek())->count();
+
+        return [
+            'total' => $totalCases,
+            'open' => $openCases,
+            'closed' => $closedCases,
+            'new_this_week' => $newThisWeek
+        ];
     }
 
     public function reportData(Request $req)
@@ -54,6 +94,7 @@ class CaseController extends Controller
 
             return [
                 'id'       => (string) $r->id,
+                'case_id'  => substr($r->id, 0, 17) . '...', // Truncated case ID for display
                 'reporter' => [
                     'name'  => $r->reporter_name ?? '—',
                     'email' => $r->reporter_email ?? '—',

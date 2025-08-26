@@ -28,7 +28,7 @@
                 <div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
                     <ul class="navbar-nav w-100 text-center text-lg-start justify-content-lg-end">
 
-                        @if (!request()->routeIs('report') && !request()->routeIs('profile.edit'))
+                        @if (!request()->routeIs('report') && !request()->routeIs('profile.edit') && !request()->routeIs('reports.track'))
 
                             <li class="nav-item border-bottom me-3">
                                 <a class="nav-link py-2" href="#about">About</a>
@@ -39,8 +39,16 @@
                         @endif
 
                         <li class="nav-item border-bottom me-3">
-                            <a class="nav-link py-2" href="{{ route('report') }}">Report</a>
+                            <a class="nav-link py-2" href="{{ route('report') }}">Report Abuse</a>
                         </li>
+
+                        @auth
+                            <li class="nav-item border-bottom me-3">
+                                <a class="nav-link py-2" href="{{ route('reports.track') }}">
+                                    My Reports
+                                </a>
+                            </li>
+                        @endauth
 
                         <li class="nav-item border-bottom me-3">
                             @auth
@@ -124,9 +132,11 @@
 
         <script>
             $(document).ready(function(){
-                $('#phone').mask('000-000-0000');
+                $('#phone').mask('000-0000000');
             });
         </script>
+
+        @yield('scripts')
 
     </body>
 

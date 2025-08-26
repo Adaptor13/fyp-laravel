@@ -6,6 +6,7 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -19,7 +20,7 @@ class ReportController extends Controller
             'victim_gender' => 'nullable|string',
             'abuse_types' => 'nullable|array',
             'incident_description' => 'required|string',
-            'incident_location' => 'required|string',
+            'incident_location' => 'required|string', 
             'incident_date' => 'required|date',
             'suspected_abuser' => 'nullable|string|max:255',
             'evidence' => 'nullable|array',
@@ -37,9 +38,9 @@ class ReportController extends Controller
         Report::create([
             'id' => Str::uuid(), // Generate UUID
             'user_id' => auth()->check() ? auth()->id() : null, // Link if logged in
-
-            'reporter_name' => $validated['reporter_name'] ?? null,
-            'reporter_email' => $validated['reporter_email'] ?? null,
+        
+            'reporter_name' => $validated['reporter_name'] ?? 'anonymous',
+            'reporter_email' => $validated['reporter_email'] ?? 'anonymous@gmail.com',
             'reporter_phone' => $validated['reporter_phone'] ?? null,
             'victim_age' => $validated['victim_age'] ?? null,
             'victim_gender' => $validated['victim_gender'] ?? null,
@@ -50,12 +51,65 @@ class ReportController extends Controller
             'suspected_abuser' => $validated['suspected_abuser'] ?? null,
             'evidence' => json_encode($filePaths),
             'confirmed_truth' => true,
-
-            // Optional: tracking defaults
             'report_status' => 'Submitted',
             'priority_level' => 'Medium',
         ]);
 
         return redirect()->back()->with('success', 'Your report has been submitted successfully.');
+    }
+
+    public function myReports()
+    {
+        $reports = Report::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('landing.my_reports', compact('reports'));
+    }
+
+    public function export(Report $report)
+    {
+        try {
+            // Check if the user owns this report
+            if ($report->user_id !== auth()->id()) {
+                abort(403, 'Unauthorized access to this report.');
+            }
+
+            // Prepare data for the PDF
+            $data = [
+                'report' => $report,
+                'abuseTypes' => $report->abuse_types ? json_decode($report->abuse_types, true) : [],
+                'evidence' => $report->evidence ? json_decode($report->evidence, true) : [],
+            ];
+
+            // Generate PDF
+            $pdf = Pdf::loadView('exports.report_pdf', $data);
+            
+            // Set PDF options
+            $pdf->setPaper('A4', 'portrait');
+            $pdf->setOption([
+                'isRemoteEnabled' => true,
+                'isHtml5ParserEnabled' => true,
+                'isFontSubsettingEnabled' => true,
+                'defaultFont' => 'Arial',
+            ]);
+
+            // Generate filename with timestamp
+            $filename = 'Child_Protection_Report_' . substr($report->id, 0, 8) . '_' . $report->created_at->format('Y-m-d') . '.pdf';
+
+            // Return PDF as download
+            return $pdf->download($filename);
+            
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('PDF Export Error: ' . $e->getMessage(), [
+                'report_id' => $report->id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+            
+            // Return a user-friendly error response
+            return back()->with('error', 'Unable to generate PDF. Please try again later.');
+        }
     }
 }

@@ -63,7 +63,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $stats['total'] ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Total Cases</p>
                             </div>
                             <div>
@@ -79,7 +79,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $stats['open'] ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Open Cases</p>
                             </div>
                             <div>
@@ -95,7 +95,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $stats['closed'] ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Closed Cases</p>
                             </div>
                             <div>
@@ -111,7 +111,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $stats['new_this_week'] ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">New This Week</p>
                             </div>
                             <div>
@@ -136,6 +136,7 @@
                             <table id="casesTable" class="display app-data-table deafult-data-tabel">
                                 <thead>
                                     <tr>
+                                        <th>Case ID</th>
                                         <th>Reporter</th>
                                         <th>Status</th>
                                         <th>Priority</th>
@@ -179,6 +180,15 @@
                 dataSrc: 'data'
             },
             columns: [
+                // Case ID column
+                { 
+                    data: 'case_id', 
+                    name: 'case_id',
+                    render: function (caseId) {
+                        return `<span class="badge bg-secondary">${caseId}</span>`;
+                    }
+                },
+                
                 // Reporter column (name + email stacked)
                 { 
                     data: 'reporter', 
@@ -246,43 +256,43 @@
 
                 // Action buttons
                 {
-    data: null,
-    orderable: false,
-    searchable: false,
-    render: function (row) {
-        // Use reporter name/email as label if available
-        const reporterName  = row.reporter?.name || '';
-        const reporterEmail = row.reporter?.email || '';
-        const label = reporterName || reporterEmail || `ID ${row.id}`;
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (row) {
+                        // Use reporter name/email as label if available
+                        const reporterName  = row.reporter?.name || '';
+                        const reporterEmail = row.reporter?.email || '';
+                        const label = reporterName || reporterEmail || `ID ${row.id}`;
 
-        return `
-            <div class="dropdown">
-                <button class="bg-none border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="ti ti-dots"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button type="button" class="dropdown-item edit-btn"
-                                data-id="${row.id}"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editCase">
-                            <i class="ti ti-edit text-success"></i> Edit
-                        </button>
-                    </li>
-                    <li>
-                        <a class="dropdown-item delete-btn" href="javascript:void(0)"
-                            data-id="${row.id}"
-                            data-label="${label}">
-                            <i class="ti ti-trash text-danger"></i> Delete
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        `;
-    }
-}
+                        return `
+                            <div class="dropdown">
+                                <button class="bg-none border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ti ti-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button type="button" class="dropdown-item edit-btn"
+                                                data-id="${row.id}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editCase">
+                                            <i class="ti ti-edit text-success"></i> Edit
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item delete-btn" href="javascript:void(0)"
+                                            data-id="${row.id}"
+                                            data-label="${label}">
+                                            <i class="ti ti-trash text-danger"></i> Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
             ],
-            order: [[4, 'desc']], // sort by Updated (index 4)
+            order: [[5, 'desc']], // sort by Updated (index 5, now that we added Case ID column)
             responsive: true
         });
     });
