@@ -90,5 +90,36 @@ class User extends Authenticatable
         return $this->hasOne(AdminProfile::class, 'user_id', 'id');
     }
 
+    /**
+     * Get all cases assigned to this user
+     */
+    public function assignedCases()
+    {
+        return $this->belongsToMany(Report::class, 'case_assignments', 'user_id', 'report_id')
+                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
+                    ->whereNull('case_assignments.unassigned_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get cases where this user is the primary assignee
+     */
+    public function primaryAssignedCases()
+    {
+        return $this->belongsToMany(Report::class, 'case_assignments', 'user_id', 'report_id')
+                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
+                    ->where('case_assignments.is_primary', true)
+                    ->whereNull('case_assignments.unassigned_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get all assignments for this user
+     */
+    public function caseAssignments()
+    {
+        return $this->hasMany(CaseAssignment::class, 'user_id')
+                    ->whereNull('unassigned_at');
+    }
 
 }

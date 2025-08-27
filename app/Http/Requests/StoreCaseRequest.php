@@ -29,7 +29,9 @@ class StoreCaseRequest extends FormRequest
             'evidence.*' => 'file|mimes:jpg,jpeg,png,mp4,pdf|max:20480',
             'report_status' => 'required|string|in:Submitted,Under Review,In Progress,Resolved,Closed',
             'priority_level' => 'required|string|in:Low,Medium,High',
-            'assigned_to' => 'nullable|string|exists:users,id',
+            'assignees' => 'nullable|array',
+            'assignees.*' => 'string|exists:users,id',
+            'primary_assignee' => 'nullable|string|exists:users,id',
         ];
     }
 
@@ -45,8 +47,21 @@ class StoreCaseRequest extends FormRequest
             'incident_date.before_or_equal' => 'Incident date cannot be in the future.',
             'report_status.required' => 'Report status is required.',
             'priority_level.required' => 'Priority level is required.',
-            'assigned_to.exists' => 'Selected assignee does not exist.',
+            'assignees.*.exists' => 'One or more selected assignees are invalid.',
+            'primary_assignee.exists' => 'The selected primary assignee is invalid.',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            // Ensure primary assignee is one of the selected assignees
+            if ($this->input('primary_assignee') && $this->input('assignees')) {
+                if (!in_array($this->input('primary_assignee'), $this->input('assignees'))) {
+                    $validator->errors()->add('primary_assignee', 'Primary assignee must be one of the selected assignees.');
+                }
+            }
+        });
     }
 }
 

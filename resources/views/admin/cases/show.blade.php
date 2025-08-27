@@ -92,8 +92,17 @@
                                         <div class="card bg-light">
                                             <div class="card-body text-center">
                                                 <h6 class="card-title">Assigned To</h6>
-                                                @if($assignee)
-                                                    <span class="badge bg-primary fs-6">{{ $assignee->name }}</span>
+                                                @if($assignees->count() > 0)
+                                                    <div class="d-flex flex-column gap-1">
+                                                        @foreach($assignees as $assignee)
+                                                            <span class="badge {{ $assignee->pivot->is_primary ? 'bg-success' : 'bg-primary' }} fs-6">
+                                                                {{ $assignee->name }}
+                                                                @if($assignee->pivot->is_primary)
+                                                                    <i class="ti ti-crown ms-1"></i>
+                                                                @endif
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     <span class="badge bg-secondary fs-6">Unassigned</span>
                                                 @endif
@@ -178,6 +187,53 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Case Assignments -->
+                            <div class="col-md-12 mt-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="ti ti-users"></i> Case Assignments</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        @if($assignees->count() > 0)
+                                            <div class="row">
+                                                @foreach($assignees as $assignee)
+                                                    <div class="col-md-6 col-lg-4 mb-3">
+                                                        <div class="card {{ $assignee->pivot->is_primary ? 'border-success' : 'border-primary' }}">
+                                                            <div class="card-body">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="flex-shrink-0">
+                                                                        <div class="avatar avatar-sm bg-{{ $assignee->pivot->is_primary ? 'success' : 'primary' }} rounded-circle">
+                                                                            <span class="avatar-text">{{ substr($assignee->name, 0, 1) }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="flex-grow-1 ms-3">
+                                                                        <h6 class="mb-1">
+                                                                            {{ $assignee->name }}
+                                                                            @if($assignee->pivot->is_primary)
+                                                                                <i class="ti ti-crown text-success ms-1" title="Primary Assignee"></i>
+                                                                            @endif
+                                                                        </h6>
+                                                                        <p class="text-muted mb-1">{{ optional($assignee->role)->name }}</p>
+                                                                        <small class="text-muted">
+                                                                            Assigned: {{ \Carbon\Carbon::parse($assignee->pivot->assigned_at)->format('M d, Y') }}
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center text-muted">
+                                                <i class="ti ti-users-off fs-1"></i>
+                                                <p class="mt-2">No assignees for this case</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

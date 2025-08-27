@@ -165,17 +165,76 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="assigned_to" class="form-label">Assign To</label>
-                    <select name="assigned_to" id="assigned_to" class="form-select">
-                        <option value="">Unassigned</option>
-                        @foreach($assignableUsers as $user)
-                            <option value="{{ $user->id }}" {{ old('assigned_to', $report->assigned_to) == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }} ({{ optional($user->role)->name }})
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="col-md-12">
+                <h6 class="mb-3">Case Assignments</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="law_enforcement_assignee" class="form-label">Law Enforcement</label>
+                            <select name="assignees[]" id="law_enforcement_assignee" class="form-select">
+                                <option value="">Select Law Enforcement Officer</option>
+                                @foreach($assignableUsers->where('role.name', 'law_enforcement') as $user)
+                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="healthcare_assignee" class="form-label">Healthcare Professional</label>
+                            <select name="assignees[]" id="healthcare_assignee" class="form-select">
+                                <option value="">Select Healthcare Professional</option>
+                                @foreach($assignableUsers->where('role.name', 'healthcare') as $user)
+                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="social_worker_assignee" class="form-label">Social Worker</label>
+                            <select name="assignees[]" id="social_worker_assignee" class="form-select">
+                                <option value="">Select Social Worker</option>
+                                @foreach($assignableUsers->where('role.name', 'social_worker') as $user)
+                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="child_welfare_assignee" class="form-label">Child Welfare Officer</label>
+                            <select name="assignees[]" id="child_welfare_assignee" class="form-select">
+                                <option value="">Select Child Welfare Officer</option>
+                                @foreach($assignableUsers->where('role.name', 'child_welfare') as $user)
+                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="primary_assignee" class="form-label">Primary Assignee (Lead)</label>
+                            <select name="primary_assignee" id="primary_assignee" class="form-select">
+                                <option value="">Select Primary Assignee</option>
+                                @foreach($assignableUsers as $user)
+                                    <option value="{{ $user->id }}" {{ old('primary_assignee', $primaryAssigneeId) == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ optional($user->role)->name }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

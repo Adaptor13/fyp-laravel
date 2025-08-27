@@ -36,7 +36,6 @@ class Report extends Model
         'confirmed_truth',
         'report_status',
         'priority_level',
-        'assigned_to',
         'last_updated_by',
         'status_updated_at',
     ];
@@ -44,5 +43,47 @@ class Report extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get all assignees for this case
+     */
+    public function assignees()
+    {
+        return $this->belongsToMany(User::class, 'case_assignments', 'report_id', 'user_id')
+                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
+                    ->whereNull('case_assignments.unassigned_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the primary assignee for this case
+     */
+    public function primaryAssignee()
+    {
+        return $this->belongsToMany(User::class, 'case_assignments', 'report_id', 'user_id')
+                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
+                    ->where('case_assignments.is_primary', true)
+                    ->whereNull('case_assignments.unassigned_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get all active assignments for this case
+     */
+    public function assignments()
+    {
+        return $this->hasMany(CaseAssignment::class, 'report_id')
+                    ->whereNull('unassigned_at');
+    }
+
+    /**
+     * Scope to get cases assigned to a specific user
+     */
+    public function scopeAssignedTo($query, $userId)
+    {
+        return $query->whereHas('assignees', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
     }
 }
