@@ -64,8 +64,8 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Total Users</p>
+                                <h3 class="header-heading mb-0">{{ $totalCwo ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">Total CWO Officers</p>
                             </div>
                             <div>
                                 <i class="ti ti-users f-s-36"></i>
@@ -80,27 +80,28 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
+                                <h3 class="header-heading mb-0">{{ $ministriesCount ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">Ministries Covered</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone f-s-36"></i>
+                                <i class="ti ti-briefcase f-s-36"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+
             <div class="col-sm-6 col-lg-3">
-                <div class="card bg-danger text-white">
+                <div class="card bg-warning text-white">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
+                                <h3 class="header-heading mb-0">{{ $statesCovered ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">States Covered</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone-off f-s-36"></i>
+                                <i class="ti ti-refresh f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -112,8 +113,8 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">New Users</p>
+                                <h3 class="header-heading mb-0">{{ $recentlyAddedCwo ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">New This Month</p>
                             </div>
                             <div>
                                 <i class="ti ti-user-plus f-s-36"></i>
@@ -122,6 +123,8 @@
                     </div>
                 </div>
             </div>
+
+
 
             <div class="col-12">
                 <div class="card">
@@ -161,7 +164,6 @@
     <div class="modal fade" id="addChildWelfareOfficer" aria-hidden="true" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
-                {{-- Update this route to your CWO store route --}}
                 <form method="POST" action="{{ route('users.cwo.store') }}" enctype="multipart/form-data">
                     @csrf
 
@@ -274,7 +276,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="add_cwo_state" class="form-label">State</label>
                                 <input id="add_cwo_state" name="cwo_state" type="text" class="form-control"
-                                    value="{{ old('state') }}" placeholder="e.g. Selangor" required>
+                                    value="{{ old('cwo_state') }}" placeholder="e.g. Selangor" required>
                             </div>
                         </div>
 
@@ -354,7 +356,6 @@
                             <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
                         @endif
 
-                        {{-- Account Details --}}
                         <h6 class="mb-3">Account Details</h6>
                         <div class="row">
                             <div class="col-12">
@@ -385,7 +386,6 @@
 
                         <hr>
 
-                        {{-- CWO Profile --}}
                         <h6 class="mb-3">Child Welfare Officer Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -477,7 +477,7 @@
     </div>
 
 
-    <form id="deleteForm" method="POST" action="{{ route('users.law.destroy', '__id__') }}" class="d-none">
+    <form id="deleteForm" method="POST" action="{{ route('users.cwo.destroy', '__id__') }}" class="d-none">
         @csrf
         @method('DELETE')
     </form>
@@ -492,7 +492,7 @@
                 </div>
 
                 <div class="modal-body">
-                    Are you sure you want to delete this law enforcement user?<br>
+                    Are you sure you want to delete this Child Welfare Officer?<br>
                     <small class="text-secondary">User: <span id="deleteUserLabel">—</span></small>
                 </div>
 
@@ -520,7 +520,7 @@
     <script>
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addHealthcareProfessional'));
+                const m = new bootstrap.Modal(document.getElementById('addChildWelfareOfficer'));
                 m.show();
             });
         @endif
@@ -650,7 +650,7 @@
         });
 
 
-        $('#addChildWelfareOfficer, #aditChildWelfareOfficer').on('show.bs.modal', function() {
+        $('#addChildWelfareOfficer, #editChildWelfareOfficer').on('show.bs.modal', function() {
             $('#add_phone, #edit_phone').mask('000-0000000');
         });
 

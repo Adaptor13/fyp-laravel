@@ -66,13 +66,13 @@
 
         <div class="row">
 
-            <div class="col-sm-6 col-lg-3">
+        <div class="col-sm-6 col-lg-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Total Users</p>
+                            <h3 class="header-heading mb-0">{{ $totalWorkers }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Total Workers</p>
                             </div>
                             <div>
                                 <i class="ti ti-users f-s-36"></i>
@@ -87,27 +87,28 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
+                            <h3 class="header-heading mb-0">{{ $agenciesCovered }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Agencies Covered</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone f-s-36"></i>
+                                <i class="ti ti-briefcase f-s-36"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+
             <div class="col-sm-6 col-lg-3">
-                <div class="card bg-danger text-white">
+                <div class="card bg-warning text-white">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
+                            <h3 class="header-heading mb-0">{{ $totalStates }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">States Covered</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone-off f-s-36"></i>
+                                <i class="ti ti-refresh f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -119,8 +120,8 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">New Users</p>
+                            <h3 class="header-heading mb-0">{{ $newUsers }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">New Users</p>
                             </div>
                             <div>
                                 <i class="ti ti-user-plus f-s-36"></i>
@@ -332,196 +333,6 @@
         </div>
     </div>
 
-    {{-- <div class="modal fade" id="editSocialWorker" aria-hidden="true" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <form method="POST" action="{{ route('users.social.update', '__ID__') }}" data-action-template="{{ route('users.social.update', '__ID__') }}"
-                    enctype="multipart/form-data">
-                   
-                    @csrf
-                    @method('PUT')
-
-                    <div class="modal-header bg-primary">
-                        <h5 class="modal-title text-white">Edit Social Worker</h5>
-                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger mb-3">
-                                {{ $errors->first() }}
-                            </div>
-                        @endif
-
-                        <h6 class="mb-3">Account Details</h6>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="avatar-upload">
-                                        <div class="avatar-edit">
-                                            <input type="file"
-                                                id="imageUploadEdit"
-                                                name="avatar"
-                                                accept=".png,.jpg,.jpeg"
-                                                data-preview="#imgPreviewEdit">
-                                            <label for="imageUploadEdit"><i class="ti ti-photo-heart"></i></label>
-                                        </div>
-                                        <div class="avatar-preview">
-                                            <div id="imgPreviewEdit"
-                                                style="background-image:url('{{ $socialWorker->avatar_url ?? '' }}');"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_name" class="form-label">Name</label>
-                                <input id="edit_name" name="name" type="text" class="form-control"
-                                    value="{{ old('name') }}" placeholder="Name" required>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_email" class="form-label">Email</label>
-                                <input id="edit_email" name="email" type="email" class="form-control"
-                                    value="{{ old('email') }}" readonly>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="mb-3">Social Worker Profile</h6>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_staff_id" class="form-label">Staff ID</label>
-                                <input id="edit_staff_id" name="staff_id" type="text" class="form-control"
-                                    value="{{ old('staff_id') }}"
-                                    placeholder="Staff ID" required>
-                            </div>
-
-                            <div class="col-md-6 mb-3 floating">
-                                <label for="edit_agencyDropdown" class="form-label">Agency Name</label>
-                                @php
-                                    $agencyName = old('agency_name', '');
-                                @endphp
-                                <select id="edit_agencyDropdown" name="agency_name" class="form-select" required>
-                                    <option value="" data-code="">Select Agency</option>
-
-                                    <option value="Jabatan Kebajikan Masyarakat" data-code="JKM"
-                                        {{ $agencyName==='Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
-                                        Jabatan Kebajikan Masyarakat (JKM)
-                                    </option>
-
-                                    <option value="Women’s Aid Organisation" data-code="WAO"
-                                        {{ $agencyName==='Women’s Aid Organisation' ? 'selected' : '' }}>
-                                        Women’s Aid Organisation (WAO)
-                                    </option>
-
-                                    <option value="Malaysian Social Workers Association" data-code="MSWA"
-                                        {{ $agencyName==='Malaysian Social Workers Association' ? 'selected' : '' }}>
-                                        Malaysian Social Workers Association (MSWA)
-                                    </option>
-
-                                    <option value="Other" data-code=""
-                                        {{ $agencyName==='Other' ? 'selected' : '' }}>
-                                        Other
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        @php
-                            $agencyOther = old('agency_name_other', '');
-                            $isOther = $agencyName === 'Other';
-                        @endphp
-
-                        <input type="text" id="edit_otherAgencyInput" name="agency_name_other" class="form-control mb-2"
-                            placeholder="Enter Agency Name"
-                            style="{{ $isOther ? '' : 'display:none;' }}"
-                            value="{{ $agencyOther }}">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_agencyCodeInput" class="form-label">Agency Code</label>
-                                <input id="edit_agencyCodeInput" name="agency_code" type="text" class="form-control"
-                                    value="{{ old('agency_code') }}"
-                                    placeholder="Agency Code" required>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_placement_state" class="form-label">Placement State</label>
-                                <input id="edit_placement_state" name="placement_state" type="text" class="form-control"
-                                    value="{{ old('placement_state') }}"
-                                    placeholder="State" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 mb-3">
-                            <label for="edit_placement_district" class="form-label">Placement District</label>
-                            <input id="edit_placement_district" name="placement_district" type="text" class="form-control"
-                                value="{{ old('placement_district') }}"
-                                placeholder="District" required>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="mb-3">Contact Information (Optional)</h6>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_phone" class="form-label">Phone</label>
-                                <input id="edit_phone" name="phone" type="text" class="form-control"
-                                    value="{{ old('phone') }}"
-                                    placeholder="e.g. 012-3456789">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_address_line1" class="form-label">Address Line 1</label>
-                                <input id="edit_address_line1" name="address_line1" type="text" class="form-control"
-                                    value="{{ old('address_line1') }}"
-                                    placeholder="Street, Apartment, etc.">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_address_line2" class="form-label">Address Line 2</label>
-                                <input id="edit_address_line2" name="address_line2" type="text" class="form-control"
-                                    value="{{ old('address_line2') }}"
-                                    placeholder="Unit, Suite">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_city" class="form-label">City</label>
-                                <input id="edit_city" name="city" type="text" class="form-control"
-                                    value="{{ old('city') }}"
-                                    placeholder="City">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_postcode" class="form-label">Postcode</label>
-                                <input id="edit_postcode" name="postcode" type="text" class="form-control"
-                                    value="{{ old('postcode') }}"
-                                    placeholder="Postcode">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_state" class="form-label">State</label>
-                                <input id="edit_state" name="state" type="text" class="form-control"
-                                    value="{{ old('state') }}"
-                                    placeholder="State">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-light-primary">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> --}}
 
     <div class="modal fade" id="editSocialWorker" aria-hidden="true" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">

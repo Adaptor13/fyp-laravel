@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h4 class="main-title">Manage Healthcare Professional</h4>
+                <h4 class="main-title">Manage Law Enforcement</h4>
             </div>
             <div class="col-sm-6 mt-sm-2">
                 <ul class="breadcrumb breadcrumb-start float-sm-end">
@@ -33,7 +33,7 @@
                     </li>
                     <li class="d-flex active">
                         <i class="ti ti-user f-s-16 ms-2"></i>
-                        <span class="f-s-14">Healthcare Professional</span>
+                        <span class="f-s-14">Law Enforcement</span>
                     </li>
                 </ul>
             </div>
@@ -65,7 +65,7 @@
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
                                 <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Total Users</p>
+                                <p class="f-w-300 f-s-12 mb-0">Total Officers</p>
                             </div>
                             <div>
                                 <i class="ti ti-users f-s-36"></i>
@@ -81,10 +81,10 @@
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
                                 <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
+                                <p class="f-w-300 f-s-12 mb-0">Agencies Represented</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone f-s-36"></i>
+                                <i class="ti ti-building f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -97,10 +97,10 @@
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
                                 <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
+                                <p class="f-w-300 f-s-12 mb-0">Stations Covered</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone-off f-s-36"></i>
+                                <i class="ti ti-map-pin f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
                                 <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">New Users</p>
+                                <p class="f-w-300 f-s-12 mb-0">New Officers</p>
                             </div>
                             <div>
                                 <i class="ti ti-user-plus f-s-36"></i>
@@ -272,8 +272,8 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="add_le_state" class="form-label">State</label>
-                                <input id="add_le_state" name="state" type="text" class="form-control"
-                                    value="{{ old('state') }}" placeholder="e.g. Selangor" required>
+                                <input id="add_le_state" name="le_state" type="text" class="form-control"
+                                    value="{{ old('le_state') }}" placeholder="e.g. Selangor" required>
                             </div>
                         </div>
 

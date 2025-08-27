@@ -59,69 +59,70 @@
 
         <div class="row">
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body p-0">
-                        <div class="d-flex justify-content-between align-items-center p-4">
-                            <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Total Users</p>
-                            </div>
-                            <div>
-                                <i class="ti ti-users f-s-36"></i>
-                            </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center p-4">
+                        <div>
+                            <h3 class="header-heading mb-0">{{ $totalUsers ?? 0 }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Total Professionals</p>
+                        </div>
+                        <div>
+                            <i class="ti ti-users f-s-36"></i>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body p-0">
-                        <div class="d-flex justify-content-between align-items-center p-4">
-                            <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
-                            </div>
-                            <div>
-                                <i class="ti ti-phone f-s-36"></i>
-                            </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-success text-white">
+                <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center p-4">
+                        <div>
+                            <h3 class="header-heading mb-0">{{ $doctorsCount ?? 0 }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Doctors</p>
+                        </div>
+                        <div>
+                            <i class="ti ti-stethoscope f-s-36"></i>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card bg-danger text-white">
-                    <div class="card-body p-0">
-                        <div class="d-flex justify-content-between align-items-center p-4">
-                            <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
-                            </div>
-                            <div>
-                                <i class="ti ti-phone-off f-s-36"></i>
-                            </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center p-4">
+                        <div>
+                            <h3 class="header-heading mb-0">{{ $nursesCount ?? 0 }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Nurses</p>
+                        </div>
+                        <div>
+                            <i class="ti ti-user f-s-36"></i>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-sm-6 col-lg-3">
-                <div class="card bg-info text-white">
-                    <div class="card-body p-0">
-                        <div class="d-flex justify-content-between align-items-center p-4">
-                            <div>
-                                <h3 class="header-heading mb-0">1</h3>
-                                <p class="f-w-300 f-s-12 mb-0">New Users</p>
-                            </div>
-                            <div>
-                                <i class="ti ti-user-plus f-s-36"></i>
-                            </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-info text-white">
+                <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center p-4">
+                        <div>
+                            <h3 class="header-heading mb-0">{{ $recentlyAdded ?? 0 }}</h3>
+                            <p class="f-w-300 f-s-12 mb-0">Recently Added (30 days)</p>
+                        </div>
+                        <div>
+                            <i class="ti ti-user-plus f-s-36"></i>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
 
             <div class="col-12">
                 <div class="card">
@@ -643,7 +644,7 @@
             $('#confirmDeleteBtn').on('click', function() {
                 if (!deleteId) return;
                 const form = document.getElementById('deleteForm');
-                form.action = "{{ route('users.social.destroy', '__id__') }}".replace('__id__', deleteId);
+                form.action = "{{ route('users.healthcare.destroy', '__id__') }}".replace('__id__', deleteId);
                 form.submit();
             });
         });

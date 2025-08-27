@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             ReportSeeder::class,
-            
+            CwoUserSeeder::class,
         ]);
     }
 }

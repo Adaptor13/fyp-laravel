@@ -9,7 +9,7 @@ use App\Models\LawEnforcementProfile;
 use App\Models\GovOfficialProfile;
 use App\Models\PublicUserProfile;
 use App\Models\HealthcareProfile;
-
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +37,7 @@ class UserController extends Controller
             ->map(function ($u) {
                 $avatarPath = optional($u->profile)->avatar_path;
                 $avatarUrl = $avatarPath
-                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    ? asset('storage/' . $avatarPath)
                     : asset('assets/images/icons/logo14.png');
 
                 return [
@@ -408,7 +408,43 @@ class UserController extends Controller
     public function socialWorkers() 
     {
         $users = $this->getUsersByRole('social_worker');
-        return view('admin.users.social.index', compact('users'));
+        
+        // Calculate dynamic statistics for Social Worker dashboard
+        $socialRoleId = Role::where('name', 'social_worker')->value('id');
+        
+        // Total social workers
+        $totalWorkers = User::where('role_id', $socialRoleId)->count();
+        
+        // Count unique agencies covered
+        $agenciesCovered = DB::table('social_worker_profiles')
+            ->join('users', 'social_worker_profiles.user_id', '=', 'users.id')
+            ->where('users.role_id', $socialRoleId)
+            ->whereNotNull('social_worker_profiles.agency_name')
+            ->where('social_worker_profiles.agency_name', '!=', '')
+            ->distinct('social_worker_profiles.agency_name')
+            ->count('social_worker_profiles.agency_name');
+        
+        // Count unique states covered
+        $totalStates = DB::table('social_worker_profiles')
+            ->join('users', 'social_worker_profiles.user_id', '=', 'users.id')
+            ->where('users.role_id', $socialRoleId)
+            ->whereNotNull('social_worker_profiles.placement_state')
+            ->where('social_worker_profiles.placement_state', '!=', '')
+            ->distinct('social_worker_profiles.placement_state')
+            ->count('social_worker_profiles.placement_state');
+        
+        // New users this month
+        $newUsers = User::where('role_id', $socialRoleId)
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->count();
+        
+        return view('admin.users.social.index', compact(
+            'users', 
+            'totalWorkers', 
+            'agenciesCovered', 
+            'totalStates',
+            'newUsers'
+        ));
     }
 
     public function socialWorkersData()
@@ -422,7 +458,7 @@ class UserController extends Controller
             ->map(function ($u) {
                 $avatarPath = optional($u->profile)->avatar_path;
                 $avatarUrl = $avatarPath
-                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    ? asset('storage/' . $avatarPath)
                     : asset('assets/images/icons/logo14.png');
 
                 return [
@@ -677,7 +713,7 @@ class UserController extends Controller
             ->map(function ($u) {
                 $avatarPath = optional($u->profile)->avatar_path;
                 $avatarUrl = $avatarPath
-                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    ? asset('storage/' . $avatarPath)
                     : asset('assets/images/icons/logo14.png');
 
                 return [
@@ -736,7 +772,7 @@ class UserController extends Controller
             'address_line2' => 'nullable|string|max:255',
             'city'          => 'nullable|string|max:120',
             'postcode'      => 'nullable|string|max:20',
-            'state'         => 'nullable|string|max:120',  // <-- profile state
+            'state_profile'         => 'nullable|string|max:120',  // <-- profile state
         ]);
 
         $roleId = Role::where('name', 'law_enforcement')->value('id');
@@ -778,7 +814,7 @@ class UserController extends Controller
                     'address_line2' => $validated['address_line2'] ?? null,
                     'city'          => $validated['city'] ?? null,
                     'postcode'      => $validated['postcode'] ?? null,
-                    'state'         => $validated['state'] ?? null,   // <-- user_profiles.state
+                    'state'         => $validated['state_profile'] ?? null,   // <-- user_profiles.state
                 ];
 
                 if ($request->hasFile('avatar')) {
@@ -905,11 +941,69 @@ class UserController extends Controller
         return back()->with('success', 'Law Officer deleted.');
     }
 
-    //cwo
+    /**
+     * Display CWO dashboard with dynamic statistics
+     * 
+     * @return \Illuminate\View\View
+     */
     public function cwo()
     {
         $users = $this->getUsersByRole('gov_official');
-        return view('admin.users.cwo.index', compact('users'));
+        
+        // Calculate dynamic statistics for CWO dashboard
+        $cwoRoleId = Role::where('name', 'gov_official')->value('id');
+        
+        // Total CWO officers
+        $totalCwo = User::where('role_id', $cwoRoleId)->count();
+        
+        // Count unique ministries
+        $ministriesCount = DB::table('gov_official_profiles')
+            ->join('users', 'gov_official_profiles.user_id', '=', 'users.id')
+            ->where('users.role_id', $cwoRoleId)
+            ->whereNotNull('gov_official_profiles.ministry')
+            ->where('gov_official_profiles.ministry', '!=', '')
+            ->distinct('gov_official_profiles.ministry')
+            ->count('gov_official_profiles.ministry');
+        
+        // Count unique states covered
+        $statesCovered = DB::table('gov_official_profiles')
+            ->join('users', 'gov_official_profiles.user_id', '=', 'users.id')
+            ->where('users.role_id', $cwoRoleId)
+            ->whereNotNull('gov_official_profiles.state')
+            ->where('gov_official_profiles.state', '!=', '')
+            ->distinct('gov_official_profiles.state')
+            ->count('gov_official_profiles.state');
+        
+        // Recently added CWO (last 30 days)
+        $recentlyAddedCwo = User::where('role_id', $cwoRoleId)
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->count();
+        
+        // Additional statistics for better insights
+        $activeThisMonth = User::where('role_id', $cwoRoleId)
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->count();
+        
+        $topMinistries = DB::table('gov_official_profiles')
+            ->join('users', 'gov_official_profiles.user_id', '=', 'users.id')
+            ->where('users.role_id', $cwoRoleId)
+            ->whereNotNull('gov_official_profiles.ministry')
+            ->where('gov_official_profiles.ministry', '!=', '')
+            ->select('gov_official_profiles.ministry', DB::raw('count(*) as count'))
+            ->groupBy('gov_official_profiles.ministry')
+            ->orderBy('count', 'desc')
+            ->limit(3)
+            ->get();
+        
+        return view('admin.users.cwo.index', compact(
+            'users', 
+            'totalCwo', 
+            'ministriesCount', 
+            'statesCovered', 
+            'recentlyAddedCwo',
+            'activeThisMonth',
+            'topMinistries'
+        ));
     }
 
     public function childWelfareOfficerData()
@@ -923,7 +1017,7 @@ class UserController extends Controller
             ->map(function ($u) {
                 $avatarPath = optional($u->profile)->avatar_path;
                 $avatarUrl = $avatarPath
-                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    ? asset('storage/' . $avatarPath)
                     : asset('assets/images/icons/logo14.png');
 
                 return [
@@ -1147,7 +1241,27 @@ class UserController extends Controller
     public function healthcare() 
     {
         $users = $this->getUsersByRole('healthcare');
-        return view('admin.users.healthcare.index', compact('users'));
+        
+        // Calculate statistics for healthcare professionals
+        $healthcareRoleId = Role::where('name', 'healthcare')->value('id');
+        
+        $totalUsers = User::where('role_id', $healthcareRoleId)->count();
+        
+        $doctorsCount = User::where('role_id', $healthcareRoleId)
+            ->whereHas('healthcareProfile', function($query) {
+                $query->where('profession', 'Doctor');
+            })->count();
+            
+        $nursesCount = User::where('role_id', $healthcareRoleId)
+            ->whereHas('healthcareProfile', function($query) {
+                $query->where('profession', 'Nurse');
+            })->count();
+            
+        $recentlyAdded = User::where('role_id', $healthcareRoleId)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+        
+        return view('admin.users.healthcare.index', compact('users', 'totalUsers', 'doctorsCount', 'nursesCount', 'recentlyAdded'));
     }
 
     public function healthcareData()
@@ -1161,7 +1275,7 @@ class UserController extends Controller
             ->map(function ($u) {
                 $avatarPath = optional($u->profile)->avatar_path;
                 $avatarUrl = $avatarPath
-                    ? asset('storage/' . ltrim($avatarPath, '/'))
+                    ? asset('storage/' . $avatarPath)
                     : asset('assets/images/icons/logo14.png');
 
                 return [
