@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h4 class="main-title">Manage Admin</h4>
+                <h4 class="main-title">Manage Cases</h4>
             </div>
             <div class="col-sm-6 mt-sm-2">
                 <ul class="breadcrumb breadcrumb-start float-sm-end">
@@ -25,14 +25,14 @@
                         </a>
                     </li>
                     <li class="d-flex">
-                        <i class="ti ti-users f-s-16 ms-2"></i>
+                        <i class="ti ti-folder f-s-16 ms-2"></i>
                         <a href="#" class="f-s-14 d-flex gap-2">
-                            <span class="d-none d-md-block">Users</span>
+                            <span class="d-none d-md-block">Cases</span>
                         </a>
                     </li>
                     <li class="d-flex active">
-                        <i class="ti ti-user f-s-16 ms-2"></i>
-                        <span class="f-s-14">Admin</span>
+                        <i class="ti ti-file-text f-s-16 ms-2"></i>
+                        <span class="f-s-14">All Cases</span>
                     </li>
                 </ul>
             </div>
@@ -126,8 +126,8 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Cases</h5>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdmin">
-                            Add
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCase">
+                            Add Case
                         </button>
                     </div>
 
@@ -156,6 +156,255 @@
         </div>
     </div>
 
+    <!-- Add Case Modal -->
+    <div class="modal fade" id="addCase" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('cases.store') }}" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title text-white">Add New Case</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="row">
+                            <!-- Reporter Information -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Reporter Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="reporter_name" class="form-label">Reporter Name *</label>
+                                    <input type="text" name="reporter_name" id="reporter_name" class="form-control" 
+                                           value="{{ old('reporter_name') }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="reporter_email" class="form-label">Reporter Email *</label>
+                                    <input type="email" name="reporter_email" id="reporter_email" class="form-control" 
+                                           value="{{ old('reporter_email') }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="reporter_phone" class="form-label">Reporter Phone</label>
+                                    <input type="text" name="reporter_phone" id="reporter_phone" class="form-control" 
+                                           value="{{ old('reporter_phone') }}">
+                                </div>
+                            </div>
+
+                            <!-- Victim Information -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Victim Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="victim_age" class="form-label">Victim Age</label>
+                                    <input type="text" name="victim_age" id="victim_age" class="form-control" 
+                                           value="{{ old('victim_age') }}" placeholder="e.g., 12">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="victim_gender" class="form-label">Victim Gender</label>
+                                    <select name="victim_gender" id="victim_gender" class="form-select">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male" {{ old('victim_gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ old('victim_gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="Other" {{ old('victim_gender') == 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Abuse Types</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="abuse_types[]" value="Physical Abuse" class="form-check-input" 
+                                               {{ in_array('Physical Abuse', old('abuse_types', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Physical Abuse</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="abuse_types[]" value="Emotional Abuse" class="form-check-input" 
+                                               {{ in_array('Emotional Abuse', old('abuse_types', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Emotional Abuse</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="abuse_types[]" value="Sexual Abuse" class="form-check-input" 
+                                               {{ in_array('Sexual Abuse', old('abuse_types', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Sexual Abuse</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="abuse_types[]" value="Neglect" class="form-check-input" 
+                                               {{ in_array('Neglect', old('abuse_types', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Neglect</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="abuse_types[]" value="Exploitation" class="form-check-input" 
+                                               {{ in_array('Exploitation', old('abuse_types', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Exploitation</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Incident Details -->
+                            <div class="col-md-12">
+                                <h6 class="mb-3">Incident Details</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="incident_description" class="form-label">Incident Description *</label>
+                                    <textarea name="incident_description" id="incident_description" class="form-control" 
+                                              rows="4" required>{{ old('incident_description') }}</textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="incident_location" class="form-label">Incident Location *</label>
+                                            <input type="text" name="incident_location" id="incident_location" class="form-control" 
+                                                   value="{{ old('incident_location') }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="incident_date" class="form-label">Incident Date *</label>
+                                            <input type="date" name="incident_date" id="incident_date" class="form-control" 
+                                                   value="{{ old('incident_date') }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="suspected_abuser" class="form-label">Suspected Abuser</label>
+                                    <input type="text" name="suspected_abuser" id="suspected_abuser" class="form-control" 
+                                           value="{{ old('suspected_abuser') }}" placeholder="e.g., Parent/Guardian, Teacher, etc.">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="evidence" class="form-label">Evidence Files</label>
+                                    <input type="file" name="evidence[]" id="evidence" class="form-control" multiple 
+                                           accept=".jpg,.jpeg,.png,.mp4,.pdf">
+                                    <small class="form-text text-muted">You can select multiple files (JPG, PNG, MP4, PDF up to 20MB each)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Case Management -->
+                            <div class="col-md-12">
+                                <h6 class="mb-3">Case Management</h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="report_status" class="form-label">Status *</label>
+                                            <select name="report_status" id="report_status" class="form-select" required>
+                                                <option value="">Select Status</option>
+                                                <option value="Submitted" {{ old('report_status') == 'Submitted' ? 'selected' : '' }}>Submitted</option>
+                                                <option value="Under Review" {{ old('report_status') == 'Under Review' ? 'selected' : '' }}>Under Review</option>
+                                                <option value="In Progress" {{ old('report_status') == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                                                <option value="Resolved" {{ old('report_status') == 'Resolved' ? 'selected' : '' }}>Resolved</option>
+                                                <option value="Closed" {{ old('report_status') == 'Closed' ? 'selected' : '' }}>Closed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="priority_level" class="form-label">Priority *</label>
+                                            <select name="priority_level" id="priority_level" class="form-select" required>
+                                                <option value="">Select Priority</option>
+                                                <option value="Low" {{ old('priority_level') == 'Low' ? 'selected' : '' }}>Low</option>
+                                                <option value="Medium" {{ old('priority_level') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                                                <option value="High" {{ old('priority_level') == 'High' ? 'selected' : '' }}>High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="assigned_to" class="form-label">Assign To</label>
+                                            <select name="assigned_to" id="assigned_to" class="form-select">
+                                                <option value="">Unassigned</option>
+                                                @foreach(\App\Models\User::whereIn('role_id', \App\Models\Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare'])->pluck('id'))->get() as $user)
+                                                    <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }} ({{ optional($user->role)->name }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Case</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Case Modal -->
+    <div class="modal fade" id="editCase" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <form method="POST" id="editCaseForm" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header bg-success">
+                        <h5 class="modal-title text-white">Edit Case</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="editCaseContent">
+                            <!-- Content will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update Case</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteCaseModal" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white">Confirm Delete</h5>
+                    <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this case? This action cannot be undone.</p>
+                    <p class="mb-0"><strong>Case:</strong> <span id="deleteCaseLabel"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" id="deleteCaseForm" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete Case</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -213,9 +462,10 @@
                     render: function (d) {
                         if (!d) return '—';
                         let cls = 'secondary';
-                        if (d === 'Open') cls = 'success';
-                        else if (d === 'Closed') cls = 'danger';
-                        else if (d === 'Pending') cls = 'warning';
+                        if (d === 'In Progress') cls = 'success';
+                        else if (d === 'Closed' || d === 'Resolved') cls = 'danger';
+                        else if (d === 'Under Review') cls = 'warning';
+                        else if (d === 'Submitted') cls = 'info';
                         return `<span class="badge bg-${cls}">${d}</span>`;
                     }
                 },
@@ -294,6 +544,32 @@
             ],
             order: [[5, 'desc']], // sort by Updated (index 5, now that we added Case ID column)
             responsive: true
+        });
+
+        // Handle edit button clicks
+        $(document).on('click', '.edit-btn', function() {
+            const caseId = $(this).data('id');
+            
+            // Show loading state
+            $('#editCaseContent').html('<div class="text-center"><i class="ti ti-loader ti-spin"></i> Loading...</div>');
+            
+            // Fetch case data and populate form
+            $.get(`/cases/${caseId}/edit`, function(data) {
+                $('#editCaseContent').html(data);
+                $('#editCaseForm').attr('action', `/cases/${caseId}`);
+            }).fail(function() {
+                $('#editCaseContent').html('<div class="alert alert-danger">Failed to load case data.</div>');
+            });
+        });
+
+        // Handle delete button clicks
+        $(document).on('click', '.delete-btn', function() {
+            const caseId = $(this).data('id');
+            const label = $(this).data('label');
+            
+            $('#deleteCaseLabel').text(label);
+            $('#deleteCaseForm').attr('action', `/cases/${caseId}`);
+            $('#deleteCaseModal').modal('show');
         });
     });
 </script>

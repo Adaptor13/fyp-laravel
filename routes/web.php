@@ -151,6 +151,12 @@ Route::middleware('web')->group(function () {
         Route::post('/cases/{report}/note', [CaseController::class, 'addNote'])->name('cases.note');
         Route::post('/cases/{report}/status',[CaseController::class, 'updateStatus'])->name('cases.status');
 
+        // Cases CRUD routes
+        Route::post('/cases', [CaseController::class, 'store'])->name('cases.store');
+        Route::get('/cases/{report}/edit', [CaseController::class, 'edit'])->name('cases.edit');
+        Route::put('/cases/{report}', [CaseController::class, 'update'])->name('cases.update');
+        Route::delete('/cases/{report}', [CaseController::class, 'destroy'])->name('cases.destroy');
+
         // Route::get('/cases-history', [CaseHistoryController::class, 'index'])->name('cases.history');
     });
 
