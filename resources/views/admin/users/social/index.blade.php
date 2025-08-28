@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Public User')
+@section('title', 'Social Worker')
 @section('css')
 
 
@@ -317,9 +317,9 @@
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_state" class="form-label">State</label>
+                                <label for="add_state" class="form-label">Mailing State</label>
                                 <input id="add_state" name="state" type="text" class="form-control" 
-                                    value="{{ old('state') }}" placeholder="State">
+                                    value="{{ old('state') }}" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -475,9 +475,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_state" class="form-label">State</label>
+                                <label for="edit_state" class="form-label">Mailing State</label>
                                 <input id="edit_state" name="state" type="text" class="form-control"
-                                    placeholder="State">
+                                    placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>

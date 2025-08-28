@@ -27,7 +27,6 @@
                 </a>
                 <ul class="collapse" id="caseManagement">
                     <li><a href="{{ route('cases.index') }}"><i class="ti ti-list"></i> View Cases</a></li>
-                    <li><a href=""><i class="ti ti-history"></i> Case History</a></li>
                 </ul>
             </li>
 

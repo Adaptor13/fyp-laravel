@@ -101,17 +101,7 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
-    /**
-     * Get cases where this user is the primary assignee
-     */
-    public function primaryAssignedCases()
-    {
-        return $this->belongsToMany(Report::class, 'case_assignments', 'user_id', 'report_id')
-                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
-                    ->where('case_assignments.is_primary', true)
-                    ->whereNull('case_assignments.unassigned_at')
-                    ->withTimestamps();
-    }
+
 
     /**
      * Get all assignments for this user

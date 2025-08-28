@@ -47,11 +47,5 @@ class CaseAssignment extends Model
         return $query->whereNull('unassigned_at');
     }
 
-    /**
-     * Scope to get only primary assignments
-     */
-    public function scopePrimary($query)
-    {
-        return $query->where('is_primary', true);
-    }
+
 }

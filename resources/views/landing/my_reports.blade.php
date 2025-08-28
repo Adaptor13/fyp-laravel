@@ -37,6 +37,7 @@
                                 <th>Abuse Types</th>
                                 <th>Status</th>
                                 <th>Priority</th>
+                                <th>Assignees</th>
                                 <th>Submitted Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -94,6 +95,20 @@
                                             };
                                         @endphp
                                         <span class="badge {{ $priorityClass }}">{{ $report->priority_level ?? 'Medium' }}</span>
+                                    </td>
+                                    <td>
+                                        @if($report->assignees && $report->assignees->count() > 0)
+                                            @php
+                                                $totalCount = $report->assignees->count();
+                                            @endphp
+                                            <span class="badge bg-success" title="{{ $totalCount }} assignee(s) total">
+                                                <i class="bi bi-people me-1"></i>{{ $totalCount }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-person-x me-1"></i>None
+                                            </span>
+                                        @endif
                                     </td>
                                 <td data-order="{{ $report->created_at->timestamp }}">{{ $report->created_at->format('d M Y H:i') }}</td>
                                      <td>
@@ -249,6 +264,41 @@
                                              </div>
                                          </div>
                                          @endif
+
+                                         <!-- Case Assignees -->
+                                         <div class="col-12 mb-3">
+                                             <h6 class="text-primary"><i class="bi bi-people me-2"></i>Case Assignees</h6>
+                                             <div class="card">
+                                                 <div class="card-body">
+                                                     @if($report->assignees && $report->assignees->count() > 0)
+                                                         <div class="row">
+                                                             @foreach($report->assignees as $assignee)
+                                                                 <div class="col-md-6 mb-2">
+                                                                     <div class="d-flex align-items-center">
+                                                                         <div class="flex-shrink-0">
+                                                                             <span class="badge bg-secondary me-2">
+                                                                                 <i class="bi bi-person"></i> Assigned
+                                                                             </span>
+                                                                         </div>
+                                                                         <div class="flex-grow-1">
+                                                                             <strong>{{ $assignee->name }}</strong>
+                                                                             @if($assignee->profile)
+                                                                                 <br><small class="text-muted">{{ $assignee->profile->phone ?? 'No phone' }}</small>
+                                                                             @endif
+                                                                             <br><small class="text-muted">Assigned: {{ \Carbon\Carbon::parse($assignee->pivot->assigned_at)->format('d M Y, H:i') }}</small>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                             @endforeach
+                                                         </div>
+                                                     @else
+                                                         <p class="text-muted mb-0">
+                                                             <i class="bi bi-info-circle me-2"></i>No assignees have been assigned to this case yet.
+                                                         </p>
+                                                     @endif
+                                                 </div>
+                                             </div>
+                                         </div>
 
                                          <!-- Timestamps -->
                                          <div class="col-12">

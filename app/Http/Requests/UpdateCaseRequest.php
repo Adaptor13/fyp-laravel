@@ -28,11 +28,13 @@ class UpdateCaseRequest extends FormRequest
             'suspected_abuser' => 'nullable|string|max:255',
             'evidence' => 'nullable|array',
             'evidence.*' => 'file|mimes:jpg,jpeg,png,mp4,pdf|max:20480',
+            'existing_evidence' => 'nullable|array',
+            'existing_evidence.*' => 'nullable|string',
+            'removed_evidence' => 'nullable|string',
             'report_status' => 'required|string|in:Submitted,Under Review,In Progress,Resolved,Closed',
             'priority_level' => 'required|string|in:Low,Medium,High',
             'assignees' => 'nullable|array',
             'assignees.*' => 'nullable|string|exists:users,id',
-            'primary_assignee' => 'nullable|string|exists:users,id',
         ];
     }
 
@@ -49,7 +51,6 @@ class UpdateCaseRequest extends FormRequest
             'report_status.required' => 'Report status is required.',
             'priority_level.required' => 'Priority level is required.',
             'assignees.*.exists' => 'One or more selected assignees are invalid.',
-            'primary_assignee.exists' => 'The selected primary assignee is invalid.',
         ];
     }
 
@@ -72,12 +73,7 @@ class UpdateCaseRequest extends FormRequest
                 $this->merge(['abuse_types' => array_values($filteredAbuseTypes)]);
             }
             
-            // Ensure primary assignee is one of the selected assignees
-            if ($this->input('primary_assignee') && $this->input('assignees')) {
-                if (!in_array($this->input('primary_assignee'), $this->input('assignees'))) {
-                    $validator->errors()->add('primary_assignee', 'Primary assignee must be one of the selected assignees.');
-                }
-            }
+
         });
     }
 }

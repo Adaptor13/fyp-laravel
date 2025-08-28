@@ -10,9 +10,10 @@ class AdminProfile extends Model
 
     protected $primaryKey = 'user_id';
     public $incrementing = false;
-    protected $keyType = 'string'; // or 'int' if user.id is int
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'display_name',
         'department',
         'position',
     ];

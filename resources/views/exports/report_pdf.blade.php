@@ -264,6 +264,34 @@
     </div>
     @endif
     
+    <!-- Case Assignees -->
+    <div class="section">
+        <h3 class="section-title">Case Assignees</h3>
+        <div class="section-content">
+            @if($report->assignees && $report->assignees->count() > 0)
+                <div class="info-grid">
+                    @foreach($report->assignees as $assignee)
+                        <div class="info-row">
+                            <div class="info-label">
+                                <span class="badge badge-secondary">Assigned</span>
+                                Assignee:
+                            </div>
+                            <div class="info-value">
+                                <strong>{{ $assignee->name }}</strong>
+                                @if($assignee->profile && $assignee->profile->phone)
+                                    <br><small style="color: #666;">Phone: {{ $assignee->profile->phone }}</small>
+                                @endif
+                                <br><small style="color: #666;">Assigned: {{ \Carbon\Carbon::parse($assignee->pivot->assigned_at)->format('d M Y, H:i') }}</small>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p style="color: #666; font-style: italic;">No assignees have been assigned to this case yet.</p>
+            @endif
+        </div>
+    </div>
+    
     <!-- Timestamps -->
     <div class="timestamp">
         <div class="info-grid">

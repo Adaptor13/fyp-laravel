@@ -75,13 +75,14 @@ class CaseController extends Controller
                 'reports.id',
                 'reports.reporter_name',
                 'reports.reporter_email',
+                'reports.incident_description',
                 'reports.report_status',
                 'reports.priority_level',
                 'reports.updated_at',
                 DB::raw("GROUP_CONCAT(CONCAT(assignee.name, CASE WHEN case_assignments.is_primary = 1 THEN ' (Lead)' ELSE '' END) SEPARATOR ', ') as assigned_names"),
             ])
             ->whereNull('case_assignments.unassigned_at')
-            ->groupBy('reports.id', 'reports.reporter_name', 'reports.reporter_email', 'reports.report_status', 'reports.priority_level', 'reports.updated_at');
+            ->groupBy('reports.id', 'reports.reporter_name', 'reports.reporter_email', 'reports.incident_description', 'reports.report_status', 'reports.priority_level', 'reports.updated_at');
 
         // Visibility by role
         if (!in_array($role, ['admin','gov_official'])) {
@@ -105,6 +106,7 @@ class CaseController extends Controller
                     'name'  => $r->reporter_name ?? '—',
                     'email' => $r->reporter_email ?? '—',
                 ],
+                'incident_description' => $r->incident_description ?? '—',
                 'status'   => $r->report_status ?? '',
                 'priority' => $r->priority_level ?? '',
                 'assigned' => $assignedDisplay,
@@ -120,19 +122,24 @@ class CaseController extends Controller
     {
         // Get all assignees for this case
         $assignees = $report->assignees;
-        $primaryAssignee = $report->primaryAssignee->first();
         
-        return view('admin.cases.show', compact('report', 'assignees', 'primaryAssignee'));
+        return view('admin.cases.show', compact('report', 'assignees'));
     }
 
     public function edit(Report $report)
     {
-        $assignableUsers = User::whereIn('role_id', Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare', 'child_welfare'])->pluck('id'))->get();
+        $assignableUsers = User::whereIn('role_id', Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare', 'gov_official'])->pluck('id'))->get();
         $abuseTypes = json_decode($report->abuse_types, true) ?? [];
         $currentAssignees = $report->assignees->pluck('id')->toArray();
-        $primaryAssigneeId = $report->primaryAssignee->first()?->id;
         
-        return view('admin.cases.edit', compact('report', 'assignableUsers', 'abuseTypes', 'currentAssignees', 'primaryAssigneeId'));
+        // Get role-specific assignments
+        $roleAssignments = [];
+        foreach ($report->assignees as $assignee) {
+            $roleName = $assignee->role->name;
+            $roleAssignments[$roleName] = $assignee->id;
+        }
+        
+        return view('admin.cases.edit', compact('report', 'assignableUsers', 'abuseTypes', 'currentAssignees', 'roleAssignments'));
     }
 
     public function store(StoreCaseRequest $request)
@@ -176,18 +183,25 @@ class CaseController extends Controller
                         return !empty($userId) && $userId !== '';
                     });
                     
-                    $primaryAssigneeId = $request->input('primary_assignee');
-                    
                     // Create assignments for all valid assignees
+                    $assignedUsers = [];
                     foreach ($validAssignees as $userId) {
-                        $isPrimary = ($userId === $primaryAssigneeId);
-                        
                         CaseAssignment::create([
                             'report_id' => $report->id,
                             'user_id' => $userId,
-                            'is_primary' => $isPrimary,
+                            'is_primary' => false,
                             'assigned_at' => now(),
                         ]);
+                        
+                        $user = User::find($userId);
+                        if ($user) {
+                            $assignedUsers[] = $user->name;
+                        }
+                    }
+                    
+                    // Log assignment if users were assigned
+                    if (!empty($assignedUsers)) {
+                        $report->logAction('assigned', 'Case assigned to: ' . implode(', ', $assignedUsers));
                     }
                 }
             });
@@ -213,17 +227,38 @@ class CaseController extends Controller
             DB::transaction(function () use ($request, $report) {
                 $validated = $request->validated();
 
-                // Handle file uploads
+                // Handle file uploads and removals
                 $filePaths = [];
+                
+                // Get existing evidence files
+                $existingEvidence = json_decode($report->evidence, true) ?? [];
+                
+                // Get files marked for removal
+                $removedEvidence = [];
+                if ($request->has('removed_evidence') && !empty($request->removed_evidence)) {
+                    $removedEvidence = json_decode($request->removed_evidence, true) ?? [];
+                }
+                
+                // Filter out removed files from existing evidence
+                $existingEvidence = array_filter($existingEvidence, function($file) use ($removedEvidence) {
+                    return !in_array($file, $removedEvidence);
+                });
+                
+                // Add new uploaded files
                 if ($request->hasFile('evidence')) {
                     foreach ($request->file('evidence') as $file) {
                         $filePaths[] = $file->store('evidence', 'public');
                     }
                 }
-
-                // Keep existing files if no new ones uploaded
-                if (empty($filePaths) && $report->evidence) {
-                    $filePaths = json_decode($report->evidence, true) ?? [];
+                
+                // Combine existing (non-removed) and new files
+                $filePaths = array_merge($existingEvidence, $filePaths);
+                
+                // Delete removed files from storage
+                foreach ($removedEvidence as $fileToDelete) {
+                    if (Storage::disk('public')->exists($fileToDelete)) {
+                        Storage::disk('public')->delete($fileToDelete);
+                    }
                 }
 
                 $report->update([
@@ -251,8 +286,6 @@ class CaseController extends Controller
                         return !empty($userId) && $userId !== '';
                     });
                     
-                    $primaryAssigneeId = $request->input('primary_assignee');
-                    
                     // Get current active assignments
                     $currentAssignments = CaseAssignment::where('report_id', $report->id)
                         ->whereNull('unassigned_at')
@@ -273,25 +306,15 @@ class CaseController extends Controller
                     
                     // Create or update assignments for all valid assignees
                     foreach ($validAssignees as $userId) {
-                        $isPrimary = ($userId === $primaryAssigneeId);
-                        
                         // Check if assignment already exists
                         $existingAssignment = $currentAssignments->get($userId);
                         
-                        if ($existingAssignment) {
-                            // Update existing assignment if primary status changed
-                            if ($existingAssignment->is_primary !== $isPrimary) {
-                                $existingAssignment->update([
-                                    'is_primary' => $isPrimary,
-                                    'updated_at' => now(),
-                                ]);
-                            }
-                        } else {
+                        if (!$existingAssignment) {
                             // Create new assignment
                             CaseAssignment::create([
                                 'report_id' => $report->id,
                                 'user_id' => $userId,
-                                'is_primary' => $isPrimary,
+                                'is_primary' => false,
                                 'assigned_at' => now(),
                             ]);
                         }
@@ -318,21 +341,60 @@ class CaseController extends Controller
     public function destroy(Report $report)
     {
         try {
+            // Check if user has permission to delete this case
+            $user = auth()->user();
+            $isAssigned = $report->assignees->contains('id', $user->id);
+            $isAdmin = $user->role && $user->role->name === 'admin';
+            
+            if (!$isAdmin && !$isAssigned) {
+                abort(403, 'You do not have permission to delete this case.');
+            }
+
             DB::transaction(function () use ($report) {
-                // Delete associated files
                 if ($report->evidence) {
                     $filePaths = json_decode($report->evidence, true) ?? [];
                     foreach ($filePaths as $filePath) {
-                        Storage::disk('public')->delete($filePath);
+                        if (Storage::disk('public')->exists($filePath)) {
+                            Storage::disk('public')->delete($filePath);
+                        }
                     }
                 }
 
-                $report->delete();
+                // Check if report still exists before deletion
+                if (!$report->exists) {
+                    throw new \Exception('Report no longer exists');
+                }
+
+                // Delete the report (cascade will handle related records)
+                $deleted = $report->delete();
+                
+                if (!$deleted) {
+                    throw new \Exception('Failed to delete report from database');
+                }
             });
 
+            // Return appropriate response based on request type
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Case deleted successfully.']);
+            }
+            
             return back()->with('success', 'Case deleted successfully.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Failed to delete case. Please try again.');
+            // Log the error for debugging
+            \Log::error('Case deletion failed: ' . $e->getMessage(), [
+                'report_id' => $report->id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMessage = 'Failed to delete case. Please try again. Error: ' . $e->getMessage();
+            
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => $errorMessage], 500);
+            }
+            
+            return back()->with('error', $errorMessage);
         }
     }
 
@@ -358,12 +420,70 @@ class CaseController extends Controller
             'status' => 'required|string|in:Submitted,Under Review,In Progress,Resolved,Closed',
         ]);
 
+        $oldStatus = $report->report_status;
+        $newStatus = $validated['status'];
+
         $report->update([
-            'report_status' => $validated['status'],
+            'report_status' => $newStatus,
             'last_updated_by' => auth()->id(),
             'status_updated_at' => now(),
         ]);
 
+        // Log the status change specifically
+        $report->logAction('status_changed', "Status changed from '{$oldStatus}' to '{$newStatus}'", [
+            'report_status' => [
+                'from' => $oldStatus,
+                'to' => $newStatus
+            ]
+        ]);
+
         return back()->with('success', 'Case status updated successfully.');
     }
+
+    public function export(Report $report)
+    {
+        try {
+            // Check if user has permission to export this case
+            // For now, we'll allow admins and assigned users to export
+            $user = auth()->user();
+            $isAssigned = $report->assignees->contains('id', $user->id);
+            $isAdmin = $user->role && $user->role->name === 'admin';
+            
+            if (!$isAdmin && !$isAssigned) {
+                abort(403, 'You do not have permission to export this case.');
+            }
+
+            // Prepare data for the PDF
+            $abuseTypes = json_decode($report->abuse_types, true) ?? [];
+            $evidence = json_decode($report->evidence, true) ?? [];
+
+            // Generate PDF using the existing PDF template
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.report_pdf', compact('report', 'abuseTypes', 'evidence'));
+            
+            // Set PDF options
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->setOption('margin-top', 10);
+            $pdf->setOption('margin-right', 10);
+            $pdf->setOption('margin-bottom', 10);
+            $pdf->setOption('margin-left', 10);
+
+            // Generate filename
+            $filename = 'Case_' . substr($report->id, 0, 8) . '_' . now()->format('Y-m-d') . '.pdf';
+
+            // Return PDF as download
+            return $pdf->download($filename);
+
+        } catch (\Throwable $e) {
+            \Log::error('Case export failed: ' . $e->getMessage(), [
+                'report_id' => $report->id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            abort(500, 'Failed to export case. Please try again.');
+        }
+    }
+
+
 }

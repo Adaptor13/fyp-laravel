@@ -254,6 +254,8 @@
                             </div>
                         </div>
 
+                        <hr>
+
                         <div class="row">
                             <!-- Incident Details -->
                             <div class="col-md-12">
@@ -296,6 +298,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
 
                         <div class="row">
                             <!-- Case Management -->
@@ -374,7 +378,7 @@
                                                     <label for="child_welfare_assignee" class="form-label">Child Welfare Officer</label>
                                                     <select name="assignees[]" id="child_welfare_assignee" class="form-select">
                                                         <option value="">Select Child Welfare Officer</option>
-                                                        @foreach(\App\Models\User::whereHas('role', function($q) { $q->where('name', 'child_welfare'); })->get() as $user)
+                                                        @foreach(\App\Models\User::whereHas('role', function($q) { $q->where('name', 'gov_official'); })->get() as $user)
                                                             <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', [])) ? 'selected' : '' }}>
                                                                 {{ $user->name }}
                                                             </option>
@@ -383,21 +387,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="primary_assignee" class="form-label">Primary Assignee (Lead)</label>
-                                                    <select name="primary_assignee" id="primary_assignee" class="form-select">
-                                                        <option value="">Select Primary Assignee</option>
-                                                        @foreach(\App\Models\User::whereIn('role_id', \App\Models\Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare', 'child_welfare'])->pluck('id'))->get() as $user)
-                                                            <option value="{{ $user->id }}" {{ old('primary_assignee') == $user->id ? 'selected' : '' }}>
-                                                                {{ $user->name }} ({{ optional($user->role)->name }})
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -451,15 +441,31 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to delete this case? This action cannot be undone.</p>
-                    <p class="mb-0"><strong>Case:</strong> <span id="deleteCaseLabel"></span></p>
+                    <div class="mb-2">
+                        <strong>Case ID:</strong> <span id="deleteCaseId"></span>
+                    </div>
+                    <div class="mb-0">
+                        <strong>Report Name:</strong> <span id="deleteReportName"></span>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <form method="POST" id="deleteCaseForm" style="display: inline;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Case</button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete Case</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View History Modal -->
+    <div class="modal fade" id="viewHistoryModal" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div id="historyModalContent">
+                    <!-- Content will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -589,9 +595,24 @@
                                         </button>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item delete-btn" href="javascript:void(0)"
+                                        <a class="dropdown-item history-btn" href="javascript:void(0)"
                                             data-id="${row.id}"
                                             data-label="${label}">
+                                            <i class="ti ti-history text-info"></i> View History
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item export-btn" href="javascript:void(0)"
+                                            data-id="${row.id}"
+                                            data-label="${label}">
+                                            <i class="ti ti-download text-info"></i> Export PDF
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item delete-btn" href="javascript:void(0)"
+                                            data-id="${row.id}"
+                                            data-case-id="${row.case_id}"
+                                            data-report-name="${row.incident_description || 'No description available'}">
                                             <i class="ti ti-trash text-danger"></i> Delete
                                         </a>
                                     </li>
@@ -624,22 +645,148 @@
         // Handle delete button clicks
         $(document).on('click', '.delete-btn', function() {
             const caseId = $(this).data('id');
-            const label = $(this).data('label');
+            const caseIdDisplay = $(this).data('case-id');
+            const reportName = $(this).data('report-name');
             
-            $('#deleteCaseLabel').text(label);
+            $('#deleteCaseId').text(caseIdDisplay);
+            $('#deleteReportName').text(reportName);
             $('#deleteCaseForm').attr('action', `/cases/${caseId}`);
             $('#deleteCaseModal').modal('show');
+        });
+
+        // Handle delete confirmation button click
+        $('#confirmDeleteBtn').on('click', function() {
+            const form = document.getElementById('deleteCaseForm');
+            form.submit(); // Submit the form normally to ensure session message works
+        });
+
+        // Handle delete form submission
+        $(document).on('submit', '#deleteCaseForm', function(e) {
+            // Don't prevent default - let the form submit normally like user deletion
+            // This ensures the session message is properly set and displayed
+        });
+
+        // Handle export button clicks
+        $(document).on('click', '.export-btn', function() {
+            const caseId = $(this).data('id');
+            const label = $(this).data('label');
+            
+            // Show loading state
+            const $btn = $(this);
+            const originalText = $btn.html();
+            $btn.html('<i class="ti ti-loader ti-spin text-info"></i> Generating PDF...');
+            $btn.prop('disabled', true);
+            
+            // Make AJAX request to export the case
+            $.ajax({
+                url: `/cases/${caseId}/export`,
+                method: 'GET',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data, status, xhr) {
+                    // Create download link
+                    const blob = new Blob([data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `Case_${caseId.substring(0, 8)}_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    // Reset button
+                    $btn.html(originalText);
+                    $btn.prop('disabled', false);
+                },
+                                 error: function(xhr, status, error) {
+                     // Reset button
+                     $btn.html(originalText);
+                     $btn.prop('disabled', false);
+                     
+                     let errorMessage = 'Failed to export PDF. Please try again.';
+                     if (xhr.status === 403) {
+                         errorMessage = 'Access denied. You do not have permission to export this case.';
+                     } else if (xhr.status === 404) {
+                         errorMessage = 'Case not found.';
+                     }
+                     
+                     // Show error alert
+                     const alertHtml = `
+                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                             <strong>Error:</strong> ${errorMessage}
+                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                         </div>
+                     `;
+                     
+                     // Remove any existing alerts
+                     $('.alert').remove();
+                     
+                     // Add new alert at the top of the container
+                     $('.container-fluid').prepend(alertHtml);
+                     
+                     // Auto-remove alert after 5 seconds
+                     setTimeout(() => {
+                         $('.alert').fadeOut(function() {
+                             $(this).remove();
+                         });
+                     }, 5000);
+                 }
+            });
+        });
+
+        // Handle history button clicks
+        $(document).on('click', '.history-btn', function() {
+            const caseId = $(this).data('id');
+            const label = $(this).data('label');
+            
+            // Show loading state
+            $('#historyModalContent').html('<div class="text-center p-4"><i class="ti ti-loader ti-spin f-s-24"></i><p class="mt-2">Loading case history...</p></div>');
+            $('#viewHistoryModal').modal('show');
+            
+            // Fetch case history and populate modal
+            $.get(`/cases/${caseId}/history`, function(data) {
+                $('#historyModalContent').html(data);
+            }).fail(function(xhr, status, error) {
+                let errorMessage = 'Failed to load case history. Please try again.';
+                if (xhr.status === 403) {
+                    errorMessage = 'Access denied. You do not have permission to view this case history.';
+                } else if (xhr.status === 404) {
+                    errorMessage = 'Case not found.';
+                }
+                
+                $('#historyModalContent').html(`
+                    <div class="modal-header bg-danger">
+                        <h5 class="modal-title text-white">Error</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center py-4">
+                            <i class="ti ti-alert-circle f-s-48 text-danger mb-3"></i>
+                            <h6 class="text-danger">Error Loading History</h6>
+                            <p class="text-muted mb-0">${errorMessage}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                `);
+            });
         });
     });
 </script>
 
-<script>
-    setTimeout(() => {
-            const a = document.querySelector('.alert');
-            if (a) a.remove();
-        }, 4000);
-
-</script>
+         <script>
+         // Auto-remove session alerts after 4 seconds
+         setTimeout(() => {
+             const alerts = document.querySelectorAll('.alert');
+             alerts.forEach(alert => {
+                 if (alert) alert.remove();
+             });
+         }, 4000);
+     </script>
 
 
 @endsection

@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\LogsCaseHistory;
 
 
 class Report extends Model
 {
+    use LogsCaseHistory;
+    
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -56,17 +59,7 @@ class Report extends Model
                     ->withTimestamps();
     }
 
-    /**
-     * Get the primary assignee for this case
-     */
-    public function primaryAssignee()
-    {
-        return $this->belongsToMany(User::class, 'case_assignments', 'report_id', 'user_id')
-                    ->withPivot('is_primary', 'assigned_at', 'unassigned_at')
-                    ->where('case_assignments.is_primary', true)
-                    ->whereNull('case_assignments.unassigned_at')
-                    ->withTimestamps();
-    }
+
 
     /**
      * Get all active assignments for this case
@@ -85,5 +78,13 @@ class Report extends Model
         return $query->whereHas('assignees', function ($q) use ($userId) {
             $q->where('user_id', $userId);
         });
+    }
+
+    /**
+     * Get the case history for this report
+     */
+    public function history()
+    {
+        return $this->hasMany(CaseHistory::class, 'report_id')->orderBy('created_at', 'desc');
     }
 }

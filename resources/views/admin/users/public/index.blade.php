@@ -271,8 +271,8 @@
                                 <input class="form-control" name="city" id="edit_city" placeholder="Exampleville">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">State</label>
-                                <input class="form-control" name="state" id="edit_state" placeholder="Example State">
+                                <label class="form-label">Mailing State</label>
+                                <input class="form-control" name="state" id="edit_state" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>

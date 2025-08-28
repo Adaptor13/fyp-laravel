@@ -16,16 +16,26 @@ class ReportController extends Controller
             'reporter_name' => 'nullable|string|max:255',
             'reporter_email' => 'nullable|email|max:255',
             'reporter_phone' => 'nullable|string|max:20',
-            'victim_age' => 'nullable|string|max:10',
-            'victim_gender' => 'nullable|string',
-            'abuse_types' => 'nullable|array',
+            'victim_age' => 'required|string|max:10',
+            'victim_gender' => 'required|string',
+            'abuse_types' => 'required|array|min:1',
             'incident_description' => 'required|string',
             'incident_location' => 'required|string', 
             'incident_date' => 'required|date',
             'suspected_abuser' => 'nullable|string|max:255',
-            'evidence' => 'nullable|array',
+            'evidence' => 'nullable|array|max:5', // Limit to 5 files
             'evidence.*' => 'file|mimes:jpg,jpeg,png,mp4,pdf|max:20480',
             'confirmed_truth' => 'accepted'
+        ], [
+            'victim_age.required' => 'Victim\'s age is required.',
+            'victim_gender.required' => 'Victim\'s gender is required.',
+            'abuse_types.required' => 'Please select at least one type of abuse.',
+            'abuse_types.min' => 'Please select at least one type of abuse.',
+            'incident_description.required' => 'Incident description is required.',
+            'incident_location.required' => 'Incident location is required.',
+            'incident_date.required' => 'Incident date is required.',
+            'evidence.max' => 'Maximum 5 files allowed for evidence.',
+            'confirmed_truth.accepted' => 'You must confirm that the information provided is accurate.'
         ]);
 
         $filePaths = [];
@@ -61,6 +71,9 @@ class ReportController extends Controller
     public function myReports()
     {
         $reports = Report::where('user_id', auth()->id())
+            ->with(['assignees' => function($query) {
+                $query->with('profile', 'publicUserProfile', 'lawEnforcementProfile', 'socialWorkerProfile', 'healthcareProfile', 'adminProfile', 'govOfficialProfile');
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
 

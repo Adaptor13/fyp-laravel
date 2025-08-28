@@ -25,6 +25,7 @@
             <div class="card-header">
                 <h5>Report a Child Protection Concern</h5>
                 <p class="text-muted mb-0">Your identity is optional. All reports are confidential and protected under PDPA.</p>
+                <p class="text-muted mb-0"><small>* Required fields</small></p>
             </div>
             <div class="card-body">
                 
@@ -61,7 +62,7 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="victim_age" class="form-label">Victim's Approximate Age</label>
+                                <label for="victim_age" class="form-label">Victim's Approximate Age *</label>
                                 <input type="number"
                                     name="victim_age"
                                     id="victim_age"
@@ -76,7 +77,7 @@
 
                         <div class="col-md-6 floating-select">
                             <div class="mb-3">
-                                <label for="victim_gender" class="form-label">Victim's Gender</label>
+                                <label for="victim_gender" class="form-label">Victim's Gender *</label>
                                 <select name="victim_gender" id="victim_gender" class="form-select" required>
                                     <option selected disabled>Select Gender</option>
                                     <option value="Male">Male</option>
@@ -88,7 +89,7 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="abuse_types" class="form-label">Type of Abuse</label>
+                                <label for="abuse_types" class="form-label">Type of Abuse *</label>
                                 <select name="abuse_types[]" id="abuse_types" class="form-select" multiple required>
                                     <option value="Physical">Physical</option>
                                     <option value="Sexual">Sexual</option>
@@ -101,22 +102,22 @@
 
                         <div class="col-md-12">
                             <div class="mb-3">
-                                <label for="incident_description" class="form-label">Incident Description</label>
+                                <label for="incident_description" class="form-label">Incident Description *</label>
                                 <textarea name="incident_description" id="incident_description" class="form-control" rows="4" placeholder="Describe what happened..." required></textarea>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="mb-3">
-                                <label for="incident_location" class="form-label">Incident Location</label>
+                                <label for="incident_location" class="form-label">Incident Location *</label>
                                 <textarea name="incident_location" id="incident_location" class="form-control" rows="2" placeholder="Enter full or approximate location" required></textarea>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="incident_date" class="form-label">Date of Incident</label>
-                                <input type="date" name="incident_date" id="incident_date" class="form-control">
+                                <label for="incident_date" class="form-label">Date of Incident *</label>
+                                <input type="date" name="incident_date" id="incident_date" class="form-control" required>
                             </div>
                         </div>
 
@@ -131,8 +132,9 @@
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="evidence" class="form-label">Upload Evidence (Optional)</label>
-                                <input type="file" name="evidence[]" id="evidence" class="form-control" accept="image/*,video/*,application/pdf" multiple>
-                                <small class="form-text text-muted">You may upload photos, videos, or documents.</small>
+                                <input type="file" name="evidence[]" id="evidence" class="form-control" accept="image/*,video/*,application/pdf" multiple onchange="validateFileUpload(this)">
+                                <small class="form-text text-muted">You may upload photos, videos, or documents. Maximum 5 files allowed.</small>
+                                <div id="file-validation-message" class="text-danger mt-1" style="display: none;"></div>
                             </div>
                         </div>
 
@@ -140,7 +142,7 @@
                         <div class="col-12">
                             <div class="mb-3 form-check">
                                 <input type="checkbox" name="confirmed_truth" id="confirmed_truth" class="form-check-input" required>
-                                <label class="form-check-label" for="confirmed_truth">I confirm that the information provided is accurate to the best of my knowledge.</label>
+                                <label class="form-check-label" for="confirmed_truth">I confirm that the information provided is accurate to the best of my knowledge. *</label>
                             </div>
                         </div>
 
@@ -156,4 +158,31 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function validateFileUpload(input) {
+            const maxFiles = 5;
+            const files = input.files;
+            const messageDiv = document.getElementById('file-validation-message');
+            
+            if (files.length > maxFiles) {
+                messageDiv.textContent = `Maximum ${maxFiles} files allowed. Please select fewer files.`;
+                messageDiv.style.display = 'block';
+                input.value = ''; // Clear the selection
+                return false;
+            } else {
+                messageDiv.style.display = 'none';
+                return true;
+            }
+        }
+
+        // Form validation before submit
+        document.querySelector('.report-form').addEventListener('submit', function(e) {
+            const fileInput = document.getElementById('evidence');
+            if (!validateFileUpload(fileInput)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
 @endsection

@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Public User')
+@section('title', 'Healthcare Professional')
 @section('css')
 
 
@@ -140,7 +140,7 @@
                                         <th>Profession</th>
                                         <th>APC Expiry</th>
                                         <th>Facility Name</th>
-                                        <th>Placement State</th>
+                                        <th>Facility State</th>
                                         <th>Last Updated</th>
                                         <th>Action</th>
                                     </tr>
@@ -257,7 +257,7 @@
                                     value="{{ old('facility_name') }}" placeholder="e.g. Hospital Kuala Lumpur" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_hc_state" class="form-label">State</label>
+                                <label for="add_hc_state" class="form-label">Facility State</label>
                                 <input id="add_hc_state" name="state" type="text" class="form-control"
                                     value="{{ old('state') }}" placeholder="e.g. Selangor" required>
                             </div>
@@ -300,9 +300,9 @@
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_state" class="form-label">State (Profile)</label>
+                                <label for="add_state" class="form-label">Mailing State</label>
                                 <input id="add_state" name="state_profile" type="text" class="form-control"
-                                    value="{{ old('state_profile') }}" placeholder="State for mailing">
+                                    value="{{ old('state_profile') }}" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -396,7 +396,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_hc_state" class="form-label">State</label>
+                                <label for="edit_hc_state" class="form-label">Facility State</label>
                                 <input id="edit_hc_state" name="state" type="text" class="form-control"
                                     placeholder="e.g. Selangor" required>
                             </div>
@@ -441,9 +441,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_state_profile" class="form-label">State (Profile)</label>
+                                <label for="edit_state_profile" class="form-label">Mailing State</label>
                                 <input id="edit_state_profile" name="state_profile" type="text" class="form-control"
-                                    placeholder="State for mailing">
+                                    placeholder="State for mailing address">
                             </div>
                         </div>
 

@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Public User')
+@section('title', 'Government Child Welfare Officers')
 @section('css')
 
 
@@ -320,9 +320,9 @@
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_state_profile" class="form-label">State (Profile)</label>
-                                <input id="add_state_profile" name="state" type="text" class="form-control"
-                                    value="{{ old('state_profile') }}" placeholder="State for mailing">
+                                <label for="add_state" class="form-label">Mailing State</label>
+                                <input id="add_state" name="state" type="text" class="form-control"
+                                    value="{{ old('state') }}" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -460,8 +460,8 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_state_profile" class="form-label">State (Profile)</label>
-                                <input id="edit_state_profile" name="state" type="text" class="form-control" placeholder="State for mailing">
+                                <label for="edit_state" class="form-label">Mailing State</label>
+                                <input id="edit_state" name="state" type="text" class="form-control" placeholder="State for mailing address">
                             </div>
                         </div>
 

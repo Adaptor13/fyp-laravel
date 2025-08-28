@@ -29,12 +29,11 @@ return new class extends Migration
             $table->date('incident_date');
             $table->string('suspected_abuser')->nullable();
 
-            $table->string('evidence')->nullable();
+            $table->text('evidence')->nullable(); // Changed from string to text for multiple file uploads
             $table->boolean('confirmed_truth')->default(false);
 
             // Tracking columns
             $table->string('report_status')->default('Submitted');
-            $table->string('assigned_to')->nullable();
             $table->string('last_updated_by')->nullable();
             $table->timestamp('status_updated_at')->nullable();
             $table->string('priority_level')->default('Medium');

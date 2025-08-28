@@ -25,4 +25,5 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return redirect()->route('sign_in');
         });
-    })->create();
+    })
+    ->create();

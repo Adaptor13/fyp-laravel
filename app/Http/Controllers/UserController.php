@@ -23,7 +23,39 @@ class UserController extends Controller
     public function admins() 
     {
         $users = $this->getUsersByRole('admin');
-        return view('admin.users.admins.index', compact('users'));
+        
+        // Calculate dynamic statistics for Admin dashboard
+        $adminRoleId = Role::where('name', 'admin')->value('id');
+        
+        // Total admins
+        $totalUsers = User::where('role_id', $adminRoleId)->count();
+        
+        // Contactable users (with phone numbers)
+        $contactableUsers = User::where('role_id', $adminRoleId)
+            ->whereHas('profile', function($query) {
+                $query->whereNotNull('phone')
+                      ->where('phone', '!=', '');
+            })->count();
+        
+        // Non-contactable users (without phone numbers)
+        $nonContactableUsers = User::where('role_id', $adminRoleId)
+            ->whereDoesntHave('profile', function($query) {
+                $query->whereNotNull('phone')
+                      ->where('phone', '!=', '');
+            })->count();
+        
+        // New users this month
+        $newUsers = User::where('role_id', $adminRoleId)
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->count();
+        
+        return view('admin.users.admins.index', compact(
+            'users', 
+            'totalUsers', 
+            'contactableUsers', 
+            'nonContactableUsers',
+            'newUsers'
+        ));
     }
 
     public function adminData()
@@ -110,6 +142,7 @@ class UserController extends Controller
 
                 // create admin profile
                 $user->adminProfile()->create([
+                    'display_name' => $validated['name'],
                     'department' => $validated['department'],
                     'position'   => $validated['position'],
                 ]);
@@ -140,8 +173,9 @@ class UserController extends Controller
             });
 
         } catch (\Throwable $e) {
+            \Log::error('Admin creation failed: ' . $e->getMessage());
             return back()
-                ->withErrors(['general' => 'Failed to create admin user. Please try again.'])
+                ->withErrors(['general' => 'Failed to create admin user: ' . $e->getMessage()])
                 ->withInput();
         }
 
@@ -176,6 +210,7 @@ class UserController extends Controller
 
                 // admin profile
                 $ap = $user->adminProfile ?: $user->adminProfile()->make();
+                $ap->display_name = $validated['name'];
                 $ap->department = $validated['department'];
                 $ap->position   = $validated['position'];
                 $ap->save();
@@ -698,7 +733,43 @@ class UserController extends Controller
     public function lawEnforcement() 
     {
         $users = $this->getUsersByRole('law_enforcement');
-        return view('admin.users.law.index', compact('users'));
+        
+        // Calculate dynamic statistics for Law Enforcement dashboard
+        $lawRoleId = Role::where('name', 'law_enforcement')->value('id');
+        
+        // Total officers
+        $totalOfficers = User::where('role_id', $lawRoleId)->count();
+        
+        // Count unique agencies represented
+        $agenciesRepresented = LawEnforcementProfile::whereHas('user', function($query) use ($lawRoleId) {
+            $query->where('role_id', $lawRoleId);
+        })->whereNotNull('agency')
+          ->where('agency', '!=', '')
+          ->select('agency')
+          ->distinct()
+          ->count();
+        
+        // Count unique stations covered
+        $stationsCovered = LawEnforcementProfile::whereHas('user', function($query) use ($lawRoleId) {
+            $query->where('role_id', $lawRoleId);
+        })->whereNotNull('station')
+          ->where('station', '!=', '')
+          ->select('station')
+          ->distinct()
+          ->count();
+        
+        // New officers this month
+        $newOfficers = User::where('role_id', $lawRoleId)
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->count();
+        
+        return view('admin.users.law.index', compact(
+            'users', 
+            'totalOfficers', 
+            'agenciesRepresented', 
+            'stationsCovered',
+            'newOfficers'
+        ));
     }
 
     public function lawEnforcementData()
@@ -772,7 +843,7 @@ class UserController extends Controller
             'address_line2' => 'nullable|string|max:255',
             'city'          => 'nullable|string|max:120',
             'postcode'      => 'nullable|string|max:20',
-            'state_profile'         => 'nullable|string|max:120',  // <-- profile state
+            'state_profile' => 'nullable|string|max:120',  // <-- profile state
         ]);
 
         $roleId = Role::where('name', 'law_enforcement')->value('id');
@@ -1379,8 +1450,14 @@ class UserController extends Controller
             });
 
         } catch (\Throwable $e) {
+            \Log::error('Healthcare user creation failed: ' . $e->getMessage(), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->except(['password', 'password_confirmation'])
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to create healthcare professional. Please try again.'])
+                ->withErrors(['general' => 'Failed to create healthcare professional: ' . $e->getMessage()])
                 ->withInput();
         }
 

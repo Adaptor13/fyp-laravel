@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Public User')
+@section('title', 'Law Enforcement Officers')
 @section('css')
 
 
@@ -64,7 +64,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $totalOfficers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Total Officers</p>
                             </div>
                             <div>
@@ -80,7 +80,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $agenciesRepresented ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Agencies Represented</p>
                             </div>
                             <div>
@@ -96,7 +96,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $stationsCovered ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Stations Covered</p>
                             </div>
                             <div>
@@ -112,7 +112,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $newOfficers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">New Officers</p>
                             </div>
                             <div>
@@ -271,7 +271,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_le_state" class="form-label">State</label>
+                                <label for="add_le_state" class="form-label">Placement State</label>
                                 <input id="add_le_state" name="le_state" type="text" class="form-control"
                                     value="{{ old('le_state') }}" placeholder="e.g. Selangor" required>
                             </div>
@@ -314,9 +314,9 @@
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_state_profile" class="form-label">State (Profile)</label>
-                                <input id="add_state_profile" name="state_profile" type="text" class="form-control"
-                                    value="{{ old('state_profile') }}" placeholder="State for mailing">
+                                <label for="add_state" class="form-label">Mailing State</label>
+                                <input id="add_state" name="state" type="text" class="form-control"
+                                    value="{{ old('state') }}" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -417,7 +417,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_le_state" class="form-label">State</label>
+                                <label for="edit_le_state" class="form-label">Placement State</label>
                                 <input id="edit_le_state" name="le_state" type="text" class="form-control"
                                     placeholder="e.g. Selangor" required>
                             </div>
@@ -462,9 +462,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_state_profile" class="form-label">State (Profile)</label>
-                                <input id="edit_state_profile" name="state" type="text" class="form-control"
-                                    placeholder="State for mailing">
+                                <label for="edit_state" class="form-label">Mailing State</label>
+                                <input id="edit_state" name="state" type="text" class="form-control"
+                                    placeholder="State for mailing address">
                             </div>
                         </div>
 
@@ -524,7 +524,7 @@
     <script>
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addHealthcareProfessional'));
+                const m = new bootstrap.Modal(document.getElementById('addLawEnforcement'));
                 m.show();
             });
         @endif
@@ -667,7 +667,7 @@
             $('#confirmDeleteBtn').on('click', function() {
                 if (!deleteId) return;
                 const form = document.getElementById('deleteForm');
-                form.action = "{{ route('users.social.destroy', '__id__') }}".replace('__id__', deleteId);
+                form.action = "{{ route('users.law.destroy', '__id__') }}".replace('__id__', deleteId);
                 form.submit();
             });
         });

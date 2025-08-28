@@ -64,7 +64,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $totalUsers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Total Users</p>
                             </div>
                             <div>
@@ -80,7 +80,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $contactableUsers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
                             </div>
                             <div>
@@ -96,7 +96,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $nonContactableUsers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
                             </div>
                             <div>
@@ -112,7 +112,7 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">1</h3>
+                                <h3 class="header-heading mb-0">{{ $newUsers ?? 0 }}</h3>
                                 <p class="f-w-300 f-s-12 mb-0">New Users</p>
                             </div>
                             <div>
@@ -169,7 +169,14 @@
 
                     <div class="modal-body">
                         @if ($errors->any())
-                            <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
+                            <div class="alert alert-danger mb-3">
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
 
                         {{-- Account Details --}}
@@ -280,9 +287,9 @@
                                     value="{{ old('postcode') }}" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_state_profile" class="form-label">State (Profile)</label>
+                                <label for="add_state_profile" class="form-label">Mailing State</label>
                                 <input id="add_state_profile" name="state" type="text" class="form-control"
-                                    value="{{ old('state_profile') }}" placeholder="State for mailing">
+                                    value="{{ old('state') }}" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -313,7 +320,14 @@
 
                     <div class="modal-body">
                         @if ($errors->any())
-                            <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
+                            <div class="alert alert-danger mb-3">
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
 
                         {{-- Account Details --}}
@@ -388,8 +402,8 @@
                                 <input id="edit_postcode" name="postcode" type="text" class="form-control" placeholder="Postcode">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="edit_state_profile" class="form-label">State (Profile)</label>
-                                <input id="edit_state_profile" name="state" type="text" class="form-control" placeholder="State for mailing">
+                                <label for="edit_state_profile" class="form-label">Mailing State</label>
+                                <input id="edit_state_profile" name="state" type="text" class="form-control" placeholder="State for mailing address">
                             </div>
                         </div>
                     </div>
@@ -418,7 +432,7 @@
                 </div>
 
                 <div class="modal-body">
-                    Are you sure you want to delete this law enforcement user?<br>
+                    Are you sure you want to delete this admin user?<br>
                     <small class="text-secondary">User: <span id="deleteUserLabel">—</span></small>
                 </div>
 
@@ -613,7 +627,7 @@
         $modal.find('input[name="address_line2"]').val(rowData.address_line2 ?? '');
         $modal.find('input[name="city"]').val(rowData.city ?? '');
         $modal.find('input[name="postcode"]').val(rowData.postcode ?? '');
-        $modal.find('input[name="state"]').val(rowData.state_profile ?? '');
+        $modal.find('input[name="state"]').val(rowData.state ?? '');
 
         const $editPhone = $modal.find('#edit_phone, input[name="phone"]');
         $editPhone.unmask().mask('000-0000000', { placeholder: '' }).trigger('input');

@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaseController;
+use App\Http\Controllers\CaseHistoryController;
 
 Route::middleware('web')->group(function () {
 
@@ -156,8 +157,11 @@ Route::middleware('web')->group(function () {
         Route::get('/cases/{report}/edit', [CaseController::class, 'edit'])->name('cases.edit');
         Route::put('/cases/{report}', [CaseController::class, 'update'])->name('cases.update');
         Route::delete('/cases/{report}', [CaseController::class, 'destroy'])->name('cases.destroy');
+        Route::get('/cases/{report}/export', [CaseController::class, 'export'])->name('cases.export');
 
-        // Route::get('/cases-history', [CaseHistoryController::class, 'index'])->name('cases.history');
+        // Case History routes
+        Route::get('/cases/{report}/history', [CaseHistoryController::class, 'show'])->name('cases.history');
+        Route::get('/cases/{report}/history/json', [CaseHistoryController::class, 'getHistory'])->name('cases.history.json');
     });
 
     // Route::middleware(['auth', 'role:admin,gov_official'])

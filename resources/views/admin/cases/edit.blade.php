@@ -1,3 +1,39 @@
+<style>
+.evidence-file-item .btn-close {
+    font-size: 0.6rem;
+    padding: 0.1rem;
+    margin-left: 0.25rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.evidence-file-item .btn-close:hover {
+    opacity: 1;
+}
+
+.evidence-file-item .badge {
+    transition: all 0.3s ease;
+}
+
+.evidence-file-item:hover .badge {
+    background-color: #6c757d !important;
+}
+
+.evidence-file-badge {
+    transition: all 0.2s ease;
+}
+
+.evidence-file-badge:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.evidence-file-badge:active {
+    transform: translateY(0);
+}
+</style>
+
 @if ($errors->any())
     <div class="alert alert-danger mb-3">
         <ul class="mb-0">
@@ -83,6 +119,8 @@
     </div>
 </div>
 
+<hr>
+
 <div class="row">
     <!-- Incident Details -->
     <div class="col-md-12">
@@ -126,14 +164,27 @@
             @if($report->evidence)
                 <div class="mt-2">
                     <small class="text-muted">Current files:</small>
-                    @foreach(json_decode($report->evidence, true) ?? [] as $file)
-                        <div class="badge bg-secondary me-1">{{ basename($file) }}</div>
-                    @endforeach
+                    <div id="current-evidence-files">
+                        @foreach(json_decode($report->evidence, true) ?? [] as $index => $file)
+                            <div class="evidence-file-item d-inline-block me-2 mb-2" data-file="{{ $file }}">
+                                <div class="badge bg-secondary d-flex align-items-center evidence-file-badge" 
+                                     style="cursor: pointer;" data-file="{{ $file }}" data-filename="{{ basename($file) }}">
+                                    <span class="me-2">{{ basename($file) }}</span>
+                                    <button type="button" class="btn-close btn-close-white btn-sm remove-evidence" 
+                                            data-file="{{ $file }}" aria-label="Remove file"></button>
+                                </div>
+                                <input type="hidden" name="existing_evidence[]" value="{{ $file }}">
+                            </div>
+                        @endforeach
+                    </div>
+                    <input type="hidden" name="removed_evidence" id="removed-evidence" value="">
                 </div>
             @endif
         </div>
     </div>
 </div>
+
+<hr>
 
 <div class="row">
     <!-- Case Management -->
@@ -174,7 +225,7 @@
                             <select name="assignees[]" id="law_enforcement_assignee" class="form-select">
                                 <option value="">Select Law Enforcement Officer</option>
                                 @foreach($assignableUsers->where('role.name', 'law_enforcement') as $user)
-                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ old('assignees.0', $roleAssignments['law_enforcement'] ?? '') == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
@@ -187,7 +238,7 @@
                             <select name="assignees[]" id="healthcare_assignee" class="form-select">
                                 <option value="">Select Healthcare Professional</option>
                                 @foreach($assignableUsers->where('role.name', 'healthcare') as $user)
-                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ old('assignees.1', $roleAssignments['healthcare'] ?? '') == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
@@ -200,7 +251,7 @@
                             <select name="assignees[]" id="social_worker_assignee" class="form-select">
                                 <option value="">Select Social Worker</option>
                                 @foreach($assignableUsers->where('role.name', 'social_worker') as $user)
-                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ old('assignees.2', $roleAssignments['social_worker'] ?? '') == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
@@ -212,8 +263,8 @@
                             <label for="child_welfare_assignee" class="form-label">Child Welfare Officer</label>
                             <select name="assignees[]" id="child_welfare_assignee" class="form-select">
                                 <option value="">Select Child Welfare Officer</option>
-                                @foreach($assignableUsers->where('role.name', 'child_welfare') as $user)
-                                    <option value="{{ $user->id }}" {{ in_array($user->id, old('assignees', $currentAssignees)) ? 'selected' : '' }}>
+                                @foreach($assignableUsers->where('role.name', 'gov_official') as $user)
+                                    <option value="{{ $user->id }}" {{ old('assignees.3', $roleAssignments['gov_official'] ?? '') == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
@@ -221,23 +272,146 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="primary_assignee" class="form-label">Primary Assignee (Lead)</label>
-                            <select name="primary_assignee" id="primary_assignee" class="form-select">
-                                <option value="">Select Primary Assignee</option>
-                                @foreach($assignableUsers as $user)
-                                    <option value="{{ $user->id }}" {{ old('primary_assignee', $primaryAssigneeId) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ optional($user->role)->name }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<!-- Evidence Viewer Modal -->
+<div class="modal fade" id="evidenceViewerModal" tabindex="-1" aria-labelledby="evidenceViewerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="evidenceViewerModalLabel">Evidence File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="evidenceContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="downloadEvidenceLink" class="btn btn-primary" download>
+                    <i class="ti ti-download"></i> Download
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Handle evidence file removal
+    $(document).on('click', '.remove-evidence', function() {
+        const fileToRemove = $(this).data('file');
+        const $fileItem = $(this).closest('.evidence-file-item');
+        const fileName = $(this).siblings('span').text();
+        
+        // Show confirmation dialog
+        if (confirm(`Are you sure you want to remove "${fileName}"? This action cannot be undone.`)) {
+            // Add to removed evidence list
+            let removedEvidence = $('#removed-evidence').val();
+            let removedArray = removedEvidence ? JSON.parse(removedEvidence) : [];
+            
+            if (!removedArray.includes(fileToRemove)) {
+                removedArray.push(fileToRemove);
+                $('#removed-evidence').val(JSON.stringify(removedArray));
+            }
+            
+            // Remove the file item from display
+            $fileItem.fadeOut(300, function() {
+                $(this).remove();
+            });
+            
+            // File removal handled silently - no alert needed
+        }
+    });
+    
+    // Handle evidence file viewing
+    $(document).on('click', '.evidence-file-badge', function(e) {
+        // Prevent triggering if clicking on remove button
+        if ($(e.target).hasClass('remove-evidence') || $(e.target).closest('.remove-evidence').length) {
+            return;
+        }
+        
+        const filePath = $(this).data('file');
+        const fileName = $(this).data('filename');
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+        
+        // Update modal title
+        $('#evidenceViewerModalLabel').text(fileName);
+        
+        // Set download link
+        $('#downloadEvidenceLink').attr('href', `/storage/${filePath}`);
+        $('#downloadEvidenceLink').attr('download', fileName);
+        
+        // Show loading state
+        $('#evidenceContent').html('<div class="text-center"><i class="ti ti-loader ti-spin fs-1"></i><p class="mt-2">Loading...</p></div>');
+        
+        // Show modal
+        $('#evidenceViewerModal').modal('show');
+        
+        // Load content based on file type
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+            // Image file
+            $('#evidenceContent').html(`
+                <img src="/storage/${filePath}" class="img-fluid" alt="${fileName}" style="max-height: 70vh;">
+            `);
+        } else if (fileExtension === 'pdf') {
+            // PDF file
+            $('#evidenceContent').html(`
+                <iframe src="/storage/${filePath}" width="100%" height="70vh" frameborder="0"></iframe>
+            `);
+        } else if (['mp4', 'avi', 'mov', 'wmv'].includes(fileExtension)) {
+            // Video file
+            $('#evidenceContent').html(`
+                <video controls width="100%" style="max-height: 70vh;">
+                    <source src="/storage/${filePath}" type="video/${fileExtension}">
+                    Your browser does not support the video tag.
+                </video>
+            `);
+        } else {
+            // Other file types - show download link
+            $('#evidenceContent').html(`
+                <div class="text-center">
+                    <i class="ti ti-file fs-1 text-muted"></i>
+                    <p class="mt-2">This file type cannot be previewed.</p>
+                    <p class="text-muted">Click the download button below to view the file.</p>
+                </div>
+            `);
+        }
+    });
+    
+    // Helper function to show alerts (if not already defined)
+    if (typeof showAlert === 'undefined') {
+        window.showAlert = function(message, type = 'info') {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'danger' ? 'alert-danger' : 
+                              type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <strong>${type === 'success' ? 'Success:' : type === 'danger' ? 'Error:' : type === 'warning' ? 'Warning:' : 'Info:'}</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Remove any existing alerts
+            $('.alert').remove();
+            
+            // Add new alert at the top of the modal
+            $('.modal-body').prepend(alertHtml);
+            
+            // Auto-remove alert after 5 seconds
+            setTimeout(() => {
+                $('.alert').fadeOut(function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        };
+    }
+});
+</script>
 
