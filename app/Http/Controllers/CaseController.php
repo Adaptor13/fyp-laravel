@@ -127,7 +127,7 @@ class CaseController extends Controller
 
     public function edit(Report $report)
     {
-        $assignableUsers = User::whereIn('role_id', Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare'])->pluck('id'))->get();
+        $assignableUsers = User::whereIn('role_id', Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare', 'child_welfare'])->pluck('id'))->get();
         $abuseTypes = json_decode($report->abuse_types, true) ?? [];
         $currentAssignees = $report->assignees->pluck('id')->toArray();
         $primaryAssigneeId = $report->primaryAssignee->first()?->id;
@@ -150,7 +150,7 @@ class CaseController extends Controller
                 }
 
                 $report = Report::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => auth()->id() ?? null,
                     'reporter_name' => $validated['reporter_name'],
                     'reporter_email' => $validated['reporter_email'],
                     'reporter_phone' => $validated['reporter_phone'] ?? null,
@@ -165,31 +165,44 @@ class CaseController extends Controller
                     'confirmed_truth' => true,
                     'report_status' => $validated['report_status'],
                     'priority_level' => $validated['priority_level'],
-                    'last_updated_by' => auth()->id(),
+                    'last_updated_by' => auth()->id() ?? null,
                     'status_updated_at' => now(),
                 ]);
 
                 // Handle assignments
                 if ($request->has('assignees') && is_array($request->assignees)) {
-                    foreach ($request->assignees as $index => $userId) {
-                        if ($userId) {
-                            $isPrimary = $request->input('primary_assignee') == $userId;
-                            
-                            CaseAssignment::create([
-                                'report_id' => $report->id,
-                                'user_id' => $userId,
-                                'is_primary' => $isPrimary,
-                                'assigned_at' => now(),
-                            ]);
-                        }
+                    // Filter out empty values
+                    $validAssignees = array_filter($request->assignees, function($userId) {
+                        return !empty($userId) && $userId !== '';
+                    });
+                    
+                    $primaryAssigneeId = $request->input('primary_assignee');
+                    
+                    // Create assignments for all valid assignees
+                    foreach ($validAssignees as $userId) {
+                        $isPrimary = ($userId === $primaryAssigneeId);
+                        
+                        CaseAssignment::create([
+                            'report_id' => $report->id,
+                            'user_id' => $userId,
+                            'is_primary' => $isPrimary,
+                            'assigned_at' => now(),
+                        ]);
                     }
                 }
             });
 
             return back()->with('success', 'Case created successfully.');
         } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Case creation failed: ' . $e->getMessage(), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to create case. Please try again.'])
+                ->withErrors(['general' => 'Failed to create case. Please try again. Error: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -233,24 +246,54 @@ class CaseController extends Controller
 
                 // Handle assignments
                 if ($request->has('assignees')) {
-                    // Mark all current assignments as unassigned
-                    CaseAssignment::where('report_id', $report->id)
+                    // Filter out empty values
+                    $validAssignees = array_filter($request->assignees, function($userId) {
+                        return !empty($userId) && $userId !== '';
+                    });
+                    
+                    $primaryAssigneeId = $request->input('primary_assignee');
+                    
+                    // Get current active assignments
+                    $currentAssignments = CaseAssignment::where('report_id', $report->id)
                         ->whereNull('unassigned_at')
-                        ->update(['unassigned_at' => now()]);
-
-                    // Create new assignments
-                    if (is_array($request->assignees)) {
-                        foreach ($request->assignees as $userId) {
-                            if ($userId) {
-                                $isPrimary = $request->input('primary_assignee') == $userId;
-                                
-                                CaseAssignment::create([
-                                    'report_id' => $report->id,
-                                    'user_id' => $userId,
+                        ->get()
+                        ->keyBy('user_id');
+                    
+                    // Mark assignments that are no longer needed as unassigned
+                    $currentUserIds = $currentAssignments->keys()->toArray();
+                    $newUserIds = $validAssignees;
+                    $toUnassign = array_diff($currentUserIds, $newUserIds);
+                    
+                    if (!empty($toUnassign)) {
+                        CaseAssignment::where('report_id', $report->id)
+                            ->whereIn('user_id', $toUnassign)
+                            ->whereNull('unassigned_at')
+                            ->update(['unassigned_at' => now()]);
+                    }
+                    
+                    // Create or update assignments for all valid assignees
+                    foreach ($validAssignees as $userId) {
+                        $isPrimary = ($userId === $primaryAssigneeId);
+                        
+                        // Check if assignment already exists
+                        $existingAssignment = $currentAssignments->get($userId);
+                        
+                        if ($existingAssignment) {
+                            // Update existing assignment if primary status changed
+                            if ($existingAssignment->is_primary !== $isPrimary) {
+                                $existingAssignment->update([
                                     'is_primary' => $isPrimary,
-                                    'assigned_at' => now(),
+                                    'updated_at' => now(),
                                 ]);
                             }
+                        } else {
+                            // Create new assignment
+                            CaseAssignment::create([
+                                'report_id' => $report->id,
+                                'user_id' => $userId,
+                                'is_primary' => $isPrimary,
+                                'assigned_at' => now(),
+                            ]);
                         }
                     }
                 }
@@ -258,8 +301,16 @@ class CaseController extends Controller
 
             return back()->with('success', 'Case updated successfully.');
         } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Case update failed: ' . $e->getMessage(), [
+                'report_id' => $report->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to update case. Please try again.'])
+                ->withErrors(['general' => 'Failed to update case. Please try again. Error: ' . $e->getMessage()])
                 ->withInput();
         }
     }

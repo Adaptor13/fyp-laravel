@@ -20,7 +20,7 @@ class StoreCaseRequest extends FormRequest
             'victim_age' => 'nullable|string|max:10',
             'victim_gender' => 'nullable|string|in:Male,Female,Other',
             'abuse_types' => 'nullable|array',
-            'abuse_types.*' => 'string|in:Physical Abuse,Emotional Abuse,Sexual Abuse,Neglect,Exploitation',
+            'abuse_types.*' => 'nullable|string|in:Physical Abuse,Emotional Abuse,Sexual Abuse,Neglect,Exploitation',
             'incident_description' => 'required|string|max:1000',
             'incident_location' => 'required|string|max:255',
             'incident_date' => 'required|date|before_or_equal:today',
@@ -30,7 +30,7 @@ class StoreCaseRequest extends FormRequest
             'report_status' => 'required|string|in:Submitted,Under Review,In Progress,Resolved,Closed',
             'priority_level' => 'required|string|in:Low,Medium,High',
             'assignees' => 'nullable|array',
-            'assignees.*' => 'string|exists:users,id',
+            'assignees.*' => 'nullable|string|exists:users,id',
             'primary_assignee' => 'nullable|string|exists:users,id',
         ];
     }
@@ -55,6 +55,22 @@ class StoreCaseRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            // Filter out empty assignee values
+            if ($this->input('assignees')) {
+                $filteredAssignees = array_filter($this->input('assignees'), function($value) {
+                    return !empty($value) && $value !== '';
+                });
+                $this->merge(['assignees' => array_values($filteredAssignees)]);
+            }
+            
+            // Filter out empty abuse_types values
+            if ($this->input('abuse_types')) {
+                $filteredAbuseTypes = array_filter($this->input('abuse_types'), function($value) {
+                    return !empty($value) && $value !== '';
+                });
+                $this->merge(['abuse_types' => array_values($filteredAbuseTypes)]);
+            }
+            
             // Ensure primary assignee is one of the selected assignees
             if ($this->input('primary_assignee') && $this->input('assignees')) {
                 if (!in_array($this->input('primary_assignee'), $this->input('assignees'))) {
