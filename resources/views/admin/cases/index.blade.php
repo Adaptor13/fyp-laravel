@@ -279,7 +279,8 @@
                                         <div class="mb-3">
                                             <label for="incident_date" class="form-label">Incident Date *</label>
                                             <input type="date" name="incident_date" id="incident_date" class="form-control" 
-                                                   value="{{ old('incident_date') }}" required>
+                                                   value="{{ old('incident_date') }}" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
+                                            <small class="form-text text-muted">Cannot select future dates</small>
                                         </div>
                                     </div>
                                 </div>
@@ -626,6 +627,28 @@
             responsive: true
         });
 
+        // Phone number masking for add and edit case modals
+        $('#addCase, #editCase').on('show.bs.modal', function() {
+            $('#reporter_phone').mask('000-0000000', {
+                placeholder: "000-0000000",
+                clearIfNotMatch: true,
+                translation: {
+                    '0': {pattern: /[0-9]/}
+                }
+            });
+        });
+
+        // Apply phone masking to dynamically loaded edit form content
+        $(document).on('DOMNodeInserted', '#editCaseContent', function() {
+            $('#editCaseContent #reporter_phone').mask('000-0000000', {
+                placeholder: "000-0000000",
+                clearIfNotMatch: true,
+                translation: {
+                    '0': {pattern: /[0-9]/}
+                }
+            });
+        });
+
         // Handle edit button clicks
         $(document).on('click', '.edit-btn', function() {
             const caseId = $(this).data('id');
@@ -685,7 +708,6 @@
                     responseType: 'blob'
                 },
                 success: function(data, status, xhr) {
-                    // Create download link
                     const blob = new Blob([data], { type: 'application/pdf' });
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -713,7 +735,6 @@
                          errorMessage = 'Case not found.';
                      }
                      
-                     // Show error alert
                      const alertHtml = `
                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
                              <strong>Error:</strong> ${errorMessage}
@@ -721,13 +742,10 @@
                          </div>
                      `;
                      
-                     // Remove any existing alerts
                      $('.alert').remove();
                      
-                     // Add new alert at the top of the container
                      $('.container-fluid').prepend(alertHtml);
                      
-                     // Auto-remove alert after 5 seconds
                      setTimeout(() => {
                          $('.alert').fadeOut(function() {
                              $(this).remove();
@@ -737,7 +755,6 @@
             });
         });
 
-        // Handle history button clicks
         $(document).on('click', '.history-btn', function() {
             const caseId = $(this).data('id');
             const label = $(this).data('label');
@@ -786,6 +803,21 @@
                  if (alert) alert.remove();
              });
          }, 4000);
+
+         // Date validation function for add case form
+         function validateIncidentDate(input) {
+             const selectedDate = new Date(input.value);
+             const today = new Date();
+             today.setHours(23, 59, 59, 999); // Set to end of today to allow today's date
+             
+             if (selectedDate > today) {
+                 alert('Please select a date that is not in the future.');
+                 input.value = ''; // Clear the invalid date
+                 input.focus();
+                 return false;
+             }
+             return true;
+         }
      </script>
 
 

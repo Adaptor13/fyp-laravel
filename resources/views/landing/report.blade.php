@@ -117,7 +117,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="incident_date" class="form-label">Date of Incident *</label>
-                                <input type="date" name="incident_date" id="incident_date" class="form-control" required>
+                                <input type="date" name="incident_date" id="incident_date" class="form-control" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
+                                <small class="form-text text-muted">Cannot select future dates</small>
                             </div>
                         </div>
 
@@ -176,10 +177,33 @@
             }
         }
 
+        function validateIncidentDate(input) {
+            const selectedDate = new Date(input.value);
+            const today = new Date();
+            today.setHours(23, 59, 59, 999); // Set to end of today to allow today's date
+            
+            if (selectedDate > today) {
+                alert('Please select a date that is not in the future.');
+                input.value = ''; // Clear the invalid date
+                input.focus();
+                return false;
+            }
+            return true;
+        }
+
         // Form validation before submit
         document.querySelector('.report-form').addEventListener('submit', function(e) {
             const fileInput = document.getElementById('evidence');
+            const dateInput = document.getElementById('incident_date');
+            
+            // Validate file upload
             if (!validateFileUpload(fileInput)) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validate incident date
+            if (dateInput.value && !validateIncidentDate(dateInput)) {
                 e.preventDefault();
                 return false;
             }

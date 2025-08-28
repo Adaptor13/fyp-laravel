@@ -1,7 +1,7 @@
 <!-- Menu Navigation starts -->
 <nav class="dark-sidebar">
     <div class="app-logo">
-        <a class="logo d-inline-block" href="#">
+        <a class="logo d-inline-block" href="{{ route('admin_index') }}">
             <img src="{{ asset('../assets/images/logo/sinda.png') }}" alt="#" class="dark-logo">
             <img src="{{ asset('../assets/images/logo/sinda.png') }}" alt="#" class="light-logo">
         </a>

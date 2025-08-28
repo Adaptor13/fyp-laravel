@@ -144,7 +144,8 @@
                 <div class="mb-3">
                     <label for="incident_date" class="form-label">Incident Date *</label>
                     <input type="date" name="incident_date" id="incident_date" class="form-control" 
-                           value="{{ old('incident_date', $report->incident_date) }}" required>
+                           value="{{ old('incident_date', $report->incident_date) }}" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
+                    <small class="form-text text-muted">Cannot select future dates</small>
                 </div>
             </div>
         </div>
@@ -411,6 +412,21 @@ $(document).ready(function() {
                 });
             }, 5000);
         };
+    }
+
+    // Date validation function for edit case form
+    function validateIncidentDate(input) {
+        const selectedDate = new Date(input.value);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // Set to end of today to allow today's date
+        
+        if (selectedDate > today) {
+            alert('Please select a date that is not in the future.');
+            input.value = ''; // Clear the invalid date
+            input.focus();
+            return false;
+        }
+        return true;
     }
 });
 </script>
