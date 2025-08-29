@@ -43,11 +43,13 @@ Route::middleware('web')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
-    // Admin-only
-    Route::middleware(['auth', 'role:admin'])->group(function () {
-
-        //Users Pages
+    // Admin Dashboard - accessible by all authenticated users with appropriate roles
+    Route::middleware(['auth', 'role:admin,social_worker,law_enforcement,healthcare,gov_official,public_user'])->group(function () {
         Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
+    });
+
+    // Admin-only routes
+    Route::middleware(['auth', 'role:admin'])->group(function () {
 
         Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
 
@@ -204,6 +206,10 @@ Route::middleware('web')->group(function () {
         // Case History routes
         Route::get('/cases/{report}/history', [CaseHistoryController::class, 'show'])->name('cases.history');
         Route::get('/cases/{report}/history/json', [CaseHistoryController::class, 'getHistory'])->name('cases.history.json');
+
+        // Case Messaging routes
+        Route::get('/cases/{case}/messages', [App\Http\Controllers\CaseMessageController::class, 'index'])->name('cases.messages.index');
+        Route::post('/cases/{case}/messages', [App\Http\Controllers\CaseMessageController::class, 'store'])->name('cases.messages.store');
     });
 
     // Route::middleware(['auth', 'role:admin,gov_official'])

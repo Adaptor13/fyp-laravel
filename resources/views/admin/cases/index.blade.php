@@ -593,6 +593,17 @@
 
                         let actionButtons = '';
                         
+                        // Add View Case Details button (always available for viewing)
+                        actionButtons += `
+                            <li>
+                                <a class="dropdown-item view-details-btn" href="${window.location.origin}/cases/${row.id}"
+                                    data-id="${row.id}"
+                                    data-label="${label}">
+                                    <i class="ti ti-eye text-primary"></i> View Case Details
+                                </a>
+                            </li>
+                        `;
+                        
                         // Add Edit button if user has edit permission
                         if (hasPermission('cases.edit')) {
                             actionButtons += `

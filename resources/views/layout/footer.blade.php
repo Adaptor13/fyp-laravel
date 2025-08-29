@@ -14,6 +14,7 @@
                     <li> <a href="mailto:justincheah13@gmail.com."> Need Help <i class="ti ti-help"></i></a></li>
                 </ul>
             </div>
+            
         </div>
     </div>
 </footer>

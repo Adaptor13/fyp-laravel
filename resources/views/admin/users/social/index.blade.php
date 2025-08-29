@@ -178,7 +178,12 @@
                     <div class="modal-body">
                         @if ($errors->any())
                             <div class="alert alert-danger mb-3">
-                                {{ $errors->first() }}
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 
@@ -227,7 +232,7 @@
                                 <label for="add_password_confirmation" class="form-label">Confirm Password</label>
                                 <div class="input-group">
                                     <input id="add_password_confirmation" name="password_confirmation" type="password" class="form-control" minlength="8" placeholder="Re-enter Password" required>
-                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password_confirmationww">
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password_confirmation">
                                         <i class="ti ti-eye"></i>
                                     </button>
                                 </div>
@@ -354,7 +359,12 @@
                     <div class="modal-body">
                         @if ($errors->any())
                             <div class="alert alert-danger mb-3">
-                                {{ $errors->first() }}
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 

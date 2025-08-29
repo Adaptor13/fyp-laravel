@@ -42,18 +42,22 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Case #{{ substr($report->id, 0, 17) }}...</h5>
+                        <h5 class="mb-0">Case #{{ $report->id }}</h5>
                         <div>
-                            <a href="{{ route('cases.index') }}" class="btn btn-secondary">
-                                <i class="ti ti-arrow-left"></i> Back to Cases
+                            <a href="{{ route('cases.index') }}" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Back to Cases">
+                                <i class="ti ti-arrow-left"></i>
                             </a>
-                            <button class="btn btn-info" onclick="exportCase('{{ $report->id }}')">
-                                <i class="ti ti-download"></i> Export PDF
+                            <button class="btn btn-info" id="exportBtn" data-case-id="{{ $report->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Export PDF">
+                                <i class="ti ti-download"></i>
                             </button>
+                            <a href="#messagesPanel" class="btn btn-info" onclick="scrollToMessages()" data-bs-toggle="tooltip" data-bs-placement="top" title="Messages">
+                                <i class="ti ti-messages"></i>
+                                <span class="badge bg-light text-dark" id="messagesCount">0</span>
+                            </a>
                             @permission('cases.edit')
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editCase" 
-                                    onclick="loadEditForm('{{ $report->id }}')">
-                                <i class="ti ti-edit"></i> Edit Case
+                                    onclick="loadEditForm('{{ $report->id }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Case">
+                                <i class="ti ti-edit"></i>
                             </button>
                             @endpermission
                         </div>
@@ -257,6 +261,11 @@
                                     </div>
                                 </div>
                             @endif
+
+                            <!-- Messages Panel -->
+                            <div class="col-md-12 mt-4" id="messagesPanel">
+                                @include('admin.cases._messages')
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -331,9 +340,12 @@ function loadEditForm(caseId) {
     });
 }
 
-function exportCase(caseId) {
+// Handle export button clicks
+$(document).on('click', '#exportBtn', function() {
+    const caseId = $(this).data('case-id');
+    
     // Show loading state
-    const $btn = $('button[onclick="exportCase(\'' + caseId + '\')"]');
+    const $btn = $(this);
     const originalText = $btn.html();
     $btn.html('<i class="ti ti-loader ti-spin"></i> Generating PDF...');
     $btn.prop('disabled', true);
@@ -346,7 +358,6 @@ function exportCase(caseId) {
             responseType: 'blob'
         },
         success: function(data, status, xhr) {
-            // Create download link
             const blob = new Blob([data], { type: 'application/pdf' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -361,9 +372,6 @@ function exportCase(caseId) {
             // Reset button
             $btn.html(originalText);
             $btn.prop('disabled', false);
-            
-            // Show success message
-            showAlert('PDF exported successfully!', 'success');
         },
         error: function(xhr, status, error) {
             // Reset button
@@ -377,10 +385,25 @@ function exportCase(caseId) {
                 errorMessage = 'Case not found.';
             }
             
-            showAlert(errorMessage, 'danger');
+            const alertHtml = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong> ${errorMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            $('.alert').remove();
+            
+            $('.container-fluid').prepend(alertHtml);
+            
+            setTimeout(() => {
+                $('.alert').fadeOut(function() {
+                    $(this).remove();
+                });
+            }, 5000);
         }
     });
-}
+});
 
 // Handle evidence file viewing
 $(document).on('click', '.evidence-viewer-btn', function() {
@@ -431,50 +454,216 @@ $(document).on('click', '.evidence-viewer-btn', function() {
         `);
     }
 });
-        },
-        error: function(xhr, status, error) {
-            // Reset button
-            $btn.html(originalText);
-            $btn.prop('disabled', false);
-            
-            let errorMessage = 'Failed to export PDF. Please try again.';
-            if (xhr.status === 403) {
-                errorMessage = 'Access denied. You do not have permission to export this case.';
-            } else if (xhr.status === 404) {
-                errorMessage = 'Case not found.';
-            }
-            
-            showAlert(errorMessage, 'danger');
-        }
+
+// Auto-remove session alerts after 4 seconds
+setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        if (alert) alert.remove();
+    });
+}, 4000);
+
+// Scroll to messages panel
+function scrollToMessages() {
+    document.getElementById('messagesPanel').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
     });
 }
 
-// Helper function to show alerts
-function showAlert(message, type = 'info') {
-    const alertClass = type === 'success' ? 'alert-success' : 
-                      type === 'danger' ? 'alert-danger' : 
-                      type === 'warning' ? 'alert-warning' : 'alert-info';
-    
-    const alertHtml = `
-        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            <strong>${type === 'success' ? 'Success:' : type === 'danger' ? 'Error:' : type === 'warning' ? 'Warning:' : 'Info:'}</strong> ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    
-    // Remove any existing alerts
-    $('.alert').remove();
-    
-    // Add new alert at the top of the container
-    $('.container-fluid').prepend(alertHtml);
-    
-    // Auto-remove alert after 5 seconds
-    setTimeout(() => {
-        $('.alert').fadeOut(function() {
-            $(this).remove();
+// Initialize tooltips
+$(document).ready(function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Messaging functionality
+    const caseId = '{{ $report->id }}';
+    let canPost = true;
+    let allMessages = []; // Store all messages for search functionality
+
+    // Load messages
+    function loadMessages() {
+        $.get(`/cases/${caseId}/messages`, function(data) {
+            canPost = data.can_post;
+            allMessages = data.messages; // Store all messages
+            renderMessages(allMessages);
+            updateComposeForm();
+            updateMessageCount(allMessages.length);
+        }).fail(function() {
+            $('#messagesThread').html(`
+                <div class="alert alert-danger">
+                    <i class="ti ti-alert-circle"></i> Failed to load messages
+                </div>
+            `);
         });
-    }, 5000);
-}
+    }
+
+    // Update message count badge
+    function updateMessageCount(count) {
+        $('#messagesCount').text(count);
+    }
+
+    // Render messages
+    function renderMessages(messages) {
+        if (messages.length === 0) {
+            $('#messagesThread').html(`
+                <div class="text-center text-muted">
+                    <i class="ti ti-messages-off fs-1"></i>
+                    <p class="mt-2">No messages yet</p>
+                    <small>Start the conversation by sending the first message</small>
+                </div>
+            `);
+            return;
+        }
+
+        // Reverse the messages array to show oldest first (chronological order)
+        const chronologicalMessages = messages.slice().reverse();
+
+        const messagesHtml = chronologicalMessages.map(message => {
+            const isOwnMessage = message.sender_id === '{{ auth()->id() }}';
+            const messageClass = isOwnMessage ? 'text-end' : 'text-start';
+            const bubbleClass = isOwnMessage ? 'bg-primary text-white' : 'bg-light';
+            
+            return `
+                <div class="mb-3 ${messageClass}">
+                    <div class="d-inline-block ${bubbleClass} rounded p-3" style="max-width: 70%;">
+                        <div class="message-body">${escapeHtml(message.body)}</div>
+                        <div class="message-meta mt-2">
+                            <small class="${isOwnMessage ? 'text-white-50' : 'text-muted'}">
+                                <strong>${escapeHtml(message.sender.name)}</strong> • 
+                                ${new Date(message.created_at).toLocaleString()}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        $('#messagesThread').html(messagesHtml);
+        $('#messagesThread').scrollTop($('#messagesThread')[0].scrollHeight);
+    }
+
+    // Update compose form based on case status
+    function updateComposeForm() {
+        if (!canPost) {
+            $('#messageBody').prop('disabled', true).attr('placeholder', 'Messaging is disabled for closed cases');
+            $('#sendMessageBtn').prop('disabled', true).html('<i class="ti ti-lock"></i> Case Closed');
+            $('#composeMessage').prepend(`
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="ti ti-alert-triangle"></i> This case is closed. You can view message history but cannot send new messages.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `);
+        }
+    }
+
+    // Handle message form submission
+    $('#messageForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const messageBody = $('#messageBody').val().trim();
+        if (!messageBody) return;
+
+        const $btn = $('#sendMessageBtn');
+        const originalText = $btn.html();
+        
+        $btn.prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Sending...');
+
+        $.ajax({
+            url: `/cases/${caseId}/messages`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                body: messageBody
+            },
+            success: function(response) {
+                $('#messageBody').val('');
+                $('#charCount').text('0');
+                loadMessages(); // Reload messages to show the new one
+            },
+            error: function(xhr) {
+                let errorMessage = 'Failed to send message';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                
+                const alertHtml = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="ti ti-alert-circle"></i> ${errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                $('.container-fluid').prepend(alertHtml);
+                
+                setTimeout(() => {
+                    $('.alert').fadeOut(function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // Character count
+    $('#messageBody').on('input', function() {
+        const count = $(this).val().length;
+        $('#charCount').text(count);
+        
+        if (count > 4500) {
+            $('#charCount').addClass('text-warning');
+        } else {
+            $('#charCount').removeClass('text-warning');
+        }
+    });
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Search functionality
+    $('#messageSearch').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase().trim();
+        
+        if (searchTerm === '') {
+            // Show all messages
+            renderMessages(allMessages);
+            $('#clearSearch').hide();
+        } else {
+            // Filter messages
+            const filteredMessages = allMessages.filter(message => {
+                const messageText = message.body.toLowerCase();
+                const senderName = message.sender.name.toLowerCase();
+                return messageText.includes(searchTerm) || senderName.includes(searchTerm);
+            });
+            
+            renderMessages(filteredMessages);
+            $('#clearSearch').show();
+        }
+    });
+
+    // Clear search
+    $('#clearSearch').on('click', function() {
+        $('#messageSearch').val('');
+        renderMessages(allMessages);
+        $(this).hide();
+    });
+
+    // Load messages on page load
+    loadMessages();
+
+    // Auto-refresh messages every 30 seconds
+    setInterval(loadMessages, 30000);
+});
+
 </script>
 @endsection
 

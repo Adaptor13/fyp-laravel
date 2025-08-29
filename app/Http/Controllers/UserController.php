@@ -549,8 +549,8 @@ class UserController extends Controller
             'agency_name'           => 'required|string|max:255',
             'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
             'agency_code'           => 'nullable|string|max:10', // keep short
-            'placement_state'       => 'nullable|string|max:100',
-            'placement_district'    => 'nullable|string|max:100',
+            'placement_state'       => 'required|string|max:100',
+            'placement_district'    => 'required|string|max:100',
 
             'phone'                 => 'nullable|string|max:30',
             'address_line1'         => 'nullable|string|max:255',
@@ -617,8 +617,14 @@ class UserController extends Controller
             });
 
         } catch (\Throwable $e) {
+            \Log::error('Social worker creation failed: ' . $e->getMessage(), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to create social worker. Please try again.'])
+                ->withErrors(['general' => 'Failed to create social worker: ' . $e->getMessage()])
                 ->withInput();
         }
 
@@ -639,8 +645,8 @@ class UserController extends Controller
             'agency_name'           => 'required|string|max:255',
             'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
             'agency_code'           => 'nullable|string|max:10',
-            'placement_state'       => 'nullable|string|max:100',
-            'placement_district'    => 'nullable|string|max:100',
+            'placement_state'       => 'required|string|max:100',
+            'placement_district'    => 'required|string|max:100',
 
             'phone'                 => 'nullable|string|max:30',
             'address_line1'         => 'nullable|string|max:255',
@@ -715,10 +721,15 @@ class UserController extends Controller
             });
 
         } catch (\Throwable $e) {
-            // You can log the error for debugging
-            // \Log::error('Update social worker failed', ['id' => $id, 'e' => $e]);
+            \Log::error('Update social worker failed: ' . $e->getMessage(), [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to update social worker. Please try again.'])
+                ->withErrors(['general' => 'Failed to update social worker: ' . $e->getMessage()])
                 ->withInput();
         }
 

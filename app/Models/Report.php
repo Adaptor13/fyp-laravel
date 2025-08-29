@@ -41,6 +41,13 @@ class Report extends Model
         'priority_level',
         'last_updated_by',
         'status_updated_at',
+        'last_message_at',
+    ];
+
+    protected $casts = [
+        'abuse_types' => 'array',
+        'evidence' => 'array',
+        'last_message_at' => 'datetime',
     ];
 
     public function user()
@@ -86,5 +93,13 @@ class Report extends Model
     public function history()
     {
         return $this->hasMany(CaseHistory::class, 'report_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get all messages for this case
+     */
+    public function messages()
+    {
+        return $this->morphMany(Message::class, 'messageable')->orderBy('created_at', 'desc');
     }
 }

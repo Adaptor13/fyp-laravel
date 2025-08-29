@@ -78,7 +78,7 @@
                 </a>
                 <ul class="collapse" id="communication">
                     <li><a href="#"><i class="ti ti-mail"></i> Contact Queries</a></li>
-                    <li><a href="#"><i class="ti ti-messages"></i> Secure Messaging</a></li>
+           <!--          <li><a href="#"><i class="ti ti-messages"></i> Secure Messaging</a></li> -->
                 </ul>
             </li>
 
