@@ -57,22 +57,22 @@ class StoreCaseRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Filter out empty assignee values
-            if ($this->input('assignees')) {
-                $filteredAssignees = array_filter($this->input('assignees'), function($value) {
+            $assignees = $this->input('assignees');
+            if ($assignees && is_array($assignees)) {
+                $filteredAssignees = array_filter($assignees, function($value) {
                     return !empty($value) && $value !== '';
                 });
                 $this->merge(['assignees' => array_values($filteredAssignees)]);
             }
             
             // Filter out empty abuse_types values
-            if ($this->input('abuse_types')) {
-                $filteredAbuseTypes = array_filter($this->input('abuse_types'), function($value) {
+            $abuseTypes = $this->input('abuse_types');
+            if ($abuseTypes && is_array($abuseTypes)) {
+                $filteredAbuseTypes = array_filter($abuseTypes, function($value) {
                     return !empty($value) && $value !== '';
                 });
                 $this->merge(['abuse_types' => array_values($filteredAbuseTypes)]);
             }
-            
-
         });
     }
 }

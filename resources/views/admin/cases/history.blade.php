@@ -28,11 +28,60 @@
                             <div class="changes-details">
                                 @foreach($entry->changes as $field => $change)
                                     @if(isset($change['from']) && isset($change['to']))
-                                        <div class="change-item mb-1">
-                                            <strong>{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
-                                            <span class="text-muted">{{ $change['from'] ?? 'None' }}</span>
-                                            <i class="ti ti-arrow-right mx-1"></i>
-                                            <span class="text-success">{{ $change['to'] ?? 'None' }}</span>
+                                        <div class="change-item mb-2">
+                                            <strong class="text-primary">{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <div class="from-value me-2">
+                                                    <small class="text-muted">From:</small>
+                                                    @if(is_array($change['from']))
+                                                        @if(empty($change['from']))
+                                                            <span class="badge bg-secondary">None</span>
+                                                        @else
+                                                            <div class="mt-1">
+                                                                @foreach($change['from'] as $item)
+                                                                    <span class="badge bg-light text-dark me-1 mb-1">{{ $item }}</span>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-light text-dark">{{ $change['from'] ?? 'None' }}</span>
+                                                    @endif
+                                                </div>
+                                                <i class="ti ti-arrow-right mx-2 text-muted"></i>
+                                                <div class="to-value">
+                                                    <small class="text-muted">To:</small>
+                                                    @if(is_array($change['to']))
+                                                        @if(empty($change['to']))
+                                                            <span class="badge bg-secondary">None</span>
+                                                        @else
+                                                            <div class="mt-1">
+                                                                                                                                 @foreach($change['to'] as $item)
+                                                                     @if($field === 'evidence')
+                                                                         @php
+                                                                             $filename = basename($item);
+                                                                             $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                                                                             $iconClass = match(strtolower($extension)) {
+                                                                                 'jpg', 'jpeg', 'png', 'gif', 'webp' => 'ti ti-photo',
+                                                                                 'mp4', 'avi', 'mov', 'wmv' => 'ti ti-video',
+                                                                                 'pdf' => 'ti ti-file-text',
+                                                                                 default => 'ti ti-file'
+                                                                             };
+                                                                         @endphp
+                                                                         <span class="badge bg-info text-white me-1 mb-1 evidence-badge" title="{{ $item }}">
+                                                                             <i class="{{ $iconClass }} me-1"></i>
+                                                                             <span class="evidence-filename">{{ strlen($filename) > 20 ? substr($filename, 0, 17) . '...' : $filename }}</span>
+                                                                         </span>
+                                                                     @else
+                                                                         <span class="badge bg-success text-white me-1 mb-1">{{ $item }}</span>
+                                                                     @endif
+                                                                 @endforeach
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-success text-white">{{ $change['to'] ?? 'None' }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
                                     @endif
                                 @endforeach
@@ -117,6 +166,47 @@
 
 .change-item {
     font-size: 0.875rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.75rem;
+}
+
+.change-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.from-value, .to-value {
+    flex: 1;
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge.bg-light {
+    border: 1px solid #dee2e6;
+}
+
+.evidence-badge {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: help;
+}
+
+.evidence-filename {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.changes-details {
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .actor-info {

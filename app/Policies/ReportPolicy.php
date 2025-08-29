@@ -48,6 +48,11 @@ class ReportPolicy
             return false;
         }
 
+        // Check if case has assignees
+        if ($report->assignees()->count() === 0) {
+            return false;
+        }
+
         return true;
     }
 

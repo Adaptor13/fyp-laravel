@@ -90,29 +90,33 @@
 
         <div class="mb-3">
             <label class="form-label">Abuse Types</label>
+            @php
+                $currentAbuseTypes = old('abuse_types', $report->abuse_types ?? []);
+                $abuseTypesArray = is_array($currentAbuseTypes) ? $currentAbuseTypes : [];
+            @endphp
             <div class="form-check">
                 <input type="checkbox" name="abuse_types[]" value="Physical Abuse" class="form-check-input" 
-                       {{ in_array('Physical Abuse', old('abuse_types', $abuseTypes)) ? 'checked' : '' }}>
+                       {{ in_array('Physical Abuse', $abuseTypesArray) ? 'checked' : '' }}>
                 <label class="form-check-label">Physical Abuse</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="abuse_types[]" value="Emotional Abuse" class="form-check-input" 
-                       {{ in_array('Emotional Abuse', old('abuse_types', $abuseTypes)) ? 'checked' : '' }}>
+                       {{ in_array('Emotional Abuse', $abuseTypesArray) ? 'checked' : '' }}>
                 <label class="form-check-label">Emotional Abuse</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="abuse_types[]" value="Sexual Abuse" class="form-check-input" 
-                       {{ in_array('Sexual Abuse', old('abuse_types', $abuseTypes)) ? 'checked' : '' }}>
+                       {{ in_array('Sexual Abuse', $abuseTypesArray) ? 'checked' : '' }}>
                 <label class="form-check-label">Sexual Abuse</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="abuse_types[]" value="Neglect" class="form-check-input" 
-                       {{ in_array('Neglect', old('abuse_types', $abuseTypes)) ? 'checked' : '' }}>
+                       {{ in_array('Neglect', $abuseTypesArray) ? 'checked' : '' }}>
                 <label class="form-check-label">Neglect</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="abuse_types[]" value="Exploitation" class="form-check-input" 
-                       {{ in_array('Exploitation', old('abuse_types', $abuseTypes)) ? 'checked' : '' }}>
+                       {{ in_array('Exploitation', $abuseTypesArray) ? 'checked' : '' }}>
                 <label class="form-check-label">Exploitation</label>
             </div>
         </div>
@@ -162,11 +166,11 @@
                    accept=".jpg,.jpeg,.png,.mp4,.pdf">
             <small class="form-text text-muted">You can select multiple files (JPG, PNG, MP4, PDF up to 20MB each)</small>
             
-            @if($report->evidence)
+            @if(!empty($report->evidence))
                 <div class="mt-2">
                     <small class="text-muted">Current files:</small>
                     <div id="current-evidence-files">
-                        @foreach(json_decode($report->evidence, true) ?? [] as $index => $file)
+                        @foreach($report->evidence as $index => $file)
                             <div class="evidence-file-item d-inline-block me-2 mb-2" data-file="{{ $file }}">
                                 <div class="badge bg-secondary d-flex align-items-center evidence-file-badge" 
                                      style="cursor: pointer;" data-file="{{ $file }}" data-filename="{{ basename($file) }}">

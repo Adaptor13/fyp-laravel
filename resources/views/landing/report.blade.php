@@ -70,6 +70,7 @@
                                     min="0"
                                     max="17"
                                     required
+                                    value="{{ old('victim_age') }}"
                                     oninvalid="this.setCustomValidity('Please enter an age between 0 and 17.')"
                                     oninput="this.setCustomValidity('')">
                             </div>
@@ -79,45 +80,68 @@
                             <div class="mb-3">
                                 <label for="victim_gender" class="form-label">Victim's Gender *</label>
                                 <select name="victim_gender" id="victim_gender" class="form-select" required>
-                                    <option selected disabled>Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Prefer not to say">Prefer not to say</option>
+                                    <option value="" {{ old('victim_gender') == '' ? 'selected' : '' }} disabled>Select Gender</option>
+                                    <option value="Male" {{ old('victim_gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ old('victim_gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Other" {{ old('victim_gender') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="abuse_types" class="form-label">Type of Abuse *</label>
-                                <select name="abuse_types[]" id="abuse_types" class="form-select" multiple required>
-                                    <option value="Physical">Physical</option>
-                                    <option value="Sexual">Sexual</option>
-                                    <option value="Neglect">Neglect</option>
-                                    <option value="Emotional">Emotional</option>
-                                </select>
-                                <small class="form-text text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+                                <label class="form-label">Type of Abuse *</label>
+                                @php
+                                    $currentAbuseTypes = old('abuse_types', []);
+                                    $abuseTypesArray = is_array($currentAbuseTypes) ? $currentAbuseTypes : [];
+                                @endphp
+                                <div class="form-check">
+                                    <input type="checkbox" name="abuse_types[]" value="Physical Abuse" class="form-check-input" 
+                                           {{ in_array('Physical Abuse', $abuseTypesArray) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Physical Abuse</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" name="abuse_types[]" value="Emotional Abuse" class="form-check-input" 
+                                           {{ in_array('Emotional Abuse', $abuseTypesArray) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Emotional Abuse</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" name="abuse_types[]" value="Sexual Abuse" class="form-check-input" 
+                                           {{ in_array('Sexual Abuse', $abuseTypesArray) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Sexual Abuse</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" name="abuse_types[]" value="Neglect" class="form-check-input" 
+                                           {{ in_array('Neglect', $abuseTypesArray) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Neglect</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" name="abuse_types[]" value="Exploitation" class="form-check-input" 
+                                           {{ in_array('Exploitation', $abuseTypesArray) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Exploitation</label>
+                                </div>
+                                <small class="form-text text-muted">Please select at least one type of abuse</small>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="incident_description" class="form-label">Incident Description *</label>
-                                <textarea name="incident_description" id="incident_description" class="form-control" rows="4" placeholder="Describe what happened..." required></textarea>
+                                <textarea name="incident_description" id="incident_description" class="form-control" rows="4" placeholder="Describe what happened..." required>{{ old('incident_description') }}</textarea>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="incident_location" class="form-label">Incident Location *</label>
-                                <textarea name="incident_location" id="incident_location" class="form-control" rows="2" placeholder="Enter full or approximate location" required></textarea>
+                                <textarea name="incident_location" id="incident_location" class="form-control" rows="2" placeholder="Enter full or approximate location" required>{{ old('incident_location') }}</textarea>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="incident_date" class="form-label">Date of Incident *</label>
-                                <input type="date" name="incident_date" id="incident_date" class="form-control" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
+                                <input type="date" name="incident_date" id="incident_date" class="form-control" required max="{{ date('Y-m-d') }}" value="{{ old('incident_date') }}" onchange="validateIncidentDate(this)">
                                 <small class="form-text text-muted">Cannot select future dates</small>
                             </div>
                         </div>
@@ -125,7 +149,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="suspected_abuser" class="form-label">Suspected Abuser (Optional)</label>
-                                <input type="text" name="suspected_abuser" id="suspected_abuser" class="form-control" placeholder="Name or relationship">
+                                <input type="text" name="suspected_abuser" id="suspected_abuser" class="form-control" placeholder="Name or relationship" value="{{ old('suspected_abuser') }}">
                             </div>
                         </div>
 
@@ -195,6 +219,14 @@
         document.querySelector('.report-form').addEventListener('submit', function(e) {
             const fileInput = document.getElementById('evidence');
             const dateInput = document.getElementById('incident_date');
+            const abuseTypeCheckboxes = document.querySelectorAll('input[name="abuse_types[]"]:checked');
+            
+            // Validate abuse types selection
+            if (abuseTypeCheckboxes.length === 0) {
+                alert('Please select at least one type of abuse.');
+                e.preventDefault();
+                return false;
+            }
             
             // Validate file upload
             if (!validateFileUpload(fileInput)) {

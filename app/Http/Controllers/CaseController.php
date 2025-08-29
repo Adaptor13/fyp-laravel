@@ -134,7 +134,7 @@ class CaseController extends Controller
     public function edit(Report $report)
     {
         $assignableUsers = User::whereIn('role_id', Role::whereIn('name', ['social_worker', 'law_enforcement', 'healthcare', 'gov_official'])->pluck('id'))->get();
-        $abuseTypes = json_decode($report->abuse_types, true) ?? [];
+        
         $currentAssignees = $report->assignees->pluck('id')->toArray();
         
         // Get role-specific assignments
@@ -144,7 +144,7 @@ class CaseController extends Controller
             $roleAssignments[$roleName] = $assignee->id;
         }
         
-        return view('admin.cases.edit', compact('report', 'assignableUsers', 'abuseTypes', 'currentAssignees', 'roleAssignments'));
+        return view('admin.cases.edit', compact('report', 'assignableUsers', 'currentAssignees', 'roleAssignments'));
     }
 
     public function store(StoreCaseRequest $request)
@@ -168,12 +168,12 @@ class CaseController extends Controller
                     'reporter_phone' => $validated['reporter_phone'] ?? null,
                     'victim_age' => $validated['victim_age'] ?? null,
                     'victim_gender' => $validated['victim_gender'] ?? null,
-                    'abuse_types' => json_encode($validated['abuse_types'] ?? []),
+                    'abuse_types' => $validated['abuse_types'] ?? [],
                     'incident_description' => $validated['incident_description'],
                     'incident_location' => $validated['incident_location'],
                     'incident_date' => $validated['incident_date'],
                     'suspected_abuser' => $validated['suspected_abuser'] ?? null,
-                    'evidence' => json_encode($filePaths),
+                    'evidence' => $filePaths,
                     'confirmed_truth' => true,
                     'report_status' => $validated['report_status'],
                     'priority_level' => $validated['priority_level'],
@@ -182,9 +182,10 @@ class CaseController extends Controller
                 ]);
 
                 // Handle assignments
-                if ($request->has('assignees') && is_array($request->assignees)) {
+                $assignees = $request->input('assignees');
+                if ($assignees && is_array($assignees)) {
                     // Filter out empty values
-                    $validAssignees = array_filter($request->assignees, function($userId) {
+                    $validAssignees = array_filter($assignees, function($userId) {
                         return !empty($userId) && $userId !== '';
                     });
                     
@@ -236,7 +237,7 @@ class CaseController extends Controller
                 $filePaths = [];
                 
                 // Get existing evidence files
-                $existingEvidence = json_decode($report->evidence, true) ?? [];
+                $existingEvidence = $report->evidence ?? [];
                 
                 // Get files marked for removal
                 $removedEvidence = [];
@@ -272,12 +273,12 @@ class CaseController extends Controller
                     'reporter_phone' => $validated['reporter_phone'] ?? null,
                     'victim_age' => $validated['victim_age'] ?? null,
                     'victim_gender' => $validated['victim_gender'] ?? null,
-                    'abuse_types' => json_encode($validated['abuse_types'] ?? []),
+                    'abuse_types' => $validated['abuse_types'] ?? [],
                     'incident_description' => $validated['incident_description'],
                     'incident_location' => $validated['incident_location'],
                     'incident_date' => $validated['incident_date'],
                     'suspected_abuser' => $validated['suspected_abuser'] ?? null,
-                    'evidence' => json_encode($filePaths),
+                    'evidence' => $filePaths,
                     'report_status' => $validated['report_status'],
                     'priority_level' => $validated['priority_level'],
                     'last_updated_by' => auth()->id(),
@@ -285,9 +286,10 @@ class CaseController extends Controller
                 ]);
 
                 // Handle assignments
-                if ($request->has('assignees')) {
+                $assignees = $request->input('assignees');
+                if ($assignees && is_array($assignees)) {
                     // Filter out empty values
-                    $validAssignees = array_filter($request->assignees, function($userId) {
+                    $validAssignees = array_filter($assignees, function($userId) {
                         return !empty($userId) && $userId !== '';
                     });
                     
@@ -357,8 +359,7 @@ class CaseController extends Controller
 
             DB::transaction(function () use ($report) {
                 if ($report->evidence) {
-                    $filePaths = json_decode($report->evidence, true) ?? [];
-                    foreach ($filePaths as $filePath) {
+                    foreach ($report->evidence as $filePath) {
                         if (Storage::disk('public')->exists($filePath)) {
                             Storage::disk('public')->delete($filePath);
                         }
@@ -459,8 +460,8 @@ class CaseController extends Controller
             }
 
             // Prepare data for the PDF
-            $abuseTypes = json_decode($report->abuse_types, true) ?? [];
-            $evidence = json_decode($report->evidence, true) ?? [];
+            $abuseTypes = $report->abuse_types ?? [];
+            $evidence = $report->evidence ?? [];
 
             // Generate PDF using the existing PDF template
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.report_pdf', compact('report', 'abuseTypes', 'evidence'));

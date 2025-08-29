@@ -57,17 +57,10 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($report->abuse_types)
-                                            @php
-                                                $abuseTypes = json_decode($report->abuse_types, true);
-                                            @endphp
-                                            @if(is_array($abuseTypes) && count($abuseTypes) > 0)
-                                                @foreach($abuseTypes as $type)
-                                                    <span class="badge bg-warning text-dark me-1">{{ $type }}</span>
-                                                @endforeach
-                                            @else
-                                                <span class="text-muted">Not specified</span>
-                                            @endif
+                                        @if($report->abuse_types && is_array($report->abuse_types) && count($report->abuse_types) > 0)
+                                            @foreach($report->abuse_types as $type)
+                                                <span class="badge bg-warning text-dark me-1">{{ $type }}</span>
+                                            @endforeach
                                         @else
                                             <span class="text-muted">Not specified</span>
                                         @endif
@@ -204,17 +197,10 @@
                                              <h6 class="text-primary"><i class="bi bi-exclamation-triangle me-2"></i>Abuse Types</h6>
                                              <div class="card">
                                                  <div class="card-body">
-                                                     @if($report->abuse_types)
-                                                         @php
-                                                             $abuseTypes = json_decode($report->abuse_types, true);
-                                                         @endphp
-                                                         @if(is_array($abuseTypes) && count($abuseTypes) > 0)
-                                                             @foreach($abuseTypes as $type)
-                                                                 <span class="badge bg-warning text-dark me-2 mb-2">{{ $type }}</span>
-                                                             @endforeach
-                                                         @else
-                                                             <span class="text-muted">Not specified</span>
-                                                         @endif
+                                                     @if($report->abuse_types && is_array($report->abuse_types) && count($report->abuse_types) > 0)
+                                                         @foreach($report->abuse_types as $type)
+                                                             <span class="badge bg-warning text-dark me-2 mb-2">{{ $type }}</span>
+                                                         @endforeach
                                                      @else
                                                          <span class="text-muted">Not specified</span>
                                                      @endif
@@ -250,12 +236,9 @@
                                              <h6 class="text-primary"><i class="bi bi-paperclip me-2"></i>Evidence</h6>
                                              <div class="card">
                                                  <div class="card-body">
-                                                     @php
-                                                         $evidence = json_decode($report->evidence, true);
-                                                     @endphp
-                                                     @if(is_array($evidence) && count($evidence) > 0)
+                                                     @if($report->evidence && is_array($report->evidence) && count($report->evidence) > 0)
                                                          <p class="text-success mb-0">
-                                                             <i class="bi bi-check-circle me-2"></i>{{ count($evidence) }} file(s) attached
+                                                             <i class="bi bi-check-circle me-2"></i>{{ count($report->evidence) }} file(s) attached
                                                          </p>
                                                      @else
                                                          <p class="text-muted mb-0">No files attached</p>

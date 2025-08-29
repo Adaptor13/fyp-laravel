@@ -52,7 +52,7 @@
                             </button>
                             <a href="#messagesPanel" class="btn btn-info" onclick="scrollToMessages()" data-bs-toggle="tooltip" data-bs-placement="top" title="Messages">
                                 <i class="ti ti-messages"></i>
-                                <span class="badge bg-light text-dark" id="messagesCount">0</span>
+                                <span class="badge bg-light text-dark" id="messagesCount">{{ $assignees->count() > 0 ? '0' : '—' }}</span>
                             </a>
                             @permission('cases.edit')
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editCase" 
@@ -97,24 +97,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="card bg-light">
-                                            <div class="card-body text-center">
-                                                <h6 class="card-title">Assigned To</h6>
-                                                @if($assignees->count() > 0)
-                                                    <div class="d-flex flex-column gap-1">
-                                                        @foreach($assignees as $assignee)
-                                                            <span class="badge bg-primary fs-6">
-                                                                {{ $assignee->name }}
-                                                            </span>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    <span class="badge bg-secondary fs-6">Unassigned</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     <div class="col-md-3">
                                         <div class="card bg-light">
                                             <div class="card-body text-center">
@@ -155,10 +138,10 @@
                                         @if($report->victim_gender)
                                             <p><strong>Gender:</strong> {{ $report->victim_gender }}</p>
                                         @endif
-                                        @if($report->abuse_types)
+                                        @if(!empty($report->abuse_types))
                                             <p><strong>Abuse Types:</strong></p>
                                             <div class="mb-2">
-                                                @foreach(json_decode($report->abuse_types, true) ?? [] as $abuseType)
+                                                @foreach($report->abuse_types as $abuseType)
                                                     <span class="badge bg-danger me-1">{{ $abuseType }}</span>
                                                 @endforeach
                                             </div>
@@ -220,7 +203,30 @@
                                                                         <h6 class="mb-1">
                                                                             {{ $assignee->name }}
                                                                         </h6>
-                                                                        <p class="text-muted mb-1">{{ optional($assignee->role)->name }}</p>
+                                                                        <p class="text-muted mb-1">
+                                                                            @php
+                                                                                $roleName = optional($assignee->role)->name;
+                                                                                $roleClass = match(strtolower($roleName)) {
+                                                                                    'law_enforcement' => 'bg-danger',
+                                                                                    'healthcare' => 'bg-success',
+                                                                                    'social_worker' => 'bg-info',
+                                                                                    'gov_official' => 'bg-warning',
+                                                                                    'admin' => 'bg-dark',
+                                                                                    default => 'bg-secondary'
+                                                                                };
+                                                                                $roleDisplay = match(strtolower($roleName)) {
+                                                                                    'law_enforcement' => 'Law Enforcement',
+                                                                                    'healthcare' => 'Healthcare',
+                                                                                    'social_worker' => 'Social Worker',
+                                                                                    'gov_official' => 'Government Official',
+                                                                                    'admin' => 'Administrator',
+                                                                                    default => ucfirst(str_replace('_', ' ', $roleName))
+                                                                                };
+                                                                            @endphp
+                                                                            <span class="badge {{ $roleClass }} text-white">
+                                                                                <i class="ti ti-shield me-1"></i>{{ $roleDisplay }}
+                                                                            </span>
+                                                                        </p>
                                                                         <small class="text-muted">
                                                                             Assigned: {{ \Carbon\Carbon::parse($assignee->pivot->assigned_at)->format('M d, Y') }}
                                                                         </small>
@@ -242,21 +248,33 @@
                             </div>
 
                             <!-- Evidence Files -->
-                            @if($report->evidence)
+                            @if(!empty($report->evidence))
                                 <div class="col-md-12 mt-4">
                                     <div class="card">
                                         <div class="card-header">
                                             <h6 class="mb-0"><i class="ti ti-paperclip"></i> Evidence Files</h6>
                                         </div>
                                         <div class="card-body">
-                                            @foreach(json_decode($report->evidence, true) ?? [] as $file)
-                                                <div class="mb-2">
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($report->evidence as $index => $file)
+                                                    @php
+                                                        $filename = basename($file);
+                                                        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                                                        $iconClass = match(strtolower($extension)) {
+                                                            'jpg', 'jpeg', 'png', 'gif', 'webp' => 'ti ti-photo',
+                                                            'mp4', 'avi', 'mov', 'wmv' => 'ti ti-video',
+                                                            'pdf' => 'ti ti-file-text',
+                                                            default => 'ti ti-file'
+                                                        };
+                                                    @endphp
                                                     <button type="button" class="btn btn-outline-primary btn-sm evidence-viewer-btn" 
-                                                            data-file="{{ $file }}" data-filename="{{ basename($file) }}">
-                                                        <i class="ti ti-eye"></i> {{ basename($file) }}
+                                                            data-file="{{ $file }}" data-filename="{{ $filename }}"
+                                                            title="{{ $filename }}">
+                                                        <span class="evidence-number me-1">{{ $index + 1 }}.</span>
+                                                        <i class="{{ $iconClass }}"></i>
                                                     </button>
-                                                </div>
-                                            @endforeach
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -479,7 +497,8 @@ $(document).ready(function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Messaging functionality
+    @if($assignees->count() > 0)
+    // Messaging functionality - only initialize if case has assignees
     const caseId = '{{ $report->id }}';
     let canPost = true;
     let allMessages = []; // Store all messages for search functionality
@@ -492,6 +511,11 @@ $(document).ready(function() {
             renderMessages(allMessages);
             updateComposeForm();
             updateMessageCount(allMessages.length);
+            
+            // Update message count badge based on assignees
+            if (!data.has_assignees) {
+                $('#messagesCount').text('—');
+            }
         }).fail(function() {
             $('#messagesThread').html(`
                 <div class="alert alert-danger">
@@ -546,7 +570,7 @@ $(document).ready(function() {
         $('#messagesThread').scrollTop($('#messagesThread')[0].scrollHeight);
     }
 
-    // Update compose form based on case status
+    // Update compose form based on case status and assignees
     function updateComposeForm() {
         if (!canPost) {
             $('#messageBody').prop('disabled', true).attr('placeholder', 'Messaging is disabled for closed cases');
@@ -662,8 +686,54 @@ $(document).ready(function() {
 
     // Auto-refresh messages every 30 seconds
     setInterval(loadMessages, 30000);
+    @endif
 });
 
 </script>
+
+<style>
+.evidence-viewer-btn {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.evidence-viewer-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.evidence-filename {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.evidence-number {
+    font-weight: bold;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .evidence-viewer-btn {
+        max-width: 140px;
+        font-size: 0.75rem;
+    }
+    
+    .evidence-filename {
+        max-width: 80px;
+    }
+    
+    .evidence-number {
+        font-size: 0.7rem;
+    }
+}
+</style>
 @endsection
 

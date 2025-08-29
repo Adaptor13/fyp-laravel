@@ -18,12 +18,16 @@ class CaseMessageController extends Controller
         // Check if user can view this case
         $this->authorize('view', $case);
 
+        // Check if case has assignees
+        $hasAssignees = $case->assignees()->count() > 0;
+
         $messages = $case->messages()->with('sender')->latest()->get();
 
         return response()->json([
             'messages' => $messages,
             'case_status' => $case->report_status,
-            'can_post' => $case->report_status !== 'Closed'
+            'can_post' => $case->report_status !== 'Closed' && $hasAssignees,
+            'has_assignees' => $hasAssignees
         ]);
     }
 
@@ -44,6 +48,13 @@ class CaseMessageController extends Controller
         if ($case->report_status === 'Closed') {
             return response()->json([
                 'error' => 'Cannot send messages to closed cases'
+            ], 403);
+        }
+
+        // Check if case has assignees
+        if ($case->assignees()->count() === 0) {
+            return response()->json([
+                'error' => 'Cannot send messages to cases without assignees'
             ], 403);
         }
 
