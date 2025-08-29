@@ -101,8 +101,6 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
-
-
     /**
      * Get all assignments for this user
      */
@@ -112,4 +110,51 @@ class User extends Authenticatable
                     ->whereNull('unassigned_at');
     }
 
+    /**
+     * Check if user has a specific permission
+     */
+    public function hasPermission($permission)
+    {
+        if (!$this->role) {
+            return false;
+        }
+        
+        return $this->role->hasPermission($permission);
+    }
+
+    /**
+     * Check if user has any of the given permissions
+     */
+    public function hasAnyPermission($permissions)
+    {
+        if (!$this->role) {
+            return false;
+        }
+        
+        return $this->role->hasAnyPermission($permissions);
+    }
+
+    /**
+     * Check if user has all of the given permissions
+     */
+    public function hasAllPermissions($permissions)
+    {
+        if (!$this->role) {
+            return false;
+        }
+        
+        return $this->role->hasAllPermissions($permissions);
+    }
+
+    /**
+     * Get all permissions for the user
+     */
+    public function getAllPermissions()
+    {
+        if (!$this->role) {
+            return collect();
+        }
+        
+        return $this->role->permissions;
+    }
 }

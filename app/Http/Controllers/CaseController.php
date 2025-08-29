@@ -22,7 +22,12 @@ class CaseController extends Controller
     {
         // Get case statistics
         $stats = $this->getCaseStatistics();
-        return view('admin.cases.index', compact('stats'));
+        
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
+        return view('admin.cases.index', compact('stats', 'userPermissions'));
     }
 
     private function getCaseStatistics()

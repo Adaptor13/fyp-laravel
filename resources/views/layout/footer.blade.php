@@ -5,9 +5,8 @@
             <div class="col-sm-9 col-12">
                 <ul class="footer-text">
                     <li>
-                        <p class="mb-0">Copyright © <span id="year"></span> SentraDx. All rights reserved.</p>
+                        <p class="mb-0">Copyright © <span id="year"></span> SinDa. All rights reserved.</p>
                     </li>
-                    <li> <a href="#"> V1.0.0 </a></li>
                 </ul>
             </div>
             <div class="col-sm-3">

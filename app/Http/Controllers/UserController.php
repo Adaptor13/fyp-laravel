@@ -49,12 +49,17 @@ class UserController extends Controller
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
         
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
         return view('admin.users.admins.index', compact(
             'users', 
             'totalUsers', 
             'contactableUsers', 
             'nonContactableUsers',
-            'newUsers'
+            'newUsers',
+            'userPermissions'
         ));
     }
 
@@ -302,8 +307,12 @@ class UserController extends Controller
 
         $users = (clone $base)->with('publicUserProfile')->latest()->get();
 
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+
         return view('admin.users.public.index', compact(
-            'users', 'totalPublic', 'contactablePublic', 'nonContactablePublic', 'newPublic'
+            'users', 'totalPublic', 'contactablePublic', 'nonContactablePublic', 'newPublic', 'userPermissions'
         ));
     }
 
@@ -473,12 +482,17 @@ class UserController extends Controller
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
         
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
         return view('admin.users.social.index', compact(
             'users', 
             'totalWorkers', 
             'agenciesCovered', 
             'totalStates',
-            'newUsers'
+            'newUsers',
+            'userPermissions'
         ));
     }
 
@@ -763,12 +777,17 @@ class UserController extends Controller
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
         
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
         return view('admin.users.law.index', compact(
             'users', 
             'totalOfficers', 
             'agenciesRepresented', 
             'stationsCovered',
-            'newOfficers'
+            'newOfficers',
+            'userPermissions'
         ));
     }
 
@@ -1066,6 +1085,10 @@ class UserController extends Controller
             ->limit(3)
             ->get();
         
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
         return view('admin.users.cwo.index', compact(
             'users', 
             'totalCwo', 
@@ -1073,7 +1096,8 @@ class UserController extends Controller
             'statesCovered', 
             'recentlyAddedCwo',
             'activeThisMonth',
-            'topMinistries'
+            'topMinistries',
+            'userPermissions'
         ));
     }
 
@@ -1332,7 +1356,11 @@ class UserController extends Controller
             ->where('created_at', '>=', now()->subDays(30))
             ->count();
         
-        return view('admin.users.healthcare.index', compact('users', 'totalUsers', 'doctorsCount', 'nursesCount', 'recentlyAdded'));
+        // Get user permissions for frontend permission checking
+        $user = auth()->user();
+        $userPermissions = $user ? $user->getAllPermissions()->pluck('slug')->toArray() : [];
+        
+        return view('admin.users.healthcare.index', compact('users', 'totalUsers', 'doctorsCount', 'nursesCount', 'recentlyAdded', 'userPermissions'));
     }
 
     public function healthcareData()

@@ -127,9 +127,11 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Admin</h5>
+                        @permission('users.create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdmin">
                             Add
                         </button>
+                        @endpermission
                     </div>
 
                     <div class="card-body p-0">
@@ -458,6 +460,13 @@
     <script src="{{ asset('assets/js/ready_to_use_form.js') }}"></script>
 
     <script>
+        // User permissions for frontend permission checking
+        const userPermissions = @json($userPermissions ?? []);
+        
+        // Helper function to check if user has permission
+        function hasPermission(permission) {
+            return userPermissions.includes(permission);
+        }
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
                 const m = new bootstrap.Modal(document.getElementById('addAdmin'));
@@ -537,27 +546,48 @@
                         searchable: false,
                         render: function(row) {
                             const label = row.name || row.email || `ID ${row.id}`;
+                            
+                            let actionButtons = '';
+                            
+                            // Add Edit button if user has edit permission
+                            if (hasPermission('users.edit')) {
+                                actionButtons += `
+                                    <li>
+                                        <button type="button" class="dropdown-item edit-btn"
+                                                data-id="${row.id}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editAdmin">
+                                            <i class="ti ti-edit text-success"></i> Edit
+                                        </button>
+                                    </li>
+                                `;
+                            }
+                            
+                            // Add Delete button if user has delete permission
+                            if (hasPermission('users.delete')) {
+                                actionButtons += `
+                                    <li>
+                                        <a class="dropdown-item delete-btn" href="javascript:void(0)"
+                                            data-id="${row.id}"
+                                            data-label="${label}">
+                                            <i class="ti ti-trash text-danger"></i> Delete
+                                        </a>
+                                    </li>
+                                `;
+                            }
+                            
+                            // If no action buttons are available, show a message
+                            if (!actionButtons.trim()) {
+                                return '<span class="text-muted">No actions available</span>';
+                            }
+                            
                             return `
                                 <div class="dropdown">
                                     <button class="bg-none border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="ti ti-dots"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li>
-                                            <button type="button" class="dropdown-item edit-btn"
-                                                    data-id="${row.id}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editAdmin">
-                                                <i class="ti ti-edit text-success"></i> Edit
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item delete-btn" href="javascript:void(0)"
-                                                data-id="${row.id}"
-                                                data-label="${label}">
-                                                <i class="ti ti-trash text-danger"></i> Delete
-                                            </a>
-                                        </li>
+                                        ${actionButtons}
                                     </ul>
                                 </div>
                             `;

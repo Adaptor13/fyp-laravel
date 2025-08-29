@@ -53,8 +53,8 @@
                     Roles & Permissions
                 </a>
                 <ul class="collapse" id="roleManagement">
-                    <li><a href="#"><i class="ti ti-settings"></i> Manage Roles</a></li>
-                    <li><a href="#"><i class="ti ti-key"></i> Assign Permissions</a></li>
+                    <li><a href="{{ route('roles.index') }}"><i class="ti ti-settings"></i> Manage Roles</a></li>
+                    <li><a href="{{ route('permissions.index') }}"><i class="ti ti-key"></i> View Permissions</a></li>
                 </ul>
             </li>
 

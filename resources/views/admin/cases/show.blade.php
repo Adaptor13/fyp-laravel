@@ -50,10 +50,12 @@
                             <button class="btn btn-info" onclick="exportCase('{{ $report->id }}')">
                                 <i class="ti ti-download"></i> Export PDF
                             </button>
+                            @permission('cases.edit')
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editCase" 
                                     onclick="loadEditForm('{{ $report->id }}')">
                                 <i class="ti ti-edit"></i> Edit Case
                             </button>
+                            @endpermission
                         </div>
                     </div>
 

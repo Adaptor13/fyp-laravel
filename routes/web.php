@@ -9,6 +9,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaseController;
 use App\Http\Controllers\CaseHistoryController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
 Route::middleware('web')->group(function () {
 
@@ -54,13 +56,16 @@ Route::middleware('web')->group(function () {
             ->name('users.admin.data');
 
         Route::post('/users/admin', [UserController::class, 'storeAdmin'])
-            ->name('users.admin.store');
+            ->name('users.admin.store')
+            ->middleware('permission:users.create');
 
         Route::put('/users/admin/{user}', [UserController::class, 'updateAdmin'])
-            ->name('users.admin.update');
+            ->name('users.admin.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/admin/{user}', [UserController::class, 'destroyAdmin'])
-            ->name('users.admin.destroy');
+            ->name('users.admin.destroy')
+            ->middleware('permission:users.delete');
 
         //Law
         Route::get('/users/law-enforcement',[UserController::class, 'lawEnforcement'])->name('users.law');
@@ -69,13 +74,16 @@ Route::middleware('web')->group(function () {
             ->name('users.law.data');
 
         Route::post('/users/law', [UserController::class, 'storeLawEnforcement'])
-            ->name('users.law.store');
+            ->name('users.law.store')
+            ->middleware('permission:users.create');
 
         Route::put('/users/law/{user}', [UserController::class, 'updateLawEnforcement'])
-            ->name('users.law.update');
+            ->name('users.law.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/law/{user}', [UserController::class, 'destroyLawEnforcement'])
-            ->name('users.law.destroy');
+            ->name('users.law.destroy')
+            ->middleware('permission:users.delete');
 
         // Government Child Welfare Officials (CWO)
         Route::get('/users/cwo', [UserController::class, 'cwo'])->name('users.cwo');
@@ -84,13 +92,16 @@ Route::middleware('web')->group(function () {
             ->name('users.cwo.data');
 
         Route::post('/users/cwo', [UserController::class, 'storeCwo'])
-            ->name('users.cwo.store');
+            ->name('users.cwo.store')
+            ->middleware('permission:users.create');
 
         Route::put('/users/cwo/{user}', [UserController::class, 'updateCwo'])
-            ->name('users.cwo.update');
+            ->name('users.cwo.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/cwo/{user}', [UserController::class, 'destroyCwo'])
-            ->name('users.cwo.destroy');
+            ->name('users.cwo.destroy')
+            ->middleware('permission:users.delete');
 
         //Public User
         Route::get('/users/public-users',  [UserController::class, 'publicUsers'])->name('users.public');
@@ -99,13 +110,16 @@ Route::middleware('web')->group(function () {
             ->name('users.public.data');
 
         Route::post('/users/public-users', [UserController::class, 'storePublic'])
-            ->name('users.public.store');
+            ->name('users.public.store')
+            ->middleware('permission:users.create');
 
         Route::put('/users/public-users/{id}', [UserController::class, 'updatePublicUser'])
-            ->name('users.public.update');
+            ->name('users.public.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/public-users/{id}', [UserController::class, 'destroyPublicUser'])
-            ->name('users.public.destroy');
+            ->name('users.public.destroy')
+            ->middleware('permission:users.delete');
 
         // Social Worker
         Route::get('/users/social-workers',[UserController::class, 'socialWorkers'])->name('users.social');
@@ -114,14 +128,17 @@ Route::middleware('web')->group(function () {
             ->name('users.social.data');
 
         Route::post('/users/social-workers', [UserController::class, 'storeSocialWorker'])
-            ->name('users.social.store');
+            ->name('users.social.store')
+            ->middleware('permission:users.create');
 
         
         Route::put('/users/social-workers/{user}', [UserController::class, 'updateSocialWorker'])
-            ->name('users.social.update');
+            ->name('users.social.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/social/{user}', [UserController::class, 'destroySocialWorker'])
-            ->name('users.social.destroy');
+            ->name('users.social.destroy')
+            ->middleware('permission:users.delete');
 
         
         //Healthcare
@@ -131,13 +148,38 @@ Route::middleware('web')->group(function () {
             ->name('users.healthcare.data');
 
         Route::post('/users/healthcare', [UserController::class, 'storeHealthcare'])
-            ->name('users.healthcare.store');
+            ->name('users.healthcare.store')
+            ->middleware('permission:users.create');
 
         Route::put('/users/healthcare/{user}', [UserController::class, 'updateHealthcare'])
-            ->name('users.healthcare.update');
+            ->name('users.healthcare.update')
+            ->middleware('permission:users.edit');
 
         Route::delete('/users/healthcare/{user}', [UserController::class, 'destroyHealthcare'])
-            ->name('users.healthcare.destroy');
+            ->name('users.healthcare.destroy')
+            ->middleware('permission:users.delete');
+
+        // Roles Management
+        Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
+        Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+        Route::get('/roles/data', [RoleController::class, 'getData'])->name('roles.data');
+        Route::get('/roles/{role}', [RoleController::class, 'show'])->name('roles.show');
+        Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+        Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+        Route::get('/roles/{role}/permissions', [RoleController::class, 'assignPermissions'])->name('roles.assign-permissions');
+        Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.update-permissions');
+
+        // Permissions Management
+        Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+        Route::get('/permissions/create', [PermissionController::class, 'create'])->name('permissions.create');
+        Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
+        Route::get('/permissions/{permission}', [PermissionController::class, 'show'])->name('permissions.show');
+        Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+        Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
+        Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+        Route::get('/permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');
 
     });
 
@@ -153,10 +195,10 @@ Route::middleware('web')->group(function () {
         Route::post('/cases/{report}/status',[CaseController::class, 'updateStatus'])->name('cases.status');
 
         // Cases CRUD routes
-        Route::post('/cases', [CaseController::class, 'store'])->name('cases.store');
-        Route::get('/cases/{report}/edit', [CaseController::class, 'edit'])->name('cases.edit');
-        Route::put('/cases/{report}', [CaseController::class, 'update'])->name('cases.update');
-        Route::delete('/cases/{report}', [CaseController::class, 'destroy'])->name('cases.destroy');
+        Route::post('/cases', [CaseController::class, 'store'])->name('cases.store')->middleware('permission:cases.create');
+        Route::get('/cases/{report}/edit', [CaseController::class, 'edit'])->name('cases.edit')->middleware('permission:cases.edit');
+        Route::put('/cases/{report}', [CaseController::class, 'update'])->name('cases.update')->middleware('permission:cases.edit');
+        Route::delete('/cases/{report}', [CaseController::class, 'destroy'])->name('cases.destroy')->middleware('permission:cases.delete');
         Route::get('/cases/{report}/export', [CaseController::class, 'export'])->name('cases.export');
 
         // Case History routes
