@@ -14,13 +14,10 @@ class RolePermissionSeeder extends Seeder
         $roles = Role::all();
         $permissions = Permission::all()->keyBy('slug');
 
-        // Admin role - all permissions except case creation
+        // Admin role - all permissions
         $adminRole = $roles->where('name', 'admin')->first();
         if ($adminRole) {
-            $adminPermissions = $permissions->filter(function ($permission) {
-                return $permission->slug !== 'cases.create';
-            });
-            $adminRole->permissions()->sync($adminPermissions->pluck('id'));
+            $adminRole->permissions()->sync($permissions->pluck('id'));
         }
 
         // Government Official - most permissions except role management
@@ -33,44 +30,46 @@ class RolePermissionSeeder extends Seeder
             $govOfficialRole->permissions()->sync($govOfficialPermissions->pluck('id'));
         }
 
-        // Social Worker - case and report related permissions
+        // Social Worker - case and contact query related permissions
         $socialWorkerRole = $roles->where('name', 'social_worker')->first();
         if ($socialWorkerRole) {
             $socialWorkerPermissions = $permissions->filter(function ($permission) {
-                return in_array($permission->module, ['cases', 'reports']) ||
-                       in_array($permission->slug, ['dashboard.view', 'analytics.view']);
+                return in_array($permission->module, ['cases', 'contact_queries']) ||
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
             });
             $socialWorkerRole->permissions()->sync($socialWorkerPermissions->pluck('id'));
         }
         
 
-        // Law Enforcement - case and report related permissions
+        // Law Enforcement - case and contact query related permissions
         $lawEnforcementRole = $roles->where('name', 'law_enforcement')->first();
         if ($lawEnforcementRole) {
             $lawEnforcementPermissions = $permissions->filter(function ($permission) {
-                return in_array($permission->module, ['cases', 'reports']) ||
-                       in_array($permission->slug, ['dashboard.view', 'analytics.view']);
+                return in_array($permission->module, ['cases', 'contact_queries']) ||
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
             });
             $lawEnforcementRole->permissions()->sync($lawEnforcementPermissions->pluck('id'));
         }
 
-        // Healthcare - case and report related permissions
+        // Healthcare - case and contact query related permissions
         $healthcareRole = $roles->where('name', 'healthcare')->first();
         if ($healthcareRole) {
             $healthcarePermissions = $permissions->filter(function ($permission) {
-                return in_array($permission->module, ['cases', 'reports']) ||
-                       in_array($permission->slug, ['dashboard.view', 'analytics.view']);
+                return in_array($permission->module, ['cases', 'contact_queries']) ||
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
             });
             $healthcareRole->permissions()->sync($healthcarePermissions->pluck('id'));
         }
 
-        // Public User - limited permissions
+        // Public User - limited permissions including contact query creation
         $publicUserRole = $roles->where('name', 'public_user')->first();
         if ($publicUserRole) {
             $publicUserPermissions = $permissions->filter(function ($permission) {
                 return in_array($permission->slug, [
-                    'reports.create',
-                    'reports.view', // Only their own reports
+                    'cases.create',
+                    'cases.view', // Only their own cases
+                    'contact_queries.create', // Can create contact queries
+                    'contact_queries.view', // Can view their own queries
                     'dashboard.view'
                 ]);
             });

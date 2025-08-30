@@ -444,16 +444,28 @@
 
                                     <li class="header-profile">
                                         <div class="flex-shrink-0 dropdown">
-                                            <a href="#" class="d-block head-icon pe-0" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                <img src="{{ asset('assets/images/avtar/woman.jpg') }}" alt="mdo"
-                                                    class="rounded-circle h-35 w-35">
-                                            </a>
+                                                                                         <a href="#" class="d-block head-icon pe-0" data-bs-toggle="dropdown"
+                                                 aria-expanded="false">
+                                                 @if(Auth::user()->getAvatarUrl())
+                                                     <img src="{{ Auth::user()->getAvatarUrl() }}" alt="{{ Auth::user()->name }}"
+                                                         class="rounded-circle h-35 w-35 object-fit-cover">
+                                                 @else
+                                                     <div class="rounded-circle h-35 w-35 d-flex align-items-center justify-content-center" style="{{ Auth::user()->getAvatarBackgroundStyle() }}">
+                                                         <span class="text-white fw-bold fs-5">{{ Auth::user()->getInitials() }}</span>
+                                                     </div>
+                                                 @endif
+                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-end header-card border-0 px-2">
                                                 <li class="dropdown-item d-flex align-items-center p-2">
                                                     <span class="h-35 w-35 d-flex-center b-r-50 position-relative">
-                                                        <img src="{{ asset('assets/images/avtar/woman.jpg') }}"
-                                                            alt="{{ Auth::user()->name }}" class="img-fluid b-r-50">
+                                                                                                                 @if(Auth::user()->getAvatarUrl())
+                                                             <img src="{{ Auth::user()->getAvatarUrl() }}"
+                                                                 alt="{{ Auth::user()->name }}" class="img-fluid rounded-circle object-fit-cover" style="width: 35px; height: 35px;">
+                                                         @else
+                                                             <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 35px; height: 35px; {{ Auth::user()->getAvatarBackgroundStyle() }}">
+                                                                 <span class="text-white fw-bold fs-6">{{ Auth::user()->getInitials() }}</span>
+                                                             </div>
+                                                         @endif
                                                         <span
                                                             class="position-absolute top-0 end-0 p-1 bg-success border border-light rounded-circle animate__animated animate__fadeIn animate__infinite animate__fast"></span>
                                                     </span>
@@ -466,8 +478,8 @@
 
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Detaiils
+                                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                                        <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
                                                     </a>
                                                 </li>
                                                 <li>
@@ -476,22 +488,6 @@
                                                     </a>
                                                 </li>
 
-                                                <li class="app-divider-v dotted py-1"></li>
-                                                <li>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="ti ti-help pe-1 f-s-18"></i> Help
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ 'faq' }}">
-                                                        <i class="ti ti-file-dollar pe-1 f-s-18"></i> FAQ
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="ti ti-currency-dollar pe-1 f-s-18"></i> Pricing
-                                                    </a>
-                                                </li>
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li class="btn-light-danger b-r-5">
                                                 <form method="POST" action="{{ route('logout') }}">

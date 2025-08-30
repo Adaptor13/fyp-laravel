@@ -28,6 +28,11 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             ReportSeeder::class,
             CwoUserSeeder::class,
+            SocialWorkerSeeder::class,
+            LawEnforcementSeeder::class,
+            HealthcareSeeder::class,
+            PublicUserSeeder::class,
+            ContactQuerySeeder::class,
         ]);
     }
 }

@@ -72,11 +72,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/' . $avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id'            => (string) $u->id,
                     'name'          => $u->name ?? '',
@@ -90,7 +85,9 @@ class UserController extends Controller
                     'city'          => optional($u->profile)->city ?? '',
                     'state_profile' => optional($u->profile)->state ?? '',
                     'postcode'      => optional($u->profile)->postcode ?? '',
-                    'avatar_url'    => $avatarUrl,
+                    'avatar_url'    => $u->getAvatarUrl(),
+                    'avatar_initials' => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     'department'    => optional($u->adminProfile)->department ?? '',
                     'position'      => optional($u->adminProfile)->position ?? '',
@@ -325,11 +322,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/'.$avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id' => $u->id,
                     'name' => $u->name,
@@ -343,7 +335,9 @@ class UserController extends Controller
                     'city' => optional($u->profile)->city,
                     'state' => optional($u->profile)->state,
                     'postcode' => optional($u->profile)->postcode,
-                    'avatar_url' => $avatarUrl,
+                    'avatar_url' => $u->getAvatarUrl(),
+                    'avatar_initials' => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     // public profile (public_user_profiles)
                     'display_name' => optional($u->publicUserProfile)->display_name,
@@ -505,11 +499,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/' . $avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id'                  => (string) $u->id,
                     'name'                => $u->name ?? '',
@@ -522,7 +511,9 @@ class UserController extends Controller
                     'city'                => optional($u->profile)->city ?? '',
                     'state'               => optional($u->profile)->state ?? '',
                     'postcode'            => optional($u->profile)->postcode ?? '',
-                    'avatar_url'          => $avatarUrl,
+                    'avatar_url'          => $u->getAvatarUrl(),
+                    'avatar_initials'     => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     'staff_id'            => optional($u->socialWorkerProfile)->staff_id ?? '',
                     'agency_name'         => optional($u->socialWorkerProfile)->agency_name ?? '',
@@ -812,11 +803,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/' . $avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id'            => (string) $u->id,
                     'name'          => $u->name ?? '',
@@ -830,7 +816,9 @@ class UserController extends Controller
                     'city'          => optional($u->profile)->city ?? '',
                     'state'         => optional($u->profile)->state ?? '',
                     'postcode'      => optional($u->profile)->postcode ?? '',
-                    'avatar_url'    => $avatarUrl,
+                    'avatar_url'    => $u->getAvatarUrl(),
+                    'avatar_initials' => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     // law_enforcement_profiles
                     'agency'        => optional($u->lawEnforcementProfile)->agency ?? '',
@@ -1121,11 +1109,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/' . $avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id'            => (string) $u->id,
                     'name'          => $u->name ?? '',
@@ -1139,7 +1122,9 @@ class UserController extends Controller
                     'city'          => optional($u->profile)->city ?? '',
                     'state_profile' => optional($u->profile)->state ?? '',
                     'postcode'      => optional($u->profile)->postcode ?? '',
-                    'avatar_url'    => $avatarUrl,
+                    'avatar_url'    => $u->getAvatarUrl(),
+                    'avatar_initials' => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     // gov_official_profiles (CWO-specific fields)
                     'ministry'        => optional($u->govOfficialProfile)->ministry ?? '',
@@ -1383,11 +1368,6 @@ class UserController extends Controller
             ->latest('users.created_at')
             ->get()
             ->map(function ($u) {
-                $avatarPath = optional($u->profile)->avatar_path;
-                $avatarUrl = $avatarPath
-                    ? asset('storage/' . $avatarPath)
-                    : asset('assets/images/icons/logo14.png');
-
                 return [
                     'id'            => (string) $u->id,
                     'name'          => $u->name ?? '',
@@ -1401,7 +1381,9 @@ class UserController extends Controller
                     'city'          => optional($u->profile)->city ?? '',
                     'state'         => optional($u->profile)->state ?? '',
                     'postcode'      => optional($u->profile)->postcode ?? '',
-                    'avatar_url'    => $avatarUrl,
+                    'avatar_url'    => $u->getAvatarUrl(),
+                    'avatar_initials' => $u->getInitials(),
+                    'avatar_background_style' => $u->getAvatarBackgroundStyle(),
 
                     // healthcare_profiles table
                     'profession'    => optional($u->healthcareProfile)->profession ?? '',

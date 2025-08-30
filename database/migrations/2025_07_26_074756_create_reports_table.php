@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -29,17 +30,21 @@ return new class extends Migration
             $table->date('incident_date');
             $table->string('suspected_abuser')->nullable();
 
-            $table->text('evidence')->nullable(); // Changed from string to text for multiple file uploads
+            $table->json('evidence')->nullable(); // JSON for multiple file uploads
             $table->boolean('confirmed_truth')->default(false);
 
             // Tracking columns
             $table->string('report_status')->default('Submitted');
             $table->string('last_updated_by')->nullable();
             $table->timestamp('status_updated_at')->nullable();
+            $table->timestamp('last_message_at')->nullable(); // Added for message tracking
             $table->string('priority_level')->default('Medium');
 
             $table->timestamps();
         });
+
+        // Note: Data fix migrations for evidence and abuse_types are not needed
+        // since the table is created with proper JSON columns from the start
 
     }
 

@@ -11,6 +11,8 @@ use App\Http\Controllers\CaseController;
 use App\Http\Controllers\CaseHistoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ContactQueryController;
+use App\Http\Controllers\AdminContactQueryController;
 
 Route::middleware('web')->group(function () {
 
@@ -46,10 +48,33 @@ Route::middleware('web')->group(function () {
     // Admin Dashboard - accessible by all authenticated users with appropriate roles
     Route::middleware(['auth', 'role:admin,social_worker,law_enforcement,healthcare,gov_official,public_user'])->group(function () {
         Route::get('/index', [AdminController::class, 'index'])->name('admin_index');
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     });
+
+
 
     // Admin-only routes
     Route::middleware(['auth', 'role:admin'])->group(function () {
+
+        // Contact Queries Management
+        Route::get('/contact-queries', [AdminContactQueryController::class, 'index'])
+            ->name('admin.contact-queries.index')
+            ->middleware('permission:contact_queries.view');
+        Route::get('/contact-queries/data', [AdminContactQueryController::class, 'getData'])
+            ->name('admin.contact-queries.data')
+            ->middleware('permission:contact_queries.view');
+        Route::get('/contact-queries/export', [AdminContactQueryController::class, 'export'])
+            ->name('admin.contact-queries.export')
+            ->middleware('permission:contact_queries.export');
+        Route::get('/contact-queries/{id}', [AdminContactQueryController::class, 'show'])
+            ->name('admin.contact-queries.show')
+            ->middleware('permission:contact_queries.view');
+        Route::post('/contact-queries/{id}/status', [AdminContactQueryController::class, 'updateStatus'])
+            ->name('admin.contact-queries.update-status')
+            ->middleware('permission:contact_queries.edit');
+        Route::delete('/contact-queries/{id}', [AdminContactQueryController::class, 'destroy'])
+            ->name('admin.contact-queries.destroy')
+            ->middleware('permission:contact_queries.delete');
 
         Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
 
@@ -183,8 +208,29 @@ Route::middleware('web')->group(function () {
         Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
         Route::get('/permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');
 
-    });
+        // Dashboard Export Routes - CSV
+        Route::get('/dashboard/export/cases/csv', [AdminController::class, 'exportCasesCSV'])
+            ->name('admin.dashboard.export.cases.csv')
+            ->middleware('permission:dashboard.export');
+        Route::get('/dashboard/export/users/csv', [AdminController::class, 'exportUsersCSV'])
+            ->name('admin.dashboard.export.users.csv')
+            ->middleware('permission:dashboard.export');
+        Route::get('/dashboard/export/contact-queries/csv', [AdminController::class, 'exportContactQueriesCSV'])
+            ->name('admin.dashboard.export.contact-queries.csv')
+            ->middleware('permission:dashboard.export');
 
+        // Dashboard Export Routes - PDF
+        Route::get('/dashboard/export/cases/pdf', [AdminController::class, 'exportCasesPDF'])
+            ->name('admin.dashboard.export.cases.pdf')
+            ->middleware('permission:dashboard.export');
+        Route::get('/dashboard/export/users/pdf', [AdminController::class, 'exportUsersPDF'])
+            ->name('admin.dashboard.export.users.pdf')
+            ->middleware('permission:dashboard.export');
+        Route::get('/dashboard/export/contact-queries/pdf', [AdminController::class, 'exportContactQueriesPDF'])
+            ->name('admin.dashboard.export.contact-queries.pdf')
+            ->middleware('permission:dashboard.export');
+
+    });
 
     Route::middleware(['auth', 'role:admin,social_worker,law_enforcement,healthcare,gov_official'])
         ->group(function () {
@@ -222,6 +268,10 @@ Route::middleware('web')->group(function () {
     Route::get('/', [LandingController::class, 'landing'])->name('landing');
     Route::get('/report', [LandingController::class, 'report'])->name('report');
     Route::post('/report', [ReportController::class, 'store'])->name('report.store');
+    
+    // Contact Queries
+    Route::get('/contact', [ContactQueryController::class, 'show'])->name('contact.show');
+    Route::post('/contact', [ContactQueryController::class, 'store'])->name('contact.store');
     
     // My Reports route for logged-in users
     Route::middleware('auth')->group(function () {

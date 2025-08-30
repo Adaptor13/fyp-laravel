@@ -33,6 +33,7 @@ class PermissionController extends Controller
             'roles' => 'Role Management',
             'cases' => 'Case Management',
             'reports' => 'Report Management',
+            'contact_queries' => 'Contact Queries Management',
             'dashboard' => 'Dashboard',
             'analytics' => 'Analytics',
             'system' => 'System Management',

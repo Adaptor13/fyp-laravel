@@ -108,5 +108,20 @@
                 </div>
             </div>
         </section>
+
+        <!-- Contact Section -->
+        <section class="py-5 bg-light" id="contact">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="mb-4">Have Questions?</h2>
+                        <p class="lead mb-4">We're here to help. Contact us for support, questions, or feedback about SinDa.</p>
+                        <a href="{{ route('contact.show') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-envelope me-2"></i>Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
 @endsection
 

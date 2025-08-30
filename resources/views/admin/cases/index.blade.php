@@ -629,16 +629,18 @@
                             </li>
                         `;
                         
-                        // Add Export button (always available)
-                        actionButtons += `
-                            <li>
-                                <a class="dropdown-item export-btn" href="javascript:void(0)"
-                                    data-id="${row.id}"
-                                    data-label="${label}">
-                                    <i class="ti ti-download text-info"></i> Export PDF
-                                </a>
-                            </li>
-                        `;
+                        // Add Export button if user has export permission
+                        if (hasPermission('cases.export')) {
+                            actionButtons += `
+                                <li>
+                                    <a class="dropdown-item export-btn" href="javascript:void(0)"
+                                        data-id="${row.id}"
+                                        data-label="${label}">
+                                        <i class="ti ti-download text-info"></i> Export PDF
+                                    </a>
+                                </li>
+                            `;
+                        }
                         
                         // Add Delete button if user has delete permission
                         if (hasPermission('cases.delete')) {
@@ -647,7 +649,7 @@
                                     <a class="dropdown-item delete-btn" href="javascript:void(0)"
                                         data-id="${row.id}"
                                         data-case-id="${row.case_id}"
-                                        data-report-name="${row.incident_description || 'No description available'}">
+                                        data-report-name="${row.reporter?.name || row.reporter?.email || 'Anonymous Reporter'}">
                                         <i class="ti ti-trash text-danger"></i> Delete
                                     </a>
                                 </li>

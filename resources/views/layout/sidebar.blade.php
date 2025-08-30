@@ -58,18 +58,6 @@
                 </ul>
             </li>
 
-            <!-- Reports & Analytics -->
-            <li>
-                <a data-bs-toggle="collapse" href="#reportsAnalytics" aria-expanded="false">
-                    <i class="ti ti-report-analytics"></i>
-                    Reports & Analytics
-                </a>
-                <ul class="collapse" id="reportsAnalytics">
-                    <li><a href="#"><i class="ti ti-chart-line"></i> Statistics</a></li>
-                    <li><a href="#"><i class="ti ti-file-export"></i> Export Reports</a></li>
-                </ul>
-            </li>
-
             <!-- Communication -->
             <li>
                 <a data-bs-toggle="collapse" href="#communication" aria-expanded="false">
@@ -77,7 +65,7 @@
                     Communication
                 </a>
                 <ul class="collapse" id="communication">
-                    <li><a href="#"><i class="ti ti-mail"></i> Contact Queries</a></li>
+                    <li><a href="{{ route('admin.contact-queries.index') }}"><i class="ti ti-mail"></i> Contact Queries</a></li>
            <!--          <li><a href="#"><i class="ti ti-messages"></i> Secure Messaging</a></li> -->
                 </ul>
             </li>

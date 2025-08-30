@@ -238,7 +238,7 @@
                 const module = $(this).hasClass('module-users') ? 'users' :
                               $(this).hasClass('module-roles') ? 'roles' :
                               $(this).hasClass('module-cases') ? 'cases' :
-                              $(this).hasClass('module-reports') ? 'reports' :
+                              $(this).hasClass('module-contact_queries') ? 'contact_queries' :
                               $(this).hasClass('module-dashboard') ? 'dashboard' :
                               $(this).hasClass('module-analytics') ? 'analytics' :
                               $(this).hasClass('module-system') ? 'system' : '';

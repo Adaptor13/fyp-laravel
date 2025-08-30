@@ -570,14 +570,22 @@
                     {
                         data: 'name',
                         render: function(data, type, row) {
-                            const imgSrc = row.avatar_url ||
-                                "{{ asset('assets/images/icons/logo14.png') }}";
                             const safeName = data || '—';
                             const sub = row.email || '';
+                            let avatarHtml = '';
+                            
+                            if (row.avatar_url) {
+                                avatarHtml = `<img src="${row.avatar_url}" alt="${safeName}" class="img-fluid" style="width:30px;height:30px;object-fit:cover;">`;
+                            } else {
+                                avatarHtml = `<div class="d-flex align-items-center justify-content-center" style="width:30px;height:30px;${row.avatar_background_style}">
+                                    <span class="text-white fw-bold" style="font-size: 12px;">${row.avatar_initials}</span>
+                                </div>`;
+                            }
+                            
                             return `
                                 <div class="d-flex justify-content-left align-items-center">
                                     <div class="h-30 w-30 d-flex-center b-r-50 overflow-hidden me-2">
-                                        <img src="${imgSrc}" alt="${safeName}" class="img-fluid" style="width:30px;height:30px;object-fit:cover;">
+                                        ${avatarHtml}
                                     </div>
                                     <div>
                                         <h6 class="f-s-15 mb-0">${safeName}</h6>

@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Create Users', 'slug' => 'users.create', 'description' => 'Can create new users', 'module' => 'users', 'action' => 'create'],
             ['name' => 'Edit Users', 'slug' => 'users.edit', 'description' => 'Can edit existing users', 'module' => 'users', 'action' => 'edit'],
             ['name' => 'Delete Users', 'slug' => 'users.delete', 'description' => 'Can delete users', 'module' => 'users', 'action' => 'delete'],
+            ['name' => 'Export Users', 'slug' => 'users.export', 'description' => 'Can export user data', 'module' => 'users', 'action' => 'export'],
             
             // Role Management
             ['name' => 'View Roles', 'slug' => 'roles.view', 'description' => 'Can view role lists', 'module' => 'roles', 'action' => 'view'],
@@ -29,16 +30,19 @@ class PermissionSeeder extends Seeder
             ['name' => 'Create Cases', 'slug' => 'cases.create', 'description' => 'Can create new cases', 'module' => 'cases', 'action' => 'create'],
             ['name' => 'Edit Cases', 'slug' => 'cases.edit', 'description' => 'Can edit existing cases', 'module' => 'cases', 'action' => 'edit'],
             ['name' => 'Delete Cases', 'slug' => 'cases.delete', 'description' => 'Can delete cases', 'module' => 'cases', 'action' => 'delete'],
+            ['name' => 'Export Cases', 'slug' => 'cases.export', 'description' => 'Can export case data', 'module' => 'cases', 'action' => 'export'],
             
-            // Report Management
-            ['name' => 'View Reports', 'slug' => 'reports.view', 'description' => 'Can view reports', 'module' => 'reports', 'action' => 'view'],
-            ['name' => 'Create Reports', 'slug' => 'reports.create', 'description' => 'Can create new reports', 'module' => 'reports', 'action' => 'create'],
-            ['name' => 'Edit Reports', 'slug' => 'reports.edit', 'description' => 'Can edit existing reports', 'module' => 'reports', 'action' => 'edit'],
-            ['name' => 'Delete Reports', 'slug' => 'reports.delete', 'description' => 'Can delete reports', 'module' => 'reports', 'action' => 'delete'],
-            ['name' => 'Export Reports', 'slug' => 'reports.export', 'description' => 'Can export report data', 'module' => 'reports', 'action' => 'export'],
+            
+            // Contact Query Management
+            ['name' => 'View Contact Queries', 'slug' => 'contact_queries.view', 'description' => 'Can view contact queries', 'module' => 'contact_queries', 'action' => 'view'],
+            ['name' => 'Create Contact Queries', 'slug' => 'contact_queries.create', 'description' => 'Can create new contact queries', 'module' => 'contact_queries', 'action' => 'create'],
+            ['name' => 'Edit Contact Queries', 'slug' => 'contact_queries.edit', 'description' => 'Can edit contact queries', 'module' => 'contact_queries', 'action' => 'edit'],
+            ['name' => 'Delete Contact Queries', 'slug' => 'contact_queries.delete', 'description' => 'Can delete contact queries', 'module' => 'contact_queries', 'action' => 'delete'],
+            ['name' => 'Export Contact Queries', 'slug' => 'contact_queries.export', 'description' => 'Can export contact query data', 'module' => 'contact_queries', 'action' => 'export'],
             
             // Dashboard & Analytics
             ['name' => 'View Dashboard', 'slug' => 'dashboard.view', 'description' => 'Can view admin dashboard', 'module' => 'dashboard', 'action' => 'view'],
+            ['name' => 'Export Dashboard Reports', 'slug' => 'dashboard.export', 'description' => 'Can export reports from dashboard', 'module' => 'dashboard', 'action' => 'export'],
             ['name' => 'View Analytics', 'slug' => 'analytics.view', 'description' => 'Can view analytics and statistics', 'module' => 'analytics', 'action' => 'view'],
             
             // System Management

@@ -195,9 +195,14 @@
                                                             <div class="card-body">
                                                                 <div class="d-flex align-items-center">
                                                                     <div class="flex-shrink-0">
-                                                                        <div class="avatar avatar-sm bg-primary rounded-circle">
-                                                                            <span class="avatar-text">{{ substr($assignee->name, 0, 1) }}</span>
-                                                                        </div>
+                                                                        @if($assignee->getAvatarUrl())
+                                                                            <img src="{{ $assignee->getAvatarUrl() }}" alt="{{ $assignee->name }}" 
+                                                                                class="avatar avatar-sm rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                                                        @else
+                                                                            <div class="avatar avatar-sm rounded-circle" style="width: 40px; height: 40px; {{ $assignee->getAvatarBackgroundStyle() }}">
+                                                                                <span class="avatar-text text-white fw-bold">{{ $assignee->getInitials() }}</span>
+                                                                            </div>
+                                                                        @endif
                                                                     </div>
                                                                     <div class="flex-grow-1 ms-3">
                                                                         <h6 class="mb-1">
