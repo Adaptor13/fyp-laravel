@@ -77,6 +77,7 @@ class AuthController extends Controller
 
             return redirect()->route('admin_index'); // Admin dashboard
         }
+        
         // If login fails
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

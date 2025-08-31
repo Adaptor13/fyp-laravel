@@ -48,6 +48,10 @@ class PermissionSeeder extends Seeder
             // System Management
             ['name' => 'System Settings', 'slug' => 'system.settings', 'description' => 'Can access system settings', 'module' => 'system', 'action' => 'settings'],
             ['name' => 'View Logs', 'slug' => 'system.logs', 'description' => 'Can view system logs', 'module' => 'system', 'action' => 'logs'],
+            
+            // Activity Logs Management
+            ['name' => 'View Activity Logs', 'slug' => 'activity_logs.view', 'description' => 'Can view activity logs', 'module' => 'activity_logs', 'action' => 'view'],
+            ['name' => 'Export Activity Logs', 'slug' => 'activity_logs.export', 'description' => 'Can export activity logs', 'module' => 'activity_logs', 'action' => 'export'],
         ];
 
         foreach ($permissions as $permission) {

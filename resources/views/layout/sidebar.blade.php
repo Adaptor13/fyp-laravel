@@ -77,8 +77,7 @@
                     Audit & Logs
                 </a>
                 <ul class="collapse" id="auditLogs">
-                    <li><a href="#"><i class="ti ti-activity"></i> Activity Logs</a></li>
-                    <li><a href="#"><i class="ti ti-server"></i> System Performance</a></li>
+                    <li><a href="{{ route('admin.activity-logs.index') }}"><i class="ti ti-activity"></i> Activity Logs</a></li>
                 </ul>
             </li>
 

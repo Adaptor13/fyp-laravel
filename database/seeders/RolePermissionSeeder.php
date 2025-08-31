@@ -20,11 +20,11 @@ class RolePermissionSeeder extends Seeder
             $adminRole->permissions()->sync($permissions->pluck('id'));
         }
 
-        // Government Official - most permissions except role management
+        // Government Official - most permissions except role management and activity logs
         $govOfficialRole = $roles->where('name', 'gov_official')->first();
         if ($govOfficialRole) {
             $govOfficialPermissions = $permissions->filter(function ($permission) {
-                return !in_array($permission->module, ['roles']) && 
+                return !in_array($permission->module, ['roles', 'activity_logs']) && 
                        !in_array($permission->slug, ['system.settings', 'system.logs']);
             });
             $govOfficialRole->permissions()->sync($govOfficialPermissions->pluck('id'));

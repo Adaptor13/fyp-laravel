@@ -13,6 +13,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ContactQueryController;
 use App\Http\Controllers\AdminContactQueryController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::middleware('web')->group(function () {
 
@@ -75,6 +76,20 @@ Route::middleware('web')->group(function () {
         Route::delete('/contact-queries/{id}', [AdminContactQueryController::class, 'destroy'])
             ->name('admin.contact-queries.destroy')
             ->middleware('permission:contact_queries.delete');
+
+        // Session Logs Management
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])
+            ->name('admin.activity-logs.index')
+            ->middleware('permission:activity_logs.view');
+        Route::get('/activity-logs/data', [ActivityLogController::class, 'getData'])
+            ->name('admin.activity-logs.data')
+            ->middleware('permission:activity_logs.view');
+        Route::get('/activity-logs/export/csv', [ActivityLogController::class, 'exportCSV'])
+            ->name('admin.activity-logs.export-csv')
+            ->middleware('permission:activity_logs.export');
+        Route::get('/activity-logs/filter-options', [ActivityLogController::class, 'getFilterOptions'])
+            ->name('admin.activity-logs.filter-options')
+            ->middleware('permission:activity_logs.view');
 
         Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
 
