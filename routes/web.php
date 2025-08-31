@@ -14,6 +14,11 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ContactQueryController;
 use App\Http\Controllers\AdminContactQueryController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\CwoProfileController;
+use App\Http\Controllers\HealthcareProfileController;
+use App\Http\Controllers\LawEnforcementProfileController;
+use App\Http\Controllers\SocialWorkerProfileController;
 
 Route::middleware('web')->group(function () {
 
@@ -92,6 +97,46 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:activity_logs.view');
 
         Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
+
+        // Admin Profile Management
+        Route::get('/admin/profile/edit', [AdminProfileController::class, 'edit'])
+            ->name('admin.profile.edit');
+        Route::put('/admin/profile/update', [AdminProfileController::class, 'update'])
+            ->name('admin.profile.update');
+        Route::delete('/admin/profile/delete', [AdminProfileController::class, 'destroy'])
+            ->name('admin.profile.destroy');
+
+        // CWO Profile Management
+        Route::get('/cwo/profile/edit', [CwoProfileController::class, 'edit'])
+            ->name('cwo.profile.edit');
+        Route::put('/cwo/profile/update', [CwoProfileController::class, 'update'])
+            ->name('cwo.profile.update');
+        Route::delete('/cwo/profile/delete', [CwoProfileController::class, 'destroy'])
+            ->name('cwo.profile.destroy');
+
+        // Healthcare Profile Management
+        Route::get('/healthcare/profile/edit', [HealthcareProfileController::class, 'edit'])
+            ->name('healthcare.profile.edit');
+        Route::put('/healthcare/profile/update', [HealthcareProfileController::class, 'update'])
+            ->name('healthcare.profile.update');
+        Route::delete('/healthcare/profile/delete', [HealthcareProfileController::class, 'destroy'])
+            ->name('healthcare.profile.destroy');
+
+        // Law Enforcement Profile Management
+        Route::get('/law/profile/edit', [LawEnforcementProfileController::class, 'edit'])
+            ->name('law.profile.edit');
+        Route::put('/law/profile/update', [LawEnforcementProfileController::class, 'update'])
+            ->name('law.profile.update');
+        Route::delete('/law/profile/delete', [LawEnforcementProfileController::class, 'destroy'])
+            ->name('law.profile.destroy');
+
+        // Social Worker Profile Management
+        Route::get('/social/profile/edit', [SocialWorkerProfileController::class, 'edit'])
+            ->name('social.profile.edit');
+        Route::put('/social/profile/update', [SocialWorkerProfileController::class, 'update'])
+            ->name('social.profile.update');
+        Route::delete('/social/profile/delete', [SocialWorkerProfileController::class, 'destroy'])
+            ->name('social.profile.destroy');
 
         // Admins
         Route::get('/users/admin/data', [UserController::class, 'adminData'])

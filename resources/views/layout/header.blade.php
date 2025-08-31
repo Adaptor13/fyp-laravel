@@ -478,9 +478,27 @@
 
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                                        <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
-                                                    </a>
+                                                    @if(Auth::user()->role->name === 'admin')
+                                                        <a class="dropdown-item" href="{{ route('admin.profile.edit') }}">
+                                                            <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
+                                                        </a>
+                                                    @elseif(Auth::user()->role->name === 'social_worker')
+                                                        <a class="dropdown-item" href="{{ route('social.profile.edit') }}">
+                                                            <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
+                                                        </a>
+                                                    @elseif(Auth::user()->role->name === 'healthcare')
+                                                        <a class="dropdown-item" href="{{ route('healthcare.profile.edit') }}">
+                                                            <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
+                                                        </a>
+                                                    @elseif(Auth::user()->role->name === 'law_enforcement')
+                                                        <a class="dropdown-item" href="{{ route('law.profile.edit') }}">
+                                                            <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
+                                                        </a>
+                                                    @else
+                                                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                                            <i class="ti ti-user-circle pe-1 f-s-18"></i> Profile Details
+                                                        </a>
+                                                    @endif
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item" href="#">
