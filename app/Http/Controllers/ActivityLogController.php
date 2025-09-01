@@ -109,133 +109,7 @@ class ActivityLogController extends Controller
         ]);
     }
 
-    /**
-     * Export activity logs to CSV
-     */
-    public function exportCSV(Request $request)
-    {
-        $query = DB::table('sessions')
-            ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
-            ->select([
-                'sessions.id as session_id',
-                'sessions.user_id',
-                'sessions.ip_address',
-                'sessions.user_agent',
-                'sessions.last_activity',
-                'users.name',
-                'users.email'
-            ]);
 
-        // Apply filters
-        if ($request->filled('user_id')) {
-            $query->where('sessions.user_id', $request->user_id);
-        }
-
-        if ($request->filled('date_from')) {
-            $query->where('sessions.last_activity', '>=', strtotime($request->date_from));
-        }
-
-        if ($request->filled('date_to')) {
-            $query->where('sessions.last_activity', '<=', strtotime($request->date_to . ' 23:59:59'));
-        }
-
-        $sessions = $query->orderBy('sessions.last_activity', 'desc')->get();
-
-        $filename = 'session_logs_' . date('Y-m-d_H-i-s') . '.csv';
-        
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
-
-        $callback = function() use ($sessions) {
-            $file = fopen('php://output', 'w');
-            
-            // CSV headers
-            fputcsv($file, [
-                'Date/Time',
-                'User',
-                'Email',
-                'IP Address',
-                'Browser',
-                'Operating System',
-                'Session ID',
-                'Last Activity'
-            ]);
-
-            // CSV data
-            foreach ($sessions as $session) {
-                fputcsv($file, [
-                    date('Y-m-d H:i:s', $session->last_activity),
-                    $session->name ?: 'Guest User',
-                    $session->email ?: 'N/A',
-                    $session->ip_address,
-                    $this->getBrowserInfo($session->user_agent),
-                    $this->getOperatingSystem($session->user_agent),
-                    $session->session_id,
-                    $this->formatDuration(time() - $session->last_activity)
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
-
-    /**
-     * Get browser information from user agent
-     */
-    private function getBrowserInfo($userAgent)
-    {
-        if (!$userAgent) {
-            return 'Unknown';
-        }
-
-        $browser = 'Unknown';
-        $version = '';
-
-        if (preg_match('/Chrome\/([0-9.]+)/', $userAgent, $matches)) {
-            $browser = 'Chrome';
-            $version = $matches[1];
-        } elseif (preg_match('/Firefox\/([0-9.]+)/', $userAgent, $matches)) {
-            $browser = 'Firefox';
-            $version = $matches[1];
-        } elseif (preg_match('/Safari\/([0-9.]+)/', $userAgent, $matches)) {
-            $browser = 'Safari';
-            $version = $matches[1];
-        } elseif (preg_match('/Edge\/([0-9.]+)/', $userAgent, $matches)) {
-            $browser = 'Edge';
-            $version = $matches[1];
-        }
-
-        return $version ? "$browser $version" : $browser;
-    }
-
-    /**
-     * Get operating system information from user agent
-     */
-    private function getOperatingSystem($userAgent)
-    {
-        if (!$userAgent) {
-            return 'Unknown';
-        }
-
-        if (preg_match('/Windows NT ([0-9.]+)/', $userAgent, $matches)) {
-            $version = $matches[1];
-            return "Windows " . ($version == '10.0' ? '10' : $version);
-        } elseif (preg_match('/Mac OS X ([0-9._]+)/', $userAgent, $matches)) {
-            return 'macOS';
-        } elseif (preg_match('/Linux/', $userAgent)) {
-            return 'Linux';
-        } elseif (preg_match('/Android ([0-9.]+)/', $userAgent, $matches)) {
-            return 'Android ' . $matches[1];
-        } elseif (preg_match('/iPhone OS ([0-9._]+)/', $userAgent, $matches)) {
-            return 'iOS';
-        }
-
-        return 'Unknown';
-    }
 
     /**
      * Format user information for display
@@ -268,6 +142,58 @@ class ActivityLogController extends Controller
                 <small class="text-muted">' . htmlspecialchars($os) . '</small>
             </div>
         ';
+    }
+
+    /**
+     * Get browser information from user agent
+     */
+    private function getBrowserInfo($userAgent)
+    {
+        if (!$userAgent) {
+            return 'Unknown';
+        }
+
+        $browser = 'Unknown';
+        
+        if (preg_match('/Chrome/i', $userAgent)) {
+            $browser = 'Chrome';
+        } elseif (preg_match('/Firefox/i', $userAgent)) {
+            $browser = 'Firefox';
+        } elseif (preg_match('/Safari/i', $userAgent)) {
+            $browser = 'Safari';
+        } elseif (preg_match('/Edge/i', $userAgent)) {
+            $browser = 'Edge';
+        } elseif (preg_match('/MSIE|Trident/i', $userAgent)) {
+            $browser = 'Internet Explorer';
+        }
+
+        return $browser;
+    }
+
+    /**
+     * Get operating system information from user agent
+     */
+    private function getOperatingSystem($userAgent)
+    {
+        if (!$userAgent) {
+            return 'Unknown';
+        }
+
+        $os = 'Unknown';
+        
+        if (preg_match('/Windows/i', $userAgent)) {
+            $os = 'Windows';
+        } elseif (preg_match('/Mac/i', $userAgent)) {
+            $os = 'macOS';
+        } elseif (preg_match('/Linux/i', $userAgent)) {
+            $os = 'Linux';
+        } elseif (preg_match('/Android/i', $userAgent)) {
+            $os = 'Android';
+        } elseif (preg_match('/iOS/i', $userAgent)) {
+            $os = 'iOS';
+        }
+
+        return $os;
     }
 
     /**

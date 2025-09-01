@@ -56,9 +56,6 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Session Logs</h5>
                         <div>
-                            <button class="btn btn-success me-2" id="exportCSV">
-                                <i class="ti ti-download"></i> Export CSV
-                            </button>
                             <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#filterSection">
                                 <i class="ti ti-filter"></i> Filters
                             </button>
@@ -171,17 +168,6 @@
                  $('#dateFromFilter').val('');
                  $('#dateToFilter').val('');
                  table.ajax.reload();
-             });
-
-                         // Export CSV
-             $('#exportCSV').on('click', function() {
-                 var params = new URLSearchParams({
-                     user_id: $('#userFilter').val(),
-                     date_from: $('#dateFromFilter').val(),
-                     date_to: $('#dateToFilter').val()
-                 });
-
-                 window.location.href = '{{ route("admin.activity-logs.export-csv") }}?' + params.toString();
              });
 
             // Auto-remove session alerts after 4 seconds

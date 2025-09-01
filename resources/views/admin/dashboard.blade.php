@@ -53,6 +53,9 @@
                                 <li><a class="dropdown-item" href="{{ route('admin.dashboard.export.contact-queries.csv') }}">
                                     <i class="ti ti-mail text-success me-2"></i>All Queries (CSV)
                                 </a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard.export.session-logs.csv') }}">
+                                    <i class="ti ti-activity text-success me-2"></i>Session Logs (CSV)
+                                </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><h6 class="dropdown-header">PDF Export</h6></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.dashboard.export.cases.pdf') }}">
@@ -63,6 +66,9 @@
                                 </a></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.dashboard.export.contact-queries.pdf') }}">
                                     <i class="ti ti-mail text-danger me-2"></i>All Queries (PDF)
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard.export.session-logs.pdf') }}">
+                                    <i class="ti ti-activity text-danger me-2"></i>Session Logs (PDF)
                                 </a></li>
                             </ul>
                         </div>

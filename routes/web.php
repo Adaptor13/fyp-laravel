@@ -89,9 +89,6 @@ Route::middleware('web')->group(function () {
         Route::get('/activity-logs/data', [ActivityLogController::class, 'getData'])
             ->name('admin.activity-logs.data')
             ->middleware('permission:activity_logs.view');
-        Route::get('/activity-logs/export/csv', [ActivityLogController::class, 'exportCSV'])
-            ->name('admin.activity-logs.export-csv')
-            ->middleware('permission:activity_logs.export');
         Route::get('/activity-logs/filter-options', [ActivityLogController::class, 'getFilterOptions'])
             ->name('admin.activity-logs.filter-options')
             ->middleware('permission:activity_logs.view');
@@ -288,6 +285,14 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:dashboard.export');
         Route::get('/dashboard/export/contact-queries/pdf', [AdminController::class, 'exportContactQueriesPDF'])
             ->name('admin.dashboard.export.contact-queries.pdf')
+            ->middleware('permission:dashboard.export');
+
+        // Dashboard Export Routes - Session Logs
+        Route::get('/dashboard/export/session-logs/csv', [AdminController::class, 'exportSessionLogsCSV'])
+            ->name('admin.dashboard.export.session-logs.csv')
+            ->middleware('permission:dashboard.export');
+        Route::get('/dashboard/export/session-logs/pdf', [AdminController::class, 'exportSessionLogsPDF'])
+            ->name('admin.dashboard.export.session-logs.pdf')
             ->middleware('permission:dashboard.export');
 
     });

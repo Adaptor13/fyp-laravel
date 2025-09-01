@@ -490,4 +490,200 @@ class AdminController extends Controller
         $filename = 'contact_queries_export_' . date('Y-m-d_H-i-s') . '.pdf';
         return $pdf->download($filename);
     }
+
+    /**
+     * Export session logs data to CSV
+     */
+    public function exportSessionLogsCSV(Request $request)
+    {
+        $query = DB::table('sessions')
+            ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
+            ->select([
+                'sessions.id as session_id',
+                'sessions.user_id',
+                'sessions.ip_address',
+                'sessions.user_agent',
+                'sessions.last_activity',
+                'users.name',
+                'users.email'
+            ]);
+
+        // Apply filters
+        if ($request->filled('user_id')) {
+            $query->where('sessions.user_id', $request->user_id);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->where('sessions.last_activity', '>=', strtotime($request->date_from));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('sessions.last_activity', '<=', strtotime($request->date_to . ' 23:59:59'));
+        }
+
+        $sessions = $query->orderBy('sessions.last_activity', 'desc')->get();
+
+        $filename = 'session_logs_export_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($sessions) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV headers
+            fputcsv($file, [
+                'Date/Time',
+                'User',
+                'Email',
+                'IP Address',
+                'Browser',
+                'Operating System',
+                'Session ID',
+                'Last Activity'
+            ]);
+
+            // CSV data
+            foreach ($sessions as $session) {
+                fputcsv($file, [
+                    date('Y-m-d H:i:s', $session->last_activity),
+                    $session->name ?: 'Guest User',
+                    $session->email ?: 'N/A',
+                    $session->ip_address,
+                    $this->getBrowserInfo($session->user_agent),
+                    $this->getOperatingSystem($session->user_agent),
+                    $session->session_id,
+                    $this->formatDuration(time() - $session->last_activity)
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export session logs data to PDF
+     */
+    public function exportSessionLogsPDF(Request $request)
+    {
+        $query = DB::table('sessions')
+            ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
+            ->select([
+                'sessions.id as session_id',
+                'sessions.user_id',
+                'sessions.ip_address',
+                'sessions.user_agent',
+                'sessions.last_activity',
+                'users.name',
+                'users.email'
+            ]);
+
+        // Apply filters
+        if ($request->filled('user_id')) {
+            $query->where('sessions.user_id', $request->user_id);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->where('sessions.last_activity', '>=', strtotime($request->date_from));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('sessions.last_activity', '<=', strtotime($request->date_to . ' 23:59:59'));
+        }
+
+        $sessions = $query->orderBy('sessions.last_activity', 'desc')->get();
+
+        // Transform data for PDF view
+        $sessionData = [];
+        foreach ($sessions as $session) {
+            $sessionData[] = [
+                'datetime' => date('Y-m-d H:i:s', $session->last_activity),
+                'user' => $session->name ?: 'Guest User',
+                'email' => $session->email ?: 'N/A',
+                'ip_address' => $session->ip_address,
+                'browser' => $this->getBrowserInfo($session->user_agent),
+                'os' => $this->getOperatingSystem($session->user_agent),
+                'session_id' => $session->session_id,
+                'last_activity' => $this->formatDuration(time() - $session->last_activity)
+            ];
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.session_logs_pdf', compact('sessionData'));
+        $pdf->setPaper('a4', 'landscape');
+        
+        $filename = 'session_logs_export_' . date('Y-m-d_H-i-s') . '.pdf';
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Get browser information from user agent
+     */
+    private function getBrowserInfo($userAgent)
+    {
+        if (!$userAgent) {
+            return 'Unknown';
+        }
+
+        $browser = 'Unknown';
+        
+        if (preg_match('/Chrome/i', $userAgent)) {
+            $browser = 'Chrome';
+        } elseif (preg_match('/Firefox/i', $userAgent)) {
+            $browser = 'Firefox';
+        } elseif (preg_match('/Safari/i', $userAgent)) {
+            $browser = 'Safari';
+        } elseif (preg_match('/Edge/i', $userAgent)) {
+            $browser = 'Edge';
+        } elseif (preg_match('/MSIE|Trident/i', $userAgent)) {
+            $browser = 'Internet Explorer';
+        }
+
+        return $browser;
+    }
+
+    /**
+     * Get operating system information from user agent
+     */
+    private function getOperatingSystem($userAgent)
+    {
+        if (!$userAgent) {
+            return 'Unknown';
+        }
+
+        $os = 'Unknown';
+        
+        if (preg_match('/Windows/i', $userAgent)) {
+            $os = 'Windows';
+        } elseif (preg_match('/Mac/i', $userAgent)) {
+            $os = 'macOS';
+        } elseif (preg_match('/Linux/i', $userAgent)) {
+            $os = 'Linux';
+        } elseif (preg_match('/Android/i', $userAgent)) {
+            $os = 'Android';
+        } elseif (preg_match('/iOS/i', $userAgent)) {
+            $os = 'iOS';
+        }
+
+        return $os;
+    }
+
+    /**
+     * Format duration in human readable format
+     */
+    private function formatDuration($seconds)
+    {
+        if ($seconds < 60) {
+            return $seconds . ' seconds ago';
+        } elseif ($seconds < 3600) {
+            return floor($seconds / 60) . ' minutes ago';
+        } elseif ($seconds < 86400) {
+            return floor($seconds / 3600) . ' hours ago';
+        } else {
+            return floor($seconds / 86400) . ' days ago';
+        }
+    }
 }
