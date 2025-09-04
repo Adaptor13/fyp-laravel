@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
     @permission('dashboard.export')
     $(document).ready(function() {
         // Handle export dropdown clicks
-        $('.dropdown-item').on('click', function(e) {
+        $('#exportDropdown').next('.dropdown-menu').find('.dropdown-item').on('click', function(e) {
             e.preventDefault();
             
             const $link = $(this);

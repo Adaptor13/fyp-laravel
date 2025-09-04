@@ -23,7 +23,7 @@
                     <li class="d-flex">
                         <i class="ti ti-clipboard-list f-s-16 ms-2"></i>
                         <a href="#" class="f-s-14 d-flex gap-2">
-                            <span class="d-none d-md-block">Audit & Logs</span>
+                            <span class="d-none d-md-block">Logs</span>
                         </a>
                     </li>
                     <li class="d-flex active">

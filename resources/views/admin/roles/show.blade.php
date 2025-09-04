@@ -29,6 +29,39 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Success:</strong> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        
+        @if ($errors->has('general'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong> {{ $errors->first('general') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -98,9 +131,9 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning">
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRole">
                                 <i class="ti ti-edit me-2"></i>Edit Role
-                            </a>
+                            </button>
                             <a href="{{ route('roles.assign-permissions', $role->id) }}" class="btn btn-primary">
                                 <i class="ti ti-key me-2"></i>Manage Permissions
                             </a>
@@ -195,4 +228,96 @@
             </div>
         @endif
     </div>
+
+    <!-- Edit Role Modal -->
+    <div class="modal fade" id="editRole" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('roles.update', $role->id) }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title text-white">Edit Role</h5>
+                        <button type="button" class="btn-close m-0 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        
+                        @if ($errors->has('general'))
+                            <div class="alert alert-danger mb-3">
+                                <strong>Error:</strong> {{ $errors->first('general') }}
+                            </div>
+                        @endif
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="edit_role_name" class="form-label">Role Name <span class="text-danger">*</span></label>
+                                <input id="edit_role_name" name="name" type="text" class="form-control @error('name') is-invalid @enderror"
+                                    value="{{ old('name', $role->pretty_name) }}" placeholder="Enter role name" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    The role name will be converted to lowercase with underscores
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="edit_role_description" class="form-label">Description</label>
+                                <textarea id="edit_role_description" name="description" class="form-control @error('description') is-invalid @enderror" 
+                                    rows="3" placeholder="Enter role description">{{ old('description', $role->description) }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-light-primary">Update Role</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('script')
+    <script>
+        // Auto-hide alerts after 4 seconds
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) alert.remove();
+        }, 4000);
+
+        // Prevent double form submissions
+        function preventDoubleSubmission(form) {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="ti ti-loader ti-spin"></i> Processing...';
+            }
+        }
+
+        $(document).ready(function() {
+            // Prevent double form submissions
+            $('form').on('submit', function() {
+                preventDoubleSubmission(this);
+            });
+        });
+    </script>
 @endsection

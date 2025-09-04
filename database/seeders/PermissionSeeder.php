@@ -20,8 +20,8 @@ class PermissionSeeder extends Seeder
             
             // Role Management
             ['name' => 'View Roles', 'slug' => 'roles.view', 'description' => 'Can view role lists', 'module' => 'roles', 'action' => 'view'],
-            ['name' => 'Create Roles', 'slug' => 'roles.create', 'description' => 'Can create new roles', 'module' => 'roles', 'action' => 'create'],
-            ['name' => 'Edit Roles', 'slug' => 'roles.edit', 'description' => 'Can edit existing roles', 'module' => 'roles', 'action' => 'edit'],
+
+
             ['name' => 'Delete Roles', 'slug' => 'roles.delete', 'description' => 'Can delete roles', 'module' => 'roles', 'action' => 'delete'],
             ['name' => 'Assign Permissions', 'slug' => 'roles.assign_permissions', 'description' => 'Can assign permissions to roles', 'module' => 'roles', 'action' => 'assign_permissions'],
             

@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Manage Roles')
+@section('title', 'Role Management')
 @section('css')
     <!-- Data Table css -->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
@@ -10,7 +10,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h4 class="main-title">Manage Roles</h4>
+                <h4 class="main-title">Role Management</h4>
             </div>
             <div class="col-sm-6 mt-sm-2">
                 <ul class="breadcrumb breadcrumb-start float-sm-end">
@@ -50,6 +50,13 @@
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        
+        @if ($errors->has('general'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong> {{ $errors->first('general') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
@@ -140,6 +147,12 @@
                                 </ul>
                             </div>
                         @endif
+                        
+                        @if ($errors->has('general'))
+                            <div class="alert alert-danger mb-3">
+                                <strong>Error:</strong> {{ $errors->first('general') }}
+                            </div>
+                        @endif
 
                         <div class="row">
                             <div class="col-md-12 mb-3">
@@ -191,11 +204,31 @@
                     </div>
 
                     <div class="modal-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <strong>Validation Errors:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        
+                        @if ($errors->has('general'))
+                            <div class="alert alert-danger mb-3">
+                                <strong>Error:</strong> {{ $errors->first('general') }}
+                            </div>
+                        @endif
+                        
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="edit_role_name" class="form-label">Role Name <span class="text-danger">*</span></label>
-                                <input id="edit_role_name" name="name" type="text" class="form-control"
+                                <input id="edit_role_name" name="name" type="text" class="form-control @error('name') is-invalid @enderror"
                                     placeholder="Enter role name" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                                 <small class="form-text text-muted">
                                     The role name will be converted to lowercase with underscores
                                 </small>
@@ -205,8 +238,11 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="edit_role_description" class="form-label">Description</label>
-                                <textarea id="edit_role_description" name="description" class="form-control" 
+                                <textarea id="edit_role_description" name="description" class="form-control @error('description') is-invalid @enderror" 
                                     rows="3" placeholder="Enter role description"></textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -266,10 +302,24 @@
             if (alert) alert.remove();
         }, 4000);
 
+        // Prevent double form submissions
+        function preventDoubleSubmission(form) {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="ti ti-loader ti-spin"></i> Processing...';
+            }
+        }
+
         $(document).ready(function() {
             console.log('Initializing DataTable...');
             console.log('Current user:', '{{ auth()->user() ? auth()->user()->name : "Not logged in" }}');
             console.log('User role:', '{{ auth()->user() ? auth()->user()->role : "No role" }}');
+            
+            // Prevent double form submissions
+            $('form').on('submit', function() {
+                preventDoubleSubmission(this);
+            });
             
             $('#rolesTable').DataTable({
                 processing: true,

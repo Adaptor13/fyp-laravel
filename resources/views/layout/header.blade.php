@@ -500,17 +500,16 @@
                                                         </a>
                                                     @endif
                                                 </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="ti ti-notification pe-1 f-s-18"></i> Notification
-                                                    </a>
-                                                </li>
+                                            
 
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li class="btn-light-danger b-r-5">
-                                                    <a href="#" class="dropdown-item mb-0 text-danger" id="logout-link">
-                                                        <i class="ti ti-logout pe-1 f-s-18 text-danger"></i> Log Out
-                                                    </a>
+                                                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="dropdown-item mb-0 text-danger border-0 bg-transparent w-100 text-start">
+                                                            <i class="ti ti-logout pe-1 f-s-18 text-danger"></i> Log Out
+                                                        </button>
+                                                    </form>
                                                 </li>
 
                                             </ul>
@@ -531,39 +530,6 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle logout functionality
-    const logoutLink = document.getElementById('logout-link');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Logout link clicked');
-            
-            // Create and submit the logout form
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route("logout") }}';
-            form.style.display = 'none';
-            
-            // Add CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-            
-            // Add form to document and submit
-            document.body.appendChild(form);
-            form.submit();
-        });
-    } else {
-        console.error('Logout link not found!');
-    }
-    
-    // Debug information
-    console.log('Logout functionality initialized');
-    console.log('CSRF token:', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
-    console.log('Logout route:', '{{ route("logout") }}');
-});
+// Logout functionality is now handled by the form submission
+// No additional JavaScript needed
 </script>

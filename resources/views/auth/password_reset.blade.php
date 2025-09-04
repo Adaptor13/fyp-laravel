@@ -22,7 +22,7 @@
                   <div class="col-12">
                     <div class="mb-5 text-center text-lg-start">
                       <h2 class="text-primary f-w-600">Reset Your Password</h2>
-                      <p>Create a new password and sign in to admin</p>
+                      <p>Create a new password for your account</p>
                     </div>
                   </div>
                   <div class="col-12">

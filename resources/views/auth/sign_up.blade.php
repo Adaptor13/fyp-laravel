@@ -30,7 +30,7 @@
                                             </div>
                                             <div class="mb-5 text-center text-lg-start">
                                                 <h2 class="text-primary f-w-600">Create Account</h2>
-                                                <p>Get Started For Free Today!</p>
+                                                <p>Get Started Today!</p>
                                             </div>
                                         </div>
 

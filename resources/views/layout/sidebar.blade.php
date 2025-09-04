@@ -70,14 +70,13 @@
                 </ul>
             </li>
 
-            <!-- Audit & Logs -->
             <li>
                 <a data-bs-toggle="collapse" href="#auditLogs" aria-expanded="false">
                     <i class="ti ti-clipboard-list"></i>
-                    Audit & Logs
+                    Logs
                 </a>
                 <ul class="collapse" id="auditLogs">
-                    <li><a href="{{ route('admin.activity-logs.index') }}"><i class="ti ti-activity"></i> Activity Logs</a></li>
+                    <li><a href="{{ route('admin.activity-logs.index') }}"><i class="ti ti-activity"></i> Session Logs</a></li>
                 </ul>
             </li>
 
