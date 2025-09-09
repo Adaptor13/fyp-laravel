@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 // Models
 use App\Models\User;
@@ -48,7 +49,7 @@ class ProfileController extends Controller
 
             case 'gov_official':
                 $user->loadMissing('govOfficialProfile');
-                $view = 'gov.profile.edit';
+                $view = 'admin.users.cwo.profile.edit';
                 break;
 
             default:
@@ -81,7 +82,8 @@ class ProfileController extends Controller
             'city' => 'nullable|string|max:100',
             'postcode' => 'nullable|digits:5',
             'state' => 'nullable|string|max:50',
-            // If you add avatar upload later: 'avatar' => 'nullable|image|max:2048'
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'remove_avatar' => 'nullable|boolean',
         ];
 
         // Role-specific rules
@@ -105,11 +107,10 @@ class ProfileController extends Controller
 
             case 'healthcare':
                 $roleRules = [
-                    'mmc_number'=> 'nullable|string|max:30',
+                    'profession' => 'nullable|string|max:100',
                     'apc_expiry' => 'nullable|date',
                     'facility_name' => 'nullable|string|max:150',
-                    'moh_facility_code'=> 'nullable|string|max:50',
-                    'state'  => 'nullable|string|max:50',
+                    'hc_state' => 'nullable|string|max:50',
                 ];
                 break;
 
@@ -119,7 +120,7 @@ class ProfileController extends Controller
                     'badge_number' => 'nullable|string|max:50',
                     'rank'  => 'nullable|string|max:50',
                     'station' => 'nullable|string|max:150',
-                    'state'  => 'nullable|string|max:50',
+                    'le_state'  => 'nullable|string|max:50',
                 ];
                 break;
 
@@ -129,7 +130,7 @@ class ProfileController extends Controller
                     'department' => 'nullable|string|max:150',
                     'service_scheme' => 'nullable|string|max:20', // M, N, FA, etc.
                     'grade' => 'nullable|string|max:10', // M41, N29
-                    'state' => 'nullable|string|max:50',
+                    'cwo_state' => 'nullable|string|max:50',
                 ];
                 break;
 
@@ -151,18 +152,40 @@ class ProfileController extends Controller
         ])->save();
 
 
+        // Prepare profile data
+        $profileData = [
+            'phone' => $validated['phone'] ?? null,
+            'address_line1' => $validated['address_line1'] ?? null,
+            'address_line2' => $validated['address_line2'] ?? null,
+            'city'  => $validated['city'] ?? null,
+            'postcode'=> $validated['postcode']?? null,
+            'state' => $validated['state']  ?? null,
+        ];
+
+        // Handle avatar upload/removal (skip for public users)
+        if ($role !== 'public_user') {
+            $existingProfile = $user->profile;
+            
+            if ($request->boolean('remove_avatar') && $existingProfile && !empty($existingProfile->avatar_path)) {
+                // Remove existing avatar
+                Storage::disk('public')->delete($existingProfile->avatar_path);
+                $profileData['avatar_path'] = null;
+            } elseif ($request->hasFile('avatar')) {
+                // Delete old avatar if exists
+                if ($existingProfile && !empty($existingProfile->avatar_path)) {
+                    Storage::disk('public')->delete($existingProfile->avatar_path);
+                }
+                
+                // Store new avatar
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $profileData['avatar_path'] = $path;
+            }
+        }
+
         // Save base profile (shared)
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
-            [
-                'phone' => $validated['phone'] ?? null,
-                'address_line1' => $validated['address_line1'] ?? null,
-                'address_line2' => $validated['address_line2'] ?? null,
-                'city'  => $validated['city'] ?? null,
-                'postcode'=> $validated['postcode']?? null,
-                'state' => $validated['state']  ?? null,
-                // If handling avatar: 'avatar_path' => $storedPath
-            ]
+            $profileData
         );
 
         // Save role-specific profile
@@ -194,11 +217,10 @@ class ProfileController extends Controller
                 $user->healthcareProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     [
-                        'mmc_number'=> $validated['mmc_number']?? null,
-                        'apc_expiry'=> $validated['apc_expiry'] ?? null,
-                        'facility_name' => $validated['facility_name']?? null,
-                        'moh_facility_code' => $validated['moh_facility_code'] ?? null,
-                        'state' => $validated['state']  ?? null,
+                        'profession' => $validated['profession'] ?? null,
+                        'apc_expiry' => $validated['apc_expiry'] ?? null,
+                        'facility_name' => $validated['facility_name'] ?? null,
+                        'state' => $validated['hc_state'] ?? null,
                     ]
                 );
                 break;
@@ -211,7 +233,7 @@ class ProfileController extends Controller
                         'badge_number' => $validated['badge_number'] ?? null,
                         'rank' => $validated['rank']  ?? null,
                         'station'=> $validated['station']  ?? null,
-                        'state'  => $validated['state'] ?? null,
+                        'le_state'  => $validated['le_state'] ?? null,
                     ]
                 );
                 break;
@@ -224,7 +246,7 @@ class ProfileController extends Controller
                         'department'  => $validated['department'] ?? null,
                         'service_scheme' => $validated['service_scheme'] ?? null,
                         'grade' => $validated['grade'] ?? null,
-                        'state' => $validated['state']  ?? null,
+                        'state' => $validated['cwo_state']  ?? null,
                     ]
                 );
                 break;

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Models\SocialWorkerProfile;
+use App\Models\GovOfficialProfile;
 
 class CwoProfileController extends Controller
 {
@@ -15,10 +16,10 @@ class CwoProfileController extends Controller
      */
     public function edit()
     {
-        $user = Auth::user()->load(['role', 'profile', 'socialWorkerProfile']);
+        $user = Auth::user()->load(['role', 'profile', 'govOfficialProfile']);
         
         // Ensure only CWO users can access this
-        if ($user->role->name !== 'social_worker') {
+        if ($user->role->name !== 'gov_official') {
             abort(403, 'Unauthorized access.');
         }
 
@@ -33,7 +34,7 @@ class CwoProfileController extends Controller
         $user = Auth::user()->load('role');
         
         // Ensure only CWO users can access this
-        if ($user->role->name !== 'social_worker') {
+        if ($user->role->name !== 'gov_official') {
             abort(403, 'Unauthorized access.');
         }
 
@@ -46,11 +47,13 @@ class CwoProfileController extends Controller
             'city' => 'nullable|string|max:100',
             'postcode' => 'nullable|digits:5',
             'state' => 'nullable|string|max:50',
-            'agency_name' => 'nullable|string|max:150',
-            'agency_code' => 'nullable|string|max:50',
-            'placement_state' => 'nullable|string|max:50',
-            'placement_district' => 'nullable|string|max:100',
-            'staff_id' => 'nullable|string|max:50',
+            'ministry' => 'nullable|string|max:150',
+            'department' => 'nullable|string|max:150',
+            'service_scheme' => 'nullable|string|max:20',
+            'grade' => 'nullable|string|max:10',
+            'cwo_state' => 'nullable|string|max:50',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'remove_avatar' => 'nullable|boolean',
         ];
 
         $validated = $request->validate($rules);
@@ -65,28 +68,49 @@ class CwoProfileController extends Controller
             'name' => $validated['name'],
         ]);
 
+        // Prepare profile data
+        $profileData = [
+            'phone' => $validated['phone'] ?? null,
+            'address_line1' => $validated['address_line1'] ?? null,
+            'address_line2' => $validated['address_line2'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'postcode' => $validated['postcode'] ?? null,
+            'state' => $validated['state'] ?? null,
+        ];
+
+        // Handle avatar upload/removal
+        $existingProfile = $user->profile;
+        
+        if ($request->boolean('remove_avatar') && $existingProfile && !empty($existingProfile->avatar_path)) {
+            // Remove existing avatar
+            Storage::disk('public')->delete($existingProfile->avatar_path);
+            $profileData['avatar_path'] = null;
+        } elseif ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($existingProfile && !empty($existingProfile->avatar_path)) {
+                Storage::disk('public')->delete($existingProfile->avatar_path);
+            }
+            
+            // Store new avatar
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $profileData['avatar_path'] = $path;
+        }
+
         // Update or create base profile
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
-            [
-                'phone' => $validated['phone'] ?? null,
-                'address_line1' => $validated['address_line1'] ?? null,
-                'address_line2' => $validated['address_line2'] ?? null,
-                'city' => $validated['city'] ?? null,
-                'postcode' => $validated['postcode'] ?? null,
-                'state' => $validated['state'] ?? null,
-            ]
+            $profileData
         );
 
         // Update or create CWO profile
-        $user->socialWorkerProfile()->updateOrCreate(
+        $user->govOfficialProfile()->updateOrCreate(
             ['user_id' => $user->id],
             [
-                'agency_name' => $validated['agency_name'] ?? null,
-                'agency_code' => $validated['agency_code'] ?? null,
-                'placement_state' => $validated['placement_state'] ?? null,
-                'placement_district' => $validated['placement_district'] ?? null,
-                'staff_id' => $validated['staff_id'] ?? null,
+                'ministry' => $validated['ministry'] ?? null,
+                'department' => $validated['department'] ?? null,
+                'service_scheme' => $validated['service_scheme'] ?? null,
+                'grade' => $validated['grade'] ?? null,
+                'state' => $validated['cwo_state'] ?? null,
             ]
         );
 
@@ -101,7 +125,7 @@ class CwoProfileController extends Controller
         $user = $request->user();
         
         // Ensure only CWO users can access this
-        if ($user->role->name !== 'social_worker') {
+        if ($user->role->name !== 'gov_official') {
             abort(403, 'Unauthorized access.');
         }
 

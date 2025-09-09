@@ -1,291 +1,671 @@
-@extends('layout.admin')
+@extends('layout.master')
+@section('title', 'Edit Social Worker Profile')
+@section('css')
+    <!-- Additional CSS for profile page -->
+    <style>
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            border: 4px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Avatar Upload Styles */
+        .avatar-upload {
+            position: relative;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
+        
+        .avatar-edit input {
+            display: none;
+        }
+        
+        .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        
+        
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            border-radius: 50%;
+            border: 6px solid #f8f8f8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        /* Avatar upload styles for modals */
+        .avatar-upload {
+            position: relative;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
+        
+        .avatar-edit input {
+            display: none;
+        }
+        
+        .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            border-radius: 50%;
+            border: 6px solid #f8f8f8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            overflow: hidden;
+        }
+    </style>
+@endsection
 
-@section('title', 'Social Worker Profile')
+@section('main-content')
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h4 class="main-title">Edit Social Worker Profile</h4>
+            </div>
+            <div class="col-sm-6 mt-sm-2">
+                <ul class="breadcrumb breadcrumb-start float-sm-end">
+                    <li class="d-flex">
+                        <i class="ti ti-home f-s-16"></i>
+                        <a href="{{ route('admin_index') }}" class="f-s-14 d-flex gap-2">
+                            <span class="d-none d-md-block">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="d-flex">
+                        <i class="ti ti-user f-s-16 ms-2"></i>
+                        <a href="#" class="f-s-14 d-flex gap-2">
+                            <span class="d-none d-md-block">Profile</span>
+                        </a>
+                    </li>
+                    <li class="d-flex active">
+                        <i class="ti ti-edit f-s-16 ms-2"></i>
+                        <span class="f-s-14">Edit</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">
-                            <i class="ti ti-user-circle me-2"></i>
-                            Social Worker Profile
-                        </h4>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                                <i class="ti ti-trash me-1"></i> Delete Account
-                            </button>
-                        </div>
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Success:</strong> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="ti ti-user-edit me-2"></i>
+                            Edit My Profile
+                        </h5>
                     </div>
-                </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('social.profile.update') }}" enctype="multipart/form-data" onsubmit="return validateForm()" id="profileForm">
+                            @csrf
+                            @method('PUT')
 
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="ti ti-check-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+                            @include('components.avatar-upload', ['user' => $user])
 
-                    @if($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="ti ti-alert-circle me-2"></i>
-                            Please fix the following errors:
-                            <ul class="mb-0 mt-2">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('social.profile.update') }}">
-                        @csrf
-                        @method('PUT')
-
-                        <!-- Personal Information -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    <i class="ti ti-user me-2"></i>Personal Information
-                                </h5>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                           id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                            <!-- Basic Information -->
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input name="name" type="text" class="form-control @error('name') is-invalid @enderror"
+                                        value="{{ old('name', $user->name) }}" placeholder="Enter your full name">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                           id="phone" name="phone" value="{{ old('phone', $user->profile?->phone) }}">
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Address Information -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    <i class="ti ti-map-pin me-2"></i>Address Information
-                                </h5>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="address_line1" class="form-label">Address Line 1</label>
-                                    <input type="text" class="form-control @error('address_line1') is-invalid @enderror" 
-                                           id="address_line1" name="address_line1" value="{{ old('address_line1', $user->profile?->address_line1) }}">
-                                    @error('address_line1')
+                            <!-- Social Worker Profile Section -->
+                            <hr class="my-4">
+                            <h6 class="mb-3">
+                                <i class="ti ti-heart me-2"></i>
+                                Social Worker Profile
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Staff ID</label>
+                                    <input name="staff_id" type="text" class="form-control @error('staff_id') is-invalid @enderror"
+                                        value="{{ old('staff_id', $user->socialWorkerProfile->staff_id ?? '') }}" placeholder="Staff ID" required>
+                                    @error('staff_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="address_line2" class="form-label">Address Line 2</label>
-                                    <input type="text" class="form-control @error('address_line2') is-invalid @enderror" 
-                                           id="address_line2" name="address_line2" value="{{ old('address_line2', $user->profile?->address_line2) }}">
-                                    @error('address_line2')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="city" class="form-label">City</label>
-                                    <input type="text" class="form-control @error('city') is-invalid @enderror" 
-                                           id="city" name="city" value="{{ old('city', $user->profile?->city) }}">
-                                    @error('city')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="state" class="form-label">State</label>
-                                    <select class="form-select @error('state') is-invalid @enderror" id="state" name="state">
-                                        <option value="">Select State</option>
-                                        <option value="Johor" {{ old('state', $user->profile?->state) == 'Johor' ? 'selected' : '' }}>Johor</option>
-                                        <option value="Kedah" {{ old('state', $user->profile?->state) == 'Kedah' ? 'selected' : '' }}>Kedah</option>
-                                        <option value="Kelantan" {{ old('state', $user->profile?->state) == 'Kelantan' ? 'selected' : '' }}>Kelantan</option>
-                                        <option value="Melaka" {{ old('state', $user->profile?->state) == 'Melaka' ? 'selected' : '' }}>Melaka</option>
-                                        <option value="Negeri Sembilan" {{ old('state', $user->profile?->state) == 'Negeri Sembilan' ? 'selected' : '' }}>Negeri Sembilan</option>
-                                        <option value="Pahang" {{ old('state', $user->profile?->state) == 'Pahang' ? 'selected' : '' }}>Pahang</option>
-                                        <option value="Perak" {{ old('state', $user->profile?->state) == 'Perak' ? 'selected' : '' }}>Perak</option>
-                                        <option value="Perlis" {{ old('state', $user->profile?->state) == 'Perlis' ? 'selected' : '' }}>Perlis</option>
-                                        <option value="Pulau Pinang" {{ old('state', $user->profile?->state) == 'Pulau Pinang' ? 'selected' : '' }}>Pulau Pinang</option>
-                                        <option value="Sabah" {{ old('state', $user->profile?->state) == 'Sabah' ? 'selected' : '' }}>Sabah</option>
-                                        <option value="Sarawak" {{ old('state', $user->profile?->state) == 'Sarawak' ? 'selected' : '' }}>Sarawak</option>
-                                        <option value="Selangor" {{ old('state', $user->profile?->state) == 'Selangor' ? 'selected' : '' }}>Selangor</option>
-                                        <option value="Terengganu" {{ old('state', $user->profile?->state) == 'Terengganu' ? 'selected' : '' }}>Terengganu</option>
-                                        <option value="W.P. Kuala Lumpur" {{ old('state', $user->profile?->state) == 'W.P. Kuala Lumpur' ? 'selected' : '' }}>W.P. Kuala Lumpur</option>
-                                        <option value="W.P. Labuan" {{ old('state', $user->profile?->state) == 'W.P. Labuan' ? 'selected' : '' }}>W.P. Labuan</option>
-                                        <option value="W.P. Putrajaya" {{ old('state', $user->profile?->state) == 'W.P. Putrajaya' ? 'selected' : '' }}>W.P. Putrajaya</option>
+
+                                <div class="col-md-6 mb-3 floating">
+                                    <label class="form-label">Agency Name</label>
+                                    <select name="agency_name" class="form-select @error('agency_name') is-invalid @enderror" required>
+                                        <option value="" data-code="">Select Agency</option>
+                                        <option value="Jabatan Kebajikan Masyarakat" data-code="JKM" {{ old('agency_name', $user->socialWorkerProfile->agency_name ?? '') === 'Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
+                                            Jabatan Kebajikan Masyarakat (JKM)
+                                        </option>
+                                        <option value="Women's Aid Organisation" data-code="WAO" {{ old('agency_name', $user->socialWorkerProfile->agency_name ?? '') === 'Women\'s Aid Organisation' ? 'selected' : '' }}>
+                                            Women's Aid Organisation (WAO)
+                                        </option>
+                                        <option value="Malaysian Social Workers Association" data-code="MSWA" {{ old('agency_name', $user->socialWorkerProfile->agency_name ?? '') === 'Malaysian Social Workers Association' ? 'selected' : '' }}>
+                                            Malaysian Social Workers Association (MSWA)
+                                        </option>
+                                        <option value="Other" data-code="" {{ old('agency_name', $user->socialWorkerProfile->agency_name ?? '') === 'Other' ? 'selected' : '' }}>
+                                            Other
+                                        </option>
                                     </select>
-                                    @error('state')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="postcode" class="form-label">Postcode</label>
-                                    <input type="text" class="form-control @error('postcode') is-invalid @enderror" 
-                                           id="postcode" name="postcode" value="{{ old('postcode', $user->profile?->postcode) }}" maxlength="5">
-                                    @error('postcode')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Social Worker Information -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    <i class="ti ti-heart me-2"></i>Social Worker Information
-                                </h5>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="agency_name" class="form-label">Agency Name</label>
-                                    <input type="text" class="form-control @error('agency_name') is-invalid @enderror" 
-                                           id="agency_name" name="agency_name" value="{{ old('agency_name', $user->socialWorkerProfile?->agency_name) }}" 
-                                           placeholder="e.g. JKM Daerah Petaling">
                                     @error('agency_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="agency_code" class="form-label">Agency Code</label>
-                                    <input type="text" class="form-control @error('agency_code') is-invalid @enderror" 
-                                           id="agency_code" name="agency_code" value="{{ old('agency_code', $user->socialWorkerProfile?->agency_code) }}" 
-                                           placeholder="e.g. JKM001">
+
+                            <input type="text" id="otherAgencyInput" name="agency_name_other" class="form-control mb-2 @error('agency_name_other') is-invalid @enderror" 
+                                placeholder="Enter Agency Name" style="display:none;" value="{{ old('agency_name_other') }}">
+                            @error('agency_name_other')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Agency Code</label>
+                                    <input name="agency_code" type="text" class="form-control @error('agency_code') is-invalid @enderror"
+                                        value="{{ old('agency_code', $user->socialWorkerProfile->agency_code ?? '') }}" placeholder="Agency Code" required>
                                     @error('agency_code')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="placement_state" class="form-label">Placement State</label>
-                                    <select class="form-select @error('placement_state') is-invalid @enderror" id="placement_state" name="placement_state">
-                                        <option value="">Select Placement State</option>
-                                        <option value="Johor" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Johor' ? 'selected' : '' }}>Johor</option>
-                                        <option value="Kedah" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Kedah' ? 'selected' : '' }}>Kedah</option>
-                                        <option value="Kelantan" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Kelantan' ? 'selected' : '' }}>Kelantan</option>
-                                        <option value="Melaka" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Melaka' ? 'selected' : '' }}>Melaka</option>
-                                        <option value="Negeri Sembilan" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Negeri Sembilan' ? 'selected' : '' }}>Negeri Sembilan</option>
-                                        <option value="Pahang" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Pahang' ? 'selected' : '' }}>Pahang</option>
-                                        <option value="Perak" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Perak' ? 'selected' : '' }}>Perak</option>
-                                        <option value="Perlis" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Perlis' ? 'selected' : '' }}>Perlis</option>
-                                        <option value="Pulau Pinang" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Pulau Pinang' ? 'selected' : '' }}>Pulau Pinang</option>
-                                        <option value="Sabah" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Sabah' ? 'selected' : '' }}>Sabah</option>
-                                        <option value="Sarawak" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Sarawak' ? 'selected' : '' }}>Sarawak</option>
-                                        <option value="Selangor" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Selangor' ? 'selected' : '' }}>Selangor</option>
-                                        <option value="Terengganu" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'Terengganu' ? 'selected' : '' }}>Terengganu</option>
-                                        <option value="W.P. Kuala Lumpur" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'W.P. Kuala Lumpur' ? 'selected' : '' }}>W.P. Kuala Lumpur</option>
-                                        <option value="W.P. Labuan" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'W.P. Labuan' ? 'selected' : '' }}>W.P. Labuan</option>
-                                        <option value="W.P. Putrajaya" {{ old('placement_state', $user->socialWorkerProfile?->placement_state) == 'W.P. Putrajaya' ? 'selected' : '' }}>W.P. Putrajaya</option>
-                                    </select>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Placement State</label>
+                                    <input name="placement_state" type="text" class="form-control @error('placement_state') is-invalid @enderror"
+                                        value="{{ old('placement_state', $user->socialWorkerProfile->placement_state ?? '') }}" placeholder="State" required>
                                     @error('placement_state')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="placement_district" class="form-label">Placement District</label>
-                                    <input type="text" class="form-control @error('placement_district') is-invalid @enderror" 
-                                           id="placement_district" name="placement_district" value="{{ old('placement_district', $user->socialWorkerProfile?->placement_district) }}" 
-                                           placeholder="e.g. Petaling Jaya">
-                                    @error('placement_district')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="staff_id" class="form-label">Staff ID</label>
-                                    <input type="text" class="form-control @error('staff_id') is-invalid @enderror" 
-                                           id="staff_id" name="staff_id" value="{{ old('staff_id', $user->socialWorkerProfile?->staff_id) }}" 
-                                           placeholder="e.g. SW001">
-                                    @error('staff_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
-                                <i class="ti ti-arrow-left me-1"></i> Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="ti ti-device-floppy me-1"></i> Update Profile
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Placement District</label>
+                                <input name="placement_district" type="text" class="form-control @error('placement_district') is-invalid @enderror"
+                                    value="{{ old('placement_district', $user->socialWorkerProfile->placement_district ?? '') }}" placeholder="District" required>
+                                @error('placement_district')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Contact Information (Optional) -->
+                            <hr class="my-4">
+                            <h6 class="mb-3">
+                                <i class="ti ti-map-pin me-2"></i>
+                                Contact Information (Optional)
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                                        value="{{ old('phone', $user->profile->phone ?? '') }}" placeholder="e.g. 012-5254545">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 1</label>
+                                    <input name="address_line1" type="text" class="form-control @error('address_line1') is-invalid @enderror"
+                                        value="{{ old('address_line1', $user->profile->address_line1 ?? '') }}" placeholder="Street, Apartment, etc">
+                                    @error('address_line1')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 2</label>
+                                    <input name="address_line2" type="text" class="form-control @error('address_line2') is-invalid @enderror"
+                                        value="{{ old('address_line2', $user->profile->address_line2 ?? '') }}" placeholder="Unit, Suite">
+                                    @error('address_line2')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input name="city" type="text" class="form-control @error('city') is-invalid @enderror"
+                                        value="{{ old('city', $user->profile->city ?? '') }}" placeholder="City">
+                                    @error('city')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Postcode</label>
+                                    <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000">
+                                    @error('postcode')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mailing State</label>
+                                    <input name="state" type="text" class="form-control @error('state') is-invalid @enderror"
+                                        value="{{ old('state', $user->profile->state ?? '') }}" placeholder="State for mailing address">
+                                    @error('state')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="ti ti-device-floppy me-1"></i>
+                                    Save Changes
+                                </button>
+                                <a href="{{ route('admin_index') }}" class="btn btn-outline-secondary ms-2">
+                                    <i class="ti ti-x me-1"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Danger Zone -->
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <i class="ti ti-trash me-1"></i>
+                                Delete My Account
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        <i class="ti ti-alert-triangle me-2"></i>
+                        Danger Zone
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center">
+                        Are you absolutely sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ti ti-x me-1"></i>
+                        Cancel
+                    </button>
+                    <form action="{{ route('social.profile.destroy') }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="ti ti-trash me-1"></i>
+                            Yes, Delete My Account
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Delete Account Modal -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteAccountModalLabel">
-                    <i class="ti ti-alert-triangle text-danger me-2"></i>Delete Account
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-                <p class="text-danger mb-0"><strong>Warning:</strong> All your data will be permanently deleted.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" action="{{ route('social.profile.destroy') }}" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="ti ti-trash me-1"></i> Delete Account
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
-@section('scripts')
-<script>
-    $(document).ready(function(){
-        // Phone number masking
-        $('#phone').mask('000-0000000');
-        
-        // Postcode validation - only numbers
-        $('#postcode').on('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
+@section('script')
+    <script src="{{ asset('assets/vendor/filepond/file-encode.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/validate-size.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/validate-type.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/exif-orientation.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/image-preview.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/filepond.min.js') }}"></script>
+    <script src="{{ asset('assets/js/ready_to_use_form.js') }}"></script>
+
+    <script>
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+            const successAlert = document.querySelector('.alert-success');
+            if (successAlert) {
+                successAlert.remove();
+            }
+        }, 3000);
+
+        // Phone number masking using vanilla JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                // Set placeholder to show the format
+                phoneInput.placeholder = '000-0000000';
+                
+                // Format existing value from database
+                function formatPhoneNumber(value) {
+                    let cleanValue = value.replace(/\D/g, ''); // Remove non-digits
+                    
+                    // Format as XXX-XXXXXXX
+                    if (cleanValue.length > 0) {
+                        if (cleanValue.length <= 3) {
+                            return cleanValue;
+                        } else if (cleanValue.length <= 10) {
+                            return cleanValue.substring(0, 3) + '-' + cleanValue.substring(3, 10);
+                        } else {
+                            // Limit to 10 digits
+                            return cleanValue.substring(0, 3) + '-' + cleanValue.substring(3, 10);
+                        }
+                    }
+                    return cleanValue;
+                }
+                
+                // Format the initial value from database
+                if (phoneInput.value) {
+                    phoneInput.value = formatPhoneNumber(phoneInput.value);
+                }
+                
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = formatPhoneNumber(e.target.value);
+                });
+                
+                // Handle backspace and delete
+                phoneInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                        // Allow backspace to work normally
+                        return true;
+                    }
+                });
+            }
         });
-    });
-</script>
+
+        // Avatar upload preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('imageUpload');
+            const imgPreview = document.getElementById('imgPreview');
+            const form = document.getElementById('profileForm');
+            
+            if (imageUpload && imgPreview) {
+                imageUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        console.log('File selected:', file.name, file.size, file.type);
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Clear any existing content and set background image
+                            imgPreview.innerHTML = '';
+                            imgPreview.style.backgroundImage = `url('${e.target.result}')`;
+                            imgPreview.style.backgroundSize = 'cover';
+                            imgPreview.style.backgroundPosition = 'center';
+                            imgPreview.style.backgroundRepeat = 'no-repeat';
+                            
+                            // Show remove button if avatar is uploaded
+                            const removeBtnContainer = document.querySelector('.text-center.mt-2');
+                            if (removeBtnContainer) {
+                                removeBtnContainer.style.display = 'block';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Add form submit event listener
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('Form is being submitted...');
+                    const avatarFile = document.getElementById('imageUpload').files[0];
+                    if (avatarFile) {
+                        console.log('Avatar file at submit time:', avatarFile.name, avatarFile.size);
+                    } else {
+                        console.log('No avatar file at submit time');
+                    }
+                });
+            }
+        });
+
+        // Form validation and debugging
+        function validateForm() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            
+            console.log('Form data being submitted:');
+            for (let [key, value] of formData.entries()) {
+                if (key === 'avatar') {
+                    console.log(key + ':', value.name, value.size, value.type);
+                } else {
+                    console.log(key + ':', value);
+                }
+            }
+            
+            // Check if avatar file is actually in the form data
+            const avatarFile = document.getElementById('imageUpload').files[0];
+            if (avatarFile) {
+                console.log('Avatar file found in input:', avatarFile.name, avatarFile.size);
+            } else {
+                console.log('No avatar file found in input');
+            }
+            
+            // Check the file input element
+            const fileInput = document.getElementById('imageUpload');
+            console.log('File input element:', fileInput);
+            console.log('File input name:', fileInput.name);
+            console.log('File input files:', fileInput.files);
+            console.log('File input files length:', fileInput.files.length);
+            
+            return true; // Allow form submission
+        }
+
+        // Remove avatar functionality
+        function removeAvatar() {
+            if (confirm('Are you sure you want to remove your avatar?')) {
+                // Create a hidden input to indicate avatar removal
+                const form = document.querySelector('form');
+                const removeInput = document.createElement('input');
+                removeInput.type = 'hidden';
+                removeInput.name = 'remove_avatar';
+                removeInput.value = '1';
+                form.appendChild(removeInput);
+                
+                // Clear the file input
+                const fileInput = document.getElementById('imageUpload');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                
+                // Reset preview to show initials
+                const imgPreview = document.getElementById('imgPreview');
+                if (imgPreview) {
+                    imgPreview.style.backgroundImage = '';
+                    imgPreview.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-center h-100" style="{{ Auth::user()->getAvatarBackgroundStyle() }}">
+                            <span class="text-white fw-bold" style="font-size: 2.5rem;">{{ Auth::user()->getInitials() }}</span>
+                        </div>
+                    `;
+                }
+                
+                // Hide remove button
+                const removeBtn = document.querySelector('button[onclick="removeAvatar()"]');
+                if (removeBtn) {
+                    removeBtn.closest('.text-center').style.display = 'none';
+                }
+            }
+        }
+
+        // Agency dropdown functionality
+        function updateAgencyFields() {
+            const agencySelect = document.querySelector('select[name="agency_name"]');
+            const otherInput = document.getElementById('otherAgencyInput');
+            const codeInput = document.querySelector('input[name="agency_code"]');
+            
+            if (!agencySelect || !otherInput || !codeInput) return;
+
+            const selectedOption = agencySelect.options[agencySelect.selectedIndex];
+            const selectedValue = agencySelect.value;
+
+            if (selectedValue === 'Other') {
+                otherInput.style.display = 'block';
+                otherInput.required = true;
+                codeInput.value = '';
+                codeInput.readOnly = false;
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.required = false;
+                
+                const code = selectedOption?.dataset?.code || '';
+                if (code) {
+                    codeInput.value = code;
+                    codeInput.readOnly = true;
+                } else {
+                    codeInput.value = '';
+                    codeInput.readOnly = false;
+                }
+            }
+        }
+
+        // Initialize agency dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const agencySelect = document.querySelector('select[name="agency_name"]');
+            if (agencySelect) {
+                // Handle existing values on page load
+                const currentValue = agencySelect.value;
+                const currentOtherValue = document.getElementById('otherAgencyInput').value;
+                
+                // If there's a current value that's not in the dropdown options, set to "Other"
+                if (currentValue && !Array.from(agencySelect.options).some(option => option.value === currentValue)) {
+                    agencySelect.value = 'Other';
+                    document.getElementById('otherAgencyInput').value = currentValue;
+                    document.getElementById('otherAgencyInput').style.display = 'block';
+                }
+                
+                // Set up change event listener
+                agencySelect.addEventListener('change', updateAgencyFields);
+                
+                // Initial update
+                updateAgencyFields();
+            }
+        });
+    </script>
 @endsection

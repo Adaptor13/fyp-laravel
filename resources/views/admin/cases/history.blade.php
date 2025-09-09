@@ -11,8 +11,8 @@
         <div class="timeline">
             @foreach($history as $entry)
                 <div class="timeline-item">
-                    <div class="timeline-marker bg-{{ $entry->action === 'created' ? 'success' : ($entry->action === 'updated' ? 'primary' : 'info') }}">
-                        <i class="ti ti-{{ $entry->action === 'created' ? 'plus' : ($entry->action === 'updated' ? 'edit' : 'activity') }}"></i>
+                    <div class="timeline-marker bg-{{ $entry->action === 'created' ? 'success' : ($entry->action === 'updated' ? 'primary' : ($entry->action === 'assignees_updated' ? 'warning' : 'info')) }}">
+                        <i class="ti ti-{{ $entry->action === 'created' ? 'plus' : ($entry->action === 'updated' ? 'edit' : ($entry->action === 'assignees_updated' ? 'users' : 'activity')) }}"></i>
                     </div>
                     <div class="timeline-content">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -26,65 +26,97 @@
                         
                         @if($entry->changes && is_array($entry->changes))
                             <div class="changes-details">
-                                @foreach($entry->changes as $field => $change)
-                                    @if(isset($change['from']) && isset($change['to']))
-                                        <div class="change-item mb-2">
-                                            <strong class="text-primary">{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
-                                            <div class="d-flex align-items-center mt-1">
-                                                <div class="from-value me-2">
-                                                    <small class="text-muted">From:</small>
-                                                    @if(is_array($change['from']))
-                                                        @if(empty($change['from']))
-                                                            <span class="badge bg-secondary">None</span>
+                                 @if($entry->action === 'assignees_updated')
+                                     {{-- Special handling for assignee changes --}}
+                                     @php
+                                         $changes = $entry->changes;
+                                     @endphp
+                                     @if(isset($changes['assigned']) && is_array($changes['assigned']) && !empty($changes['assigned']))
+                                         <div class="change-item mb-2">
+                                             <strong class="text-success">Assigned:</strong>
+                                             <div class="mt-1">
+                                                 @foreach($changes['assigned'] as $assignee)
+                                                     <span class="badge bg-success text-white me-1 mb-1">
+                                                         <i class="ti ti-user-plus me-1"></i>{{ $assignee }}
+                                                     </span>
+                                                 @endforeach
+                                             </div>
+                                         </div>
+                                     @endif
+                                     @if(isset($changes['unassigned']) && is_array($changes['unassigned']) && !empty($changes['unassigned']))
+                                         <div class="change-item mb-2">
+                                             <strong class="text-danger">Unassigned:</strong>
+                                             <div class="mt-1">
+                                                 @foreach($changes['unassigned'] as $assignee)
+                                                     <span class="badge bg-danger text-white me-1 mb-1">
+                                                         <i class="ti ti-user-minus me-1"></i>{{ $assignee }}
+                                                     </span>
+                                                 @endforeach
+                                             </div>
+                                         </div>
+                                     @endif
+                                @else
+                                    {{-- Regular field changes --}}
+                                    @foreach($entry->changes as $field => $change)
+                                        @if(isset($change['from']) && isset($change['to']))
+                                            <div class="change-item mb-2">
+                                                <strong class="text-primary">{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
+                                                <div class="d-flex align-items-center mt-1">
+                                                    <div class="from-value me-2">
+                                                        <small class="text-muted">From:</small>
+                                                        @if(is_array($change['from']))
+                                                            @if(empty($change['from']))
+                                                                <span class="badge bg-secondary">None</span>
+                                                            @else
+                                                                <div class="mt-1">
+                                                                    @foreach($change['from'] as $item)
+                                                                        <span class="badge bg-light text-dark me-1 mb-1">{{ $item }}</span>
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
                                                         @else
-                                                            <div class="mt-1">
-                                                                @foreach($change['from'] as $item)
-                                                                    <span class="badge bg-light text-dark me-1 mb-1">{{ $item }}</span>
-                                                                @endforeach
-                                                            </div>
+                                                            <span class="badge bg-light text-dark">{{ $change['from'] ?? 'None' }}</span>
                                                         @endif
-                                                    @else
-                                                        <span class="badge bg-light text-dark">{{ $change['from'] ?? 'None' }}</span>
-                                                    @endif
-                                                </div>
-                                                <i class="ti ti-arrow-right mx-2 text-muted"></i>
-                                                <div class="to-value">
-                                                    <small class="text-muted">To:</small>
-                                                    @if(is_array($change['to']))
-                                                        @if(empty($change['to']))
-                                                            <span class="badge bg-secondary">None</span>
+                                                    </div>
+                                                    <i class="ti ti-arrow-right mx-2 text-muted"></i>
+                                                    <div class="to-value">
+                                                        <small class="text-muted">To:</small>
+                                                        @if(is_array($change['to']))
+                                                            @if(empty($change['to']))
+                                                                <span class="badge bg-secondary">None</span>
+                                                            @else
+                                                                <div class="mt-1">
+                                                                    @foreach($change['to'] as $item)
+                                                                        @if($field === 'evidence')
+                                                                            @php
+                                                                                $filename = basename($item);
+                                                                                $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                                                                                $iconClass = match(strtolower($extension)) {
+                                                                                    'jpg', 'jpeg', 'png', 'gif', 'webp' => 'ti ti-photo',
+                                                                                    'mp4', 'avi', 'mov', 'wmv' => 'ti ti-video',
+                                                                                    'pdf' => 'ti ti-file-text',
+                                                                                    default => 'ti ti-file'
+                                                                                };
+                                                                            @endphp
+                                                                            <span class="badge bg-info text-white me-1 mb-1 evidence-badge" title="{{ $item }}">
+                                                                                <i class="{{ $iconClass }} me-1"></i>
+                                                                                <span class="evidence-filename">{{ strlen($filename) > 20 ? substr($filename, 0, 17) . '...' : $filename }}</span>
+                                                                            </span>
+                                                                        @else
+                                                                            <span class="badge bg-success text-white me-1 mb-1">{{ $item }}</span>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
                                                         @else
-                                                            <div class="mt-1">
-                                                                                                                                 @foreach($change['to'] as $item)
-                                                                     @if($field === 'evidence')
-                                                                         @php
-                                                                             $filename = basename($item);
-                                                                             $extension = pathinfo($filename, PATHINFO_EXTENSION);
-                                                                             $iconClass = match(strtolower($extension)) {
-                                                                                 'jpg', 'jpeg', 'png', 'gif', 'webp' => 'ti ti-photo',
-                                                                                 'mp4', 'avi', 'mov', 'wmv' => 'ti ti-video',
-                                                                                 'pdf' => 'ti ti-file-text',
-                                                                                 default => 'ti ti-file'
-                                                                             };
-                                                                         @endphp
-                                                                         <span class="badge bg-info text-white me-1 mb-1 evidence-badge" title="{{ $item }}">
-                                                                             <i class="{{ $iconClass }} me-1"></i>
-                                                                             <span class="evidence-filename">{{ strlen($filename) > 20 ? substr($filename, 0, 17) . '...' : $filename }}</span>
-                                                                         </span>
-                                                                     @else
-                                                                         <span class="badge bg-success text-white me-1 mb-1">{{ $item }}</span>
-                                                                     @endif
-                                                                 @endforeach
-                                                            </div>
+                                                            <span class="badge bg-success text-white">{{ $change['to'] ?? 'None' }}</span>
                                                         @endif
-                                                    @else
-                                                        <span class="badge bg-success text-white">{{ $change['to'] ?? 'None' }}</span>
-                                                    @endif
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endif
-                                @endforeach
+                                        @endif
+                                    @endforeach
+                                @endif
                             </div>
                         @endif
                         

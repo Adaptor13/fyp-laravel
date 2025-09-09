@@ -38,12 +38,14 @@ class CaseController extends Controller
         // Base query
         $query = Report::query();
 
-        // Visibility by role
-        if (!in_array($role, ['admin','gov_official'])) {
-            if (in_array($role, ['social_worker','law_enforcement','healthcare'])) {
+        // Visibility by role - Admin and Government Officials see all cases
+        if (!in_array($role, ['admin', 'gov_official'])) {
+            if (in_array($role, ['social_worker', 'law_enforcement', 'healthcare'])) {
+                // These roles see only cases assigned to them
                 $query->assignedTo($user->id);
             } else {
-                $query->whereRaw('1=0'); // blocks public_user or unknown roles
+                // Public users and unknown roles see no cases in the cases management interface
+                $query->whereRaw('1=0');
             }
         }
 
@@ -89,12 +91,14 @@ class CaseController extends Controller
             ->whereNull('case_assignments.unassigned_at')
             ->groupBy('reports.id', 'reports.reporter_name', 'reports.reporter_email', 'reports.incident_description', 'reports.report_status', 'reports.priority_level', 'reports.updated_at');
 
-        // Visibility by role
-        if (!in_array($role, ['admin','gov_official'])) {
-            if (in_array($role, ['social_worker','law_enforcement','healthcare'])) {
+        // Visibility by role - Admin and Government Officials see all cases
+        if (!in_array($role, ['admin', 'gov_official'])) {
+            if (in_array($role, ['social_worker', 'law_enforcement', 'healthcare'])) {
+                // These roles see only cases assigned to them
                 $query->where('case_assignments.user_id', $user->id);
             } else {
-                $query->whereRaw('1=0'); // blocks public_user or unknown roles
+                // Public users and unknown roles see no cases in the cases management interface
+                $query->whereRaw('1=0');
             }
         }
 
@@ -207,7 +211,9 @@ class CaseController extends Controller
                     
                     // Log assignment if users were assigned
                     if (!empty($assignedUsers)) {
-                        $report->logAction('assigned', 'Case assigned to: ' . implode(', ', $assignedUsers));
+                        $report->logAction('assignees_updated', 'Assigned to: ' . implode(', ', $assignedUsers), [
+                            'assigned' => $assignedUsers
+                        ]);
                     }
                 }
             });
@@ -296,8 +302,13 @@ class CaseController extends Controller
                     // Get current active assignments
                     $currentAssignments = CaseAssignment::where('report_id', $report->id)
                         ->whereNull('unassigned_at')
+                        ->with('user')
                         ->get()
                         ->keyBy('user_id');
+                    
+                    // Get current and new assignee names for logging
+                    $currentAssigneeNames = $currentAssignments->pluck('user.name')->filter()->toArray();
+                    $newAssigneeNames = User::whereIn('id', $validAssignees)->pluck('name')->toArray();
                     
                     // Mark assignments that are no longer needed as unassigned
                     $currentUserIds = $currentAssignments->keys()->toArray();
@@ -312,6 +323,7 @@ class CaseController extends Controller
                     }
                     
                     // Create or update assignments for all valid assignees
+                    $newlyAssigned = [];
                     foreach ($validAssignees as $userId) {
                         // Check if assignment already exists
                         $existingAssignment = $currentAssignments->get($userId);
@@ -324,7 +336,38 @@ class CaseController extends Controller
                                 'is_primary' => false,
                                 'assigned_at' => now(),
                             ]);
+                            
+                            $user = User::find($userId);
+                            if ($user) {
+                                $newlyAssigned[] = $user->name;
+                            }
                         }
+                    }
+                    
+                    // Log assignment changes if there were any changes
+                    if (!empty($toUnassign) || !empty($newlyAssigned)) {
+                        $assignmentChanges = [];
+                        
+                        if (!empty($toUnassign)) {
+                            $unassignedNames = User::whereIn('id', $toUnassign)->pluck('name')->toArray();
+                            $assignmentChanges['unassigned'] = $unassignedNames;
+                        }
+                        
+                        if (!empty($newlyAssigned)) {
+                            $assignmentChanges['assigned'] = $newlyAssigned;
+                        }
+                        
+                        // Create a detailed description of the changes
+                        $changeDescription = '';
+                        if (!empty($assignmentChanges['assigned'])) {
+                            $changeDescription .= 'Assigned to: ' . implode(', ', $assignmentChanges['assigned']);
+                        }
+                        if (!empty($assignmentChanges['unassigned'])) {
+                            if ($changeDescription) $changeDescription .= '; ';
+                            $changeDescription .= 'Unassigned: ' . implode(', ', $assignmentChanges['unassigned']);
+                        }
+                        
+                        $report->logAction('assignees_updated', $changeDescription, $assignmentChanges);
                     }
                 }
             });

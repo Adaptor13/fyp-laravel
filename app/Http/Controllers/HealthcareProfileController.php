@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\HealthcareProfile;
@@ -46,12 +47,18 @@ class HealthcareProfileController extends Controller
             'city' => 'nullable|string|max:100',
             'postcode' => 'nullable|digits:5',
             'state' => 'nullable|string|max:50',
+            'hc_state' => 'nullable|string|max:50',
             'profession' => 'nullable|string|max:100',
             'apc_expiry' => 'nullable|date',
             'facility_name' => 'nullable|string|max:150',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'remove_avatar' => 'nullable|boolean',
         ];
 
         $validated = $request->validate($rules);
+
+        // Debug: dump the validated data to check APC expiry
+
 
         // Clean phone number
         if (!empty($validated['phone'])) {
@@ -63,17 +70,38 @@ class HealthcareProfileController extends Controller
             'name' => $validated['name'],
         ]);
 
+        // Prepare profile data
+        $profileData = [
+            'phone' => $validated['phone'] ?? null,
+            'address_line1' => $validated['address_line1'] ?? null,
+            'address_line2' => $validated['address_line2'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'postcode' => $validated['postcode'] ?? null,
+            'state' => $validated['state'] ?? null,
+        ];
+
+        // Handle avatar upload/removal
+        $existingProfile = $user->profile;
+        
+        if ($request->boolean('remove_avatar') && $existingProfile && !empty($existingProfile->avatar_path)) {
+            // Remove existing avatar
+            Storage::disk('public')->delete($existingProfile->avatar_path);
+            $profileData['avatar_path'] = null;
+        } elseif ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($existingProfile && !empty($existingProfile->avatar_path)) {
+                Storage::disk('public')->delete($existingProfile->avatar_path);
+            }
+            
+            // Store new avatar
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $profileData['avatar_path'] = $path;
+        }
+
         // Update or create base profile
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
-            [
-                'phone' => $validated['phone'] ?? null,
-                'address_line1' => $validated['address_line1'] ?? null,
-                'address_line2' => $validated['address_line2'] ?? null,
-                'city' => $validated['city'] ?? null,
-                'postcode' => $validated['postcode'] ?? null,
-                'state' => $validated['state'] ?? null,
-            ]
+            $profileData
         );
 
         // Update or create healthcare profile
@@ -83,7 +111,7 @@ class HealthcareProfileController extends Controller
                 'profession' => $validated['profession'] ?? null,
                 'apc_expiry' => $validated['apc_expiry'] ?? null,
                 'facility_name' => $validated['facility_name'] ?? null,
-                'state' => $validated['state'] ?? null,
+                'state' => $validated['hc_state'] ?? null,
             ]
         );
 

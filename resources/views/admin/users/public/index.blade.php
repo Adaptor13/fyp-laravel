@@ -1,11 +1,8 @@
 @extends('layout.master')
 @section('title', 'Public User')
 @section('css')
-
-
     <!-- Data Table css -->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
-
 
 @endsection
 
@@ -134,7 +131,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Public Users</h5>
                         @permission('users.create')
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPublicUser">Add</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPublicUser"><i class="ti ti-plus"></i> Add</button>
                         @endpermission
                     </div>
                     <div class="card-body p-0">
@@ -221,67 +218,118 @@
     </div>
 
     <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <form id="editUserForm" method="POST">
+        <div class="modal-dialog modal-lg">
+            <form id="editUserForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-content">
                     <div class="modal-header bg-primary">
-                        <h5 class="modal-title  text-white">Edit Public User</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title text-white">
+                            Edit Public User
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
                         <input type="hidden" id="edit_id">
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <input class="form-control" name="name" id="edit_name" required placeholder="John Doe">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input class="form-control" name="email" id="edit_email" type="email" disabled placeholder="johndoe@example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Display Name</label>
-                            <input class="form-control" name="display_name" id="edit_display_name" placeholder="Johnny">
-                        </div>
+                        
 
-                        <div class="row g-2">
-                            <div class="col-md-6">
+                        <!-- Account Details Section -->
+                        <h6 class="mb-3">
+                            Account Details
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input class="form-control" name="name" id="edit_name" required placeholder="Enter full name">
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="phone" id="phone" placeholder="012-3456789">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Postcode</label>
-                                <input class="form-control" name="postcode" id="edit_postcode" placeholder="12345">
+                                <input type="tel" class="form-control" name="phone" id="phone" placeholder="000-0000000">
                             </div>
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label">Address Line 1</label>
-                            <input class="form-control" name="address_line1" id="edit_address_line1" placeholder="123 Example Street">
+                        <!-- Public User Profile Section -->
+                        <hr class="my-4">
+                        <h6 class="mb-3">
+                            Public User Profile
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Display Name</label>
+                                <input class="form-control" name="display_name" id="edit_display_name" placeholder="Enter display name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Allow Contact</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="edit_allow_contact" name="allow_contact" value="1">
+                                    <label class="form-check-label" for="edit_allow_contact">
+                                        Allow contact about reports
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label">Address Line 2</label>
-                            <input class="form-control" name="address_line2" id="edit_address_line2" placeholder="Suite 456">
+                        <!-- Contact Information -->
+                        <hr class="my-4">
+                        <h6 class="mb-3">
+                            Contact Information (Optional)
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Address Line 1</label>
+                                <input class="form-control" name="address_line1" id="edit_address_line1" placeholder="Street, Apartment, etc.">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Address Line 2</label>
+                                <input class="form-control" name="address_line2" id="edit_address_line2" placeholder="Unit, Suite">
+                            </div>
                         </div>
 
-                        <div class="row g-2">
-                            <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">City</label>
-                                <input class="form-control" name="city" id="edit_city" placeholder="Exampleville">
+                                <input class="form-control" name="city" id="edit_city" placeholder="City">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Mailing State</label>
-                                <input class="form-control" name="state" id="edit_state" placeholder="State for mailing address">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Postcode</label>
+                                <input class="form-control" name="postcode" id="edit_postcode" placeholder="Postcode">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">State</label>
+                                <select name="state" id="edit_state" class="form-select">
+                                    <option value="">-- Select State --</option>
+                                    <option value="Johor">Johor</option>
+                                    <option value="Kedah">Kedah</option>
+                                    <option value="Kelantan">Kelantan</option>
+                                    <option value="Melaka">Melaka</option>
+                                    <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                    <option value="Pahang">Pahang</option>
+                                    <option value="Perak">Perak</option>
+                                    <option value="Perlis">Perlis</option>
+                                    <option value="Pulau Pinang">Pulau Pinang</option>
+                                    <option value="Sabah">Sabah</option>
+                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="Selangor">Selangor</option>
+                                    <option value="Terengganu">Terengganu</option>
+                                    <option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option>
+                                    <option value="W.P. Labuan">W.P. Labuan</option>
+                                    <option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save Changes
+                        </button>
                     </div>
                 </div>
             </form>
@@ -489,22 +537,26 @@
         $('#publicUsersTable').on('click', '.edit-btn', function() {
             const rowData = $('#publicUsersTable').DataTable().row($(this).closest('tr')).data();
 
+            // Set basic information
             $('#editUserForm input[name="id"]').val(rowData.id);
             $('#editUserForm input[name="name"]').val(rowData.name);
-            $('#editUserForm input[name="email"]').val(rowData.email);
-            $('#editUserForm input[name="display_name"]').val(rowData.display_name);
-            $('#editUserForm [name="phone"]').val(rowData.phone ?? '');
-
+            $('#editUserForm input[name="phone"]').val(rowData.phone ?? '');
             
+            
+            // Set public user profile
+            $('#editUserForm input[name="display_name"]').val(rowData.display_name ?? '');
+            $('#edit_allow_contact').prop('checked', rowData.allow_contact == 1 || rowData.allow_contact === true);
+            
+            // Set address information
             $('#editUserForm [name="address_line1"]').val(rowData.address_line1 ?? '');
             $('#editUserForm [name="address_line2"]').val(rowData.address_line2 ?? '');
             $('#editUserForm [name="city"]').val(rowData.city ?? '');
             $('#editUserForm [name="state"]').val(rowData.state ?? '');
             $('#editUserForm [name="postcode"]').val(rowData.postcode ?? '');
+            
 
             const updateUrl = `/users/public-users/${rowData.id}`;
             $('#editUserForm').attr('action', updateUrl);
-
 
             $('#editUserModal').modal('show');
         });
@@ -526,5 +578,6 @@
                 }
             });
         });
+
     </script>
 @endsection

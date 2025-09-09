@@ -30,23 +30,20 @@ class UserController extends Controller
         // Total admins
         $totalUsers = User::where('role_id', $adminRoleId)->count();
         
-        // Contactable users (with phone numbers)
-        $contactableUsers = User::where('role_id', $adminRoleId)
-            ->whereHas('profile', function($query) {
-                $query->whereNotNull('phone')
-                      ->where('phone', '!=', '');
-            })->count();
+        // Active admins (those who have been active recently, e.g., past 30 days)
+        // Using updated_at as a proxy for activity since we don't have last_login_at
+        $activeAdmins = User::where('role_id', $adminRoleId)
+            ->where('updated_at', '>=', Carbon::now()->subDays(30))
+            ->count();
         
-        // Non-contactable users (without phone numbers)
-        $nonContactableUsers = User::where('role_id', $adminRoleId)
-            ->whereDoesntHave('profile', function($query) {
-                $query->whereNotNull('phone')
-                      ->where('phone', '!=', '');
-            })->count();
+        // Inactive admins (no activity for long period - more than 30 days)
+        $inactiveAdmins = User::where('role_id', $adminRoleId)
+            ->where('updated_at', '<', Carbon::now()->subDays(30))
+            ->count();
         
-        // New users this month
-        $newUsers = User::where('role_id', $adminRoleId)
-            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+        // New admins (recently added - last 30 days)
+        $newAdmins = User::where('role_id', $adminRoleId)
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
             ->count();
         
         // Get user permissions for frontend permission checking
@@ -56,9 +53,9 @@ class UserController extends Controller
         return view('admin.users.admins.index', compact(
             'users', 
             'totalUsers', 
-            'contactableUsers', 
-            'nonContactableUsers',
-            'newUsers',
+            'activeAdmins', 
+            'inactiveAdmins',
+            'newAdmins',
             'userPermissions'
         ));
     }

@@ -250,9 +250,16 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <div class="position-relative" style="height: 300px;">
-                        <canvas id="statusDistributionChart"></canvas>
-                    </div>
+                    @if(empty($statusDistribution) || array_sum($statusDistribution) == 0)
+                        <div class="text-center text-muted py-4" style="height: 300px; display: flex; flex-direction: column; justify-content: center;">
+                            <i class="ti ti-chart-pie f-s-48 mb-3"></i>
+                            <p>No case data available</p>
+                        </div>
+                    @else
+                        <div class="position-relative" style="height: 300px;">
+                            <canvas id="statusDistributionChart"></canvas>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -319,34 +326,37 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Status Distribution Chart (for all users)
-    const statusDistributionCtx = document.getElementById('statusDistributionChart').getContext('2d');
-    new Chart(statusDistributionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: @json(array_keys($statusDistribution)),
-            datasets: [{
-                data: @json(array_values($statusDistribution)),
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#4BC0C0',
-                    '#9966FF'
-                ],
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
+    // Status Distribution Chart (for all users) - only if data exists
+    const statusDistributionCanvas = document.getElementById('statusDistributionChart');
+    if (statusDistributionCanvas) {
+        const statusDistributionCtx = statusDistributionCanvas.getContext('2d');
+        new Chart(statusDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @json(array_keys($statusDistribution)),
+                datasets: [{
+                    data: @json(array_values($statusDistribution)),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 
     @if($role === 'admin')
     // Monthly Trends Chart (admin only)
@@ -389,22 +399,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Role Distribution Chart (admin only)
     const roleDistributionCtx = document.getElementById('roleDistributionChart').getContext('2d');
+    
+    // Beautify role names for display
+    const roleNameMapping = {
+        'admin': 'Administrator',
+        'gov_official': 'Child Welfare Officer',
+        'social_worker': 'Social Worker',
+        'law_enforcement': 'Law Enforcement',
+        'healthcare': 'Healthcare Professional',
+        'public_user': 'Public User'
+    };
+    
+    const roleLabels = @json(array_keys($roleDistribution)).map(role => roleNameMapping[role] || role);
+    
     new Chart(roleDistributionCtx, {
         type: 'bar',
         data: {
-            labels: @json(array_keys($roleDistribution)),
+            labels: roleLabels,
             datasets: [{
                 label: 'Users',
                 data: @json(array_values($roleDistribution)),
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)'
+                    'rgba(220, 53, 69, 0.8)',   // Administrator - Red
+                    'rgba(0, 123, 255, 0.8)',   // Government Official - Blue
+                    'rgba(40, 167, 69, 0.8)',   // Social Worker - Green
+                    'rgba(255, 193, 7, 0.8)',   // Law Enforcement - Yellow
+                    'rgba(23, 162, 184, 0.8)',  // Healthcare Professional - Cyan
+                    'rgba(108, 117, 125, 0.8)'  // Public User - Gray
                 ],
-                borderWidth: 1
+                borderColor: [
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(23, 162, 184, 1)',
+                    'rgba(108, 117, 125, 1)'
+                ],
+                borderWidth: 2
             }]
         },
         options: {
@@ -413,12 +444,42 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#fff',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: '#6c757d'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#6c757d',
+                        maxRotation: 45,
+                        minRotation: 0
+                    },
+                    grid: {
+                        display: false
+                    }
                 }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
             }
         }
     });

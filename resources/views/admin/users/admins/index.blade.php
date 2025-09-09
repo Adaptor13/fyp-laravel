@@ -62,7 +62,7 @@
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
                                 <h3 class="header-heading mb-0">{{ $totalUsers ?? 0 }}</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Total Users</p>
+                                <p class="f-w-300 f-s-12 mb-0">Total Admins</p>
                             </div>
                             <div>
                                 <i class="ti ti-users f-s-36"></i>
@@ -77,11 +77,11 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">{{ $contactableUsers ?? 0 }}</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Contactable Users</p>
+                                <h3 class="header-heading mb-0">{{ $activeAdmins ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">Active Admins</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone f-s-36"></i>
+                                <i class="ti ti-user-check f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -89,15 +89,15 @@
             </div>
 
             <div class="col-sm-6 col-lg-3">
-                <div class="card bg-danger text-white">
+                <div class="card bg-warning text-white">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">{{ $nonContactableUsers ?? 0 }}</h3>
-                                <p class="f-w-300 f-s-12 mb-0">Non-Contactable Users</p>
+                                <h3 class="header-heading mb-0">{{ $inactiveAdmins ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">Inactive Admins</p>
                             </div>
                             <div>
-                                <i class="ti ti-phone-off f-s-36"></i>
+                                <i class="ti ti-user-x f-s-36"></i>
                             </div>
                         </div>
                     </div>
@@ -109,8 +109,8 @@
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center p-4">
                             <div>
-                                <h3 class="header-heading mb-0">{{ $newUsers ?? 0 }}</h3>
-                                <p class="f-w-300 f-s-12 mb-0">New Users</p>
+                                <h3 class="header-heading mb-0">{{ $newAdmins ?? 0 }}</h3>
+                                <p class="f-w-300 f-s-12 mb-0">New Admins</p>
                             </div>
                             <div>
                                 <i class="ti ti-user-plus f-s-36"></i>
@@ -126,7 +126,7 @@
                         <h5 class="mb-0">Admin</h5>
                         @permission('users.create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdmin">
-                            Add
+                            <i class="ti ti-plus"></i> Add
                         </button>
                         @endpermission
                     </div>

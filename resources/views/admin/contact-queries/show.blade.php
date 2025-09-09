@@ -83,9 +83,6 @@
                                         <div class="col-md-6">
                                             <strong>Submitted:</strong> {{ $contactQuery->created_at->format('M d, Y H:i') }}
                                         </div>
-                                        <div class="col-md-6">
-                                            <strong>Last Updated:</strong> {{ $contactQuery->updated_at->format('M d, Y H:i') }}
-                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-12">

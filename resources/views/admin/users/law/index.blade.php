@@ -129,7 +129,7 @@
                         <h5 class="mb-0">Law Enforcement</h5>
                         @permission('users.create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLawEnforcement">
-                            Add
+                            <i class="ti ti-plus"></i> Add
                         </button>
                         @endpermission
                     </div>

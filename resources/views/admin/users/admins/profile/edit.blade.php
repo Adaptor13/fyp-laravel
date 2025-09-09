@@ -24,6 +24,134 @@
             border: 4px solid #fff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
+        /* Avatar Upload Styles */
+        .avatar-upload {
+            position: relative;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
+        
+        .avatar-edit input {
+            display: none;
+        }
+        
+        .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        
+        
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            border-radius: 50%;
+            border: 6px solid #f8f8f8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        /* Avatar upload styles for modals */
+        .avatar-upload {
+            position: relative;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
+        
+        .avatar-edit input {
+            display: none;
+        }
+        
+        .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            border-radius: 50%;
+            border: 6px solid #f8f8f8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            overflow: hidden;
+        }
     </style>
 @endsection
 
@@ -84,55 +212,37 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <!-- Profile Avatar Section -->
-                        <div class="text-center mb-4">
-                            @if(Auth::user()->getAvatarUrl())
-                                <img src="{{ Auth::user()->getAvatarUrl() }}" alt="{{ Auth::user()->name }}" class="profile-avatar">
-                            @else
-                                <div class="avatar-placeholder" style="{{ Auth::user()->getAvatarBackgroundStyle() }}">
-                                    {{ Auth::user()->getInitials() }}
-                                </div>
-                            @endif
-                            <div class="mt-3">
-                                <a href="mailto:{{ $user->email }}" class="text-decoration-none">
-                                    <i class="ti ti-mail me-1"></i>
-                                    {{ $user->email }}
-                                </a>
-                                <small class="text-muted d-block">(Private — cannot be changed)</small>
-                            </div>
-                        </div>
-
-                        <form method="POST" action="{{ route('admin.profile.update') }}">
+                        <form method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data" onsubmit="return validateForm()" id="profileForm">
                             @csrf
                             @method('PUT')
 
+                            <!-- Profile Avatar Section -->
+                            @include('components.avatar-upload', ['user' => $user])
+
                             <!-- Basic Information -->
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
                                     <input name="name" type="text" class="form-control @error('name') is-invalid @enderror"
                                         value="{{ old('name', $user->name) }}" placeholder="Enter your full name">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Phone Number</label>
-                                    <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                                        value="{{ old('phone', $user->profile->phone ?? '') }}" placeholder="Enter phone number">
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
                             </div>
 
-                            <!-- Admin Specific Information -->
+                            <!-- Admin Profile Section -->
+                            <hr class="my-4">
+                            <h6 class="mb-3">
+                                <i class="ti ti-user me-2"></i>
+                                Admin Profile
+                            </h6>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Display Name</label>
+                                    <label class="form-label">Display Name <span class="text-danger">*</span></label>
                                     <input name="display_name" type="text" class="form-control @error('display_name') is-invalid @enderror"
-                                        value="{{ old('display_name', $user->adminProfile->display_name ?? '') }}" placeholder="Enter display name">
+                                        value="{{ old('display_name', $user->adminProfile->display_name ?? '') }}" placeholder="Enter display name" required>
                                     @error('display_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -159,69 +269,67 @@
                                 </div>
                             </div>
 
-                            <!-- Address Information -->
+                            <!-- Contact Information (Optional) -->
                             <hr class="my-4">
                             <h6 class="mb-3">
                                 <i class="ti ti-map-pin me-2"></i>
-                                Address Information
+                                Contact Information (Optional)
                             </h6>
 
-                            <div class="mb-3">
-                                <label class="form-label">Address Line 1</label>
-                                <input name="address_line1" type="text" class="form-control @error('address_line1') is-invalid @enderror"
-                                    value="{{ old('address_line1', $user->profile->address_line1 ?? '') }}" placeholder="Enter address line 1">
-                                @error('address_line1')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Address Line 2</label>
-                                <input name="address_line2" type="text" class="form-control @error('address_line2') is-invalid @enderror"
-                                    value="{{ old('address_line2', $user->profile->address_line2 ?? '') }}" placeholder="Enter address line 2 (optional)">
-                                @error('address_line2')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
                             <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">City</label>
-                                    <input name="city" type="text" class="form-control @error('city') is-invalid @enderror"
-                                        value="{{ old('city', $user->profile->city ?? '') }}" placeholder="Enter city">
-                                    @error('city')
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                                        value="{{ old('phone', $user->profile->phone ?? '') }}" placeholder="e.g. 012-5254545">
+                                    @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 1</label>
+                                    <input name="address_line1" type="text" class="form-control @error('address_line1') is-invalid @enderror"
+                                        value="{{ old('address_line1', $user->profile->address_line1 ?? '') }}" placeholder="Street, Apartment, etc">
+                                    @error('address_line1')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 2</label>
+                                    <input name="address_line2" type="text" class="form-control @error('address_line2') is-invalid @enderror"
+                                        value="{{ old('address_line2', $user->profile->address_line2 ?? '') }}" placeholder="Unit, Suite">
+                                    @error('address_line2')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input name="city" type="text" class="form-control @error('city') is-invalid @enderror"
+                                        value="{{ old('city', $user->profile->city ?? '') }}" placeholder="City">
+                                    @error('city')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Postcode</label>
-                                    <input name="postcode" type="text" inputmode="numeric" pattern="\d{5}" maxlength="5" 
-                                        class="form-control @error('postcode') is-invalid @enderror"
-                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="Enter postcode">
+                                    <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000">
                                     @error('postcode')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">State</label>
-                                    @php
-                                        $states = [
-                                            'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 
-                                            'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 
-                                            'Terengganu', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'
-                                        ];
-                                        $stateVal = old('state', $user->profile->state ?? '');
-                                    @endphp
-                                    <select name="state" class="form-select @error('state') is-invalid @enderror">
-                                        <option value="">-- Select State --</option>
-                                        @foreach($states as $state)
-                                            <option value="{{ $state }}" {{ $stateVal === $state ? 'selected' : '' }}>
-                                                {{ $state }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mailing State</label>
+                                    <input name="state" type="text" class="form-control @error('state') is-invalid @enderror"
+                                        value="{{ old('state', $user->profile->state ?? '') }}" placeholder="State for mailing address">
                                     @error('state')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -291,6 +399,18 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('assets/vendor/filepond/file-encode.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/validate-size.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/validate-type.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/exif-orientation.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/image-preview.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/filepond/filepond.min.js') }}"></script>
+    <script src="{{ asset('assets/js/ready_to_use_form.js') }}"></script>
+
+
 
     <script>
         // Auto-hide success message after 3 seconds
@@ -300,5 +420,125 @@
                 successAlert.remove();
             }
         }, 3000);
+
+        // Phone number masking using jQuery mask plugin
+        $(document).ready(function() {
+            $('#phone').mask('000-0000000');
+        });
+
+        // Avatar upload preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('imageUpload');
+            const imgPreview = document.getElementById('imgPreview');
+            const form = document.getElementById('profileForm');
+            
+            if (imageUpload && imgPreview) {
+                imageUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        console.log('File selected:', file.name, file.size, file.type);
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Clear any existing content and set background image
+                            imgPreview.innerHTML = '';
+                            imgPreview.style.backgroundImage = `url('${e.target.result}')`;
+                            imgPreview.style.backgroundSize = 'cover';
+                            imgPreview.style.backgroundPosition = 'center';
+                            imgPreview.style.backgroundRepeat = 'no-repeat';
+                            
+                            // Show remove button if avatar is uploaded
+                            const removeBtnContainer = document.querySelector('.text-center.mt-2');
+                            if (removeBtnContainer) {
+                                removeBtnContainer.style.display = 'block';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Add form submit event listener
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('Form is being submitted...');
+                    const avatarFile = document.getElementById('imageUpload').files[0];
+                    if (avatarFile) {
+                        console.log('Avatar file at submit time:', avatarFile.name, avatarFile.size);
+                    } else {
+                        console.log('No avatar file at submit time');
+                    }
+                });
+            }
+        });
+
+        // Form validation and debugging
+        function validateForm() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            
+            console.log('Form data being submitted:');
+            for (let [key, value] of formData.entries()) {
+                if (key === 'avatar') {
+                    console.log(key + ':', value.name, value.size, value.type);
+                } else {
+                    console.log(key + ':', value);
+                }
+            }
+            
+            // Check if avatar file is actually in the form data
+            const avatarFile = document.getElementById('imageUpload').files[0];
+            if (avatarFile) {
+                console.log('Avatar file found in input:', avatarFile.name, avatarFile.size);
+            } else {
+                console.log('No avatar file found in input');
+            }
+            
+            // Check the file input element
+            const fileInput = document.getElementById('imageUpload');
+            console.log('File input element:', fileInput);
+            console.log('File input name:', fileInput.name);
+            console.log('File input files:', fileInput.files);
+            console.log('File input files length:', fileInput.files.length);
+            
+            return true; // Allow form submission
+        }
+
+        // Remove avatar functionality
+        function removeAvatar() {
+            if (confirm('Are you sure you want to remove your avatar?')) {
+                // Create a hidden input to indicate avatar removal
+                const form = document.querySelector('form');
+                const removeInput = document.createElement('input');
+                removeInput.type = 'hidden';
+                removeInput.name = 'remove_avatar';
+                removeInput.value = '1';
+                form.appendChild(removeInput);
+                
+                // Clear the file input
+                const fileInput = document.getElementById('imageUpload');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                
+                // Reset preview to show initials
+                const imgPreview = document.getElementById('imgPreview');
+                if (imgPreview) {
+                    imgPreview.style.backgroundImage = '';
+                    imgPreview.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-center h-100" style="{{ Auth::user()->getAvatarBackgroundStyle() }}">
+                            <span class="text-white fw-bold" style="font-size: 2.5rem;">{{ Auth::user()->getInitials() }}</span>
+                        </div>
+                    `;
+                }
+                
+                // Hide remove button
+                const removeBtn = document.querySelector('button[onclick="removeAvatar()"]');
+                if (removeBtn) {
+                    removeBtn.closest('.text-center').style.display = 'none';
+                }
+            }
+        }
     </script>
 @endsection
+

@@ -11,45 +11,10 @@
                                     <i class="ti ti-category"></i>
                                 </span>
 
-                                <div class="header-searchbar">
-                                    <form class="me-3 app-form app-icon-form " action="#">
-                                        <div class="position-relative">
-                                            <input type="search" class="form-control" placeholder="Search..."
-                                                aria-label="Search">
-                                            <i class="ti ti-search text-dark"></i>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
 
                             <div class="col-6 d-flex align-items-center justify-content-end header-right">
                                 <ul class="d-flex align-items-center">
-                                    <li class="header-search">
-                                        <a href="#" class="d-block head-icon" role=button
-                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-                                            aria-controls="offcanvasTop">
-                                            <i class="ti ti-search"></i>
-                                        </a>
-
-                                        <div class="offcanvas offcanvas-top search-canvas" tabindex="-1"
-                                            id="offcanvasTop">
-                                            <div class="offcanvas-body">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1">
-                                                        <form class="me-3 app-form app-icon-form " action="#">
-                                                            <div class="position-relative">
-                                                                <input type="search" class="form-control"
-                                                                    placeholder="Search..." aria-label="Search">
-                                                                <i class="ti ti-search f-s-15"></i>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
 
                                     {{-- <li class="header-language">
                                         <div id="lang_selector" class="flex-shrink-0 dropdown">

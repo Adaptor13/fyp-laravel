@@ -136,7 +136,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Social Worker</h5>
                         @permission('users.create')
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSocialWorker">Add</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSocialWorker"><i class="ti ti-plus"></i> Add</button>
                         @endpermission
                     </div>
                     <div class="card-body p-0">

@@ -189,19 +189,19 @@
                                 <div class="mb-3">
                                     <label for="reporter_name" class="form-label">Reporter Name *</label>
                                     <input type="text" name="reporter_name" id="reporter_name" class="form-control" 
-                                           value="{{ old('reporter_name') }}" required>
+                                           value="{{ old('reporter_name') }}" placeholder="Enter full name of the person reporting" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="reporter_email" class="form-label">Reporter Email *</label>
                                     <input type="email" name="reporter_email" id="reporter_email" class="form-control" 
-                                           value="{{ old('reporter_email') }}" required>
+                                           value="{{ old('reporter_email') }}" placeholder="reporter@example.com" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="reporter_phone" class="form-label">Reporter Phone</label>
                                     <input type="text" name="reporter_phone" id="reporter_phone" class="form-control" 
-                                           value="{{ old('reporter_phone') }}">
+                                           value="{{ old('reporter_phone') }}" placeholder="000-0000000">
                                 </div>
                             </div>
 
@@ -212,7 +212,7 @@
                                 <div class="mb-3">
                                     <label for="victim_age" class="form-label">Victim Age</label>
                                     <input type="text" name="victim_age" id="victim_age" class="form-control" 
-                                           value="{{ old('victim_age') }}" placeholder="e.g., 12">
+                                           value="{{ old('victim_age') }}" placeholder="Enter victim's age (e.g., 12)">
                                 </div>
 
                                 <div class="mb-3">
@@ -266,7 +266,7 @@
                                 <div class="mb-3">
                                     <label for="incident_description" class="form-label">Incident Description *</label>
                                     <textarea name="incident_description" id="incident_description" class="form-control" 
-                                              rows="4" required>{{ old('incident_description') }}</textarea>
+                                              rows="4" placeholder="Provide detailed description of the incident, including what happened, when, and any relevant circumstances..." required>{{ old('incident_description') }}</textarea>
                                 </div>
 
                                 <div class="row">
@@ -274,7 +274,7 @@
                                         <div class="mb-3">
                                             <label for="incident_location" class="form-label">Incident Location *</label>
                                             <input type="text" name="incident_location" id="incident_location" class="form-control" 
-                                                   value="{{ old('incident_location') }}" required>
+                                                   value="{{ old('incident_location') }}" placeholder="Enter specific address or location where incident occurred" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -290,7 +290,7 @@
                                 <div class="mb-3">
                                     <label for="suspected_abuser" class="form-label">Suspected Abuser</label>
                                     <input type="text" name="suspected_abuser" id="suspected_abuser" class="form-control" 
-                                           value="{{ old('suspected_abuser') }}" placeholder="e.g., Parent/Guardian, Teacher, etc.">
+                                           value="{{ old('suspected_abuser') }}" placeholder="Enter name or relationship (e.g., Parent/Guardian, Teacher, Neighbor, etc.)">
                                 </div>
 
                                 <div class="mb-3">
@@ -448,7 +448,7 @@
                         <strong>Case ID:</strong> <span id="deleteCaseId"></span>
                     </div>
                     <div class="mb-0">
-                        <strong>Report Name:</strong> <span id="deleteReportName"></span>
+                        <strong>Reporter Name:</strong> <span id="deleteReportName"></span>
                     </div>
                 </div>
                 <div class="modal-footer">

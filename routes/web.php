@@ -103,37 +103,8 @@ Route::middleware('web')->group(function () {
         Route::delete('/admin/profile/delete', [AdminProfileController::class, 'destroy'])
             ->name('admin.profile.destroy');
 
-        // CWO Profile Management
-        Route::get('/cwo/profile/edit', [CwoProfileController::class, 'edit'])
-            ->name('cwo.profile.edit');
-        Route::put('/cwo/profile/update', [CwoProfileController::class, 'update'])
-            ->name('cwo.profile.update');
-        Route::delete('/cwo/profile/delete', [CwoProfileController::class, 'destroy'])
-            ->name('cwo.profile.destroy');
 
-        // Healthcare Profile Management
-        Route::get('/healthcare/profile/edit', [HealthcareProfileController::class, 'edit'])
-            ->name('healthcare.profile.edit');
-        Route::put('/healthcare/profile/update', [HealthcareProfileController::class, 'update'])
-            ->name('healthcare.profile.update');
-        Route::delete('/healthcare/profile/delete', [HealthcareProfileController::class, 'destroy'])
-            ->name('healthcare.profile.destroy');
 
-        // Law Enforcement Profile Management
-        Route::get('/law/profile/edit', [LawEnforcementProfileController::class, 'edit'])
-            ->name('law.profile.edit');
-        Route::put('/law/profile/update', [LawEnforcementProfileController::class, 'update'])
-            ->name('law.profile.update');
-        Route::delete('/law/profile/delete', [LawEnforcementProfileController::class, 'destroy'])
-            ->name('law.profile.destroy');
-
-        // Social Worker Profile Management
-        Route::get('/social/profile/edit', [SocialWorkerProfileController::class, 'edit'])
-            ->name('social.profile.edit');
-        Route::put('/social/profile/update', [SocialWorkerProfileController::class, 'update'])
-            ->name('social.profile.update');
-        Route::delete('/social/profile/delete', [SocialWorkerProfileController::class, 'destroy'])
-            ->name('social.profile.destroy');
 
         // Admins
         Route::get('/users/admin/data', [UserController::class, 'adminData'])
@@ -297,6 +268,16 @@ Route::middleware('web')->group(function () {
 
     });
 
+    // CWO Profile Management - accessible by gov_official role
+    Route::middleware(['auth', 'role:gov_official'])->group(function () {
+        Route::get('/cwo/profile/edit', [CwoProfileController::class, 'edit'])
+            ->name('cwo.profile.edit');
+        Route::put('/cwo/profile/update', [CwoProfileController::class, 'update'])
+            ->name('cwo.profile.update');
+        Route::delete('/cwo/profile/delete', [CwoProfileController::class, 'destroy'])
+            ->name('cwo.profile.destroy');
+    });
+
     Route::middleware(['auth', 'role:admin,social_worker,law_enforcement,healthcare,gov_official'])
         ->group(function () {
          Route::get('/cases/data', [CaseController::class, 'reportData'])->name('cases.data');
@@ -321,6 +302,47 @@ Route::middleware('web')->group(function () {
         // Case Messaging routes
         Route::get('/cases/{case}/messages', [App\Http\Controllers\CaseMessageController::class, 'index'])->name('cases.messages.index');
         Route::post('/cases/{case}/messages', [App\Http\Controllers\CaseMessageController::class, 'store'])->name('cases.messages.store');
+    });
+
+    // Profile Management Routes - accessible by respective role users
+    Route::middleware(['auth', 'role:social_worker'])->group(function () {
+        // Social Worker Profile Management
+        Route::get('/social/profile/edit', [SocialWorkerProfileController::class, 'edit'])
+            ->name('social.profile.edit');
+        Route::put('/social/profile/update', [SocialWorkerProfileController::class, 'update'])
+            ->name('social.profile.update');
+        Route::delete('/social/profile/delete', [SocialWorkerProfileController::class, 'destroy'])
+            ->name('social.profile.destroy');
+    });
+
+    Route::middleware(['auth', 'role:healthcare'])->group(function () {
+        // Healthcare Profile Management
+        Route::get('/healthcare/profile/edit', [HealthcareProfileController::class, 'edit'])
+            ->name('healthcare.profile.edit');
+        Route::put('/healthcare/profile/update', [HealthcareProfileController::class, 'update'])
+            ->name('healthcare.profile.update');
+        Route::delete('/healthcare/profile/delete', [HealthcareProfileController::class, 'destroy'])
+            ->name('healthcare.profile.destroy');
+    });
+
+    Route::middleware(['auth', 'role:law_enforcement'])->group(function () {
+        // Law Enforcement Profile Management
+        Route::get('/law/profile/edit', [LawEnforcementProfileController::class, 'edit'])
+            ->name('law.profile.edit');
+        Route::put('/law/profile/update', [LawEnforcementProfileController::class, 'update'])
+            ->name('law.profile.update');
+        Route::delete('/law/profile/delete', [LawEnforcementProfileController::class, 'destroy'])
+            ->name('law.profile.destroy');
+    });
+
+    Route::middleware(['auth', 'role:gov_official'])->group(function () {
+        // CWO Profile Management
+        Route::get('/cwo/profile/edit', [CwoProfileController::class, 'edit'])
+            ->name('cwo.profile.edit');
+        Route::put('/cwo/profile/update', [CwoProfileController::class, 'update'])
+            ->name('cwo.profile.update');
+        Route::delete('/cwo/profile/delete', [CwoProfileController::class, 'destroy'])
+            ->name('cwo.profile.destroy');
     });
 
     // Route::middleware(['auth', 'role:admin,gov_official'])
