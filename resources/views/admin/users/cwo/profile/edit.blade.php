@@ -113,7 +113,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Ministry</label>
+                                    <label class="form-label">Ministry <span class="text-danger">*</span></label>
                                     <select name="ministry" class="form-select @error('ministry') is-invalid @enderror" required>
                                         <option value="">Select Ministry</option>
                                         <option value="KPWKM" {{ old('ministry', $user->govOfficialProfile->ministry ?? '') === 'KPWKM' ? 'selected' : '' }}>
@@ -127,7 +127,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Department</label>
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
                                     <select name="department" class="form-select @error('department') is-invalid @enderror" required>
                                         <option value="">Select Department</option>
                                         <option value="JKM" {{ old('department', $user->govOfficialProfile->department ?? '') === 'JKM' ? 'selected' : '' }}>
@@ -163,7 +163,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">State</label>
+                                    <label class="form-label">State <span class="text-danger">*</span></label>
                                     <input name="cwo_state" type="text" class="form-control @error('cwo_state') is-invalid @enderror"
                                         value="{{ old('cwo_state', $user->govOfficialProfile->state ?? '') }}" placeholder="e.g. Selangor" required>
                                     @error('cwo_state')
@@ -223,7 +223,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Postcode</label>
                                     <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
-                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="Postcode">
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="Postcode" maxlength="5">
                                     @error('postcode')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

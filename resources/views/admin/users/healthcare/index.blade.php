@@ -170,7 +170,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('_method'))
                             <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
                         @endif
 
@@ -193,12 +193,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_name" class="form-label">Name</label>
+                                <label for="add_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="add_name" name="name" type="text" class="form-control"
                                     value="{{ old('name') }}" placeholder="Full name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_email" class="form-label">Email</label>
+                                <label for="add_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="add_email" name="email" type="email" class="form-control"
                                     value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
@@ -206,7 +206,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_password" class="form-label">Password</label>
+                                <label for="add_password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password" name="password" type="password" class="form-control"
                                         placeholder="Password (min 8 chars)" minlength="8" required>
@@ -217,7 +217,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password_confirmation" name="password_confirmation" type="password"
                                         class="form-control" minlength="8" placeholder="Re-enter password" required>
@@ -235,7 +235,7 @@
                         <h6 class="mb-3">Healthcare Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_profession" class="form-label">Profession</label>
+                                <label for="add_profession" class="form-label">Profession <span class="text-danger">*</span></label>
                                 <select id="add_profession" name="profession" class="form-select" required>
                                     <option value="">Select profession</option>
                                     <option value="Doctor" {{ old('profession') === 'Doctor' ? 'selected' : '' }}>Doctor
@@ -254,12 +254,12 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_facility_name" class="form-label">Facility Name</label>
+                                <label for="add_facility_name" class="form-label">Facility Name <span class="text-danger">*</span></label>
                                 <input id="add_facility_name" name="facility_name" type="text" class="form-control"
                                     value="{{ old('facility_name') }}" placeholder="e.g. Hospital Kuala Lumpur" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_hc_state" class="form-label">Facility State</label>
+                                <label for="add_hc_state" class="form-label">Facility State <span class="text-danger">*</span></label>
                                 <input id="add_hc_state" name="state" type="text" class="form-control"
                                     value="{{ old('state') }}" placeholder="e.g. Selangor" required>
                             </div>
@@ -336,7 +336,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && old('_method') === 'PUT')
                             <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
                         @endif
 
@@ -360,13 +360,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_hc_name" class="form-label">Name</label>
+                                <label for="edit_hc_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="edit_hc_name" name="name" type="text" class="form-control"
                                     placeholder="Full name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_hc_email" class="form-label">Email</label>
+                                <label for="edit_hc_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="edit_hc_email" name="email" type="email" class="form-control" readonly>
                             </div>
                         </div>
@@ -376,7 +376,7 @@
                         <h6 class="mb-3">Healthcare Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_profession" class="form-label">Profession</label>
+                                <label for="edit_profession" class="form-label">Profession <span class="text-danger">*</span></label>
                                 <select id="edit_profession" name="profession" class="form-select" required>
                                     <option value="">Select profession</option>
                                     <option value="Doctor">Doctor</option>
@@ -392,13 +392,13 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_facility_name" class="form-label">Facility Name</label>
+                                <label for="edit_facility_name" class="form-label">Facility Name <span class="text-danger">*</span></label>
                                 <input id="edit_facility_name" name="facility_name" type="text" class="form-control"
                                     placeholder="e.g. Hospital Kuala Lumpur" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_hc_state" class="form-label">Facility State</label>
+                                <label for="edit_hc_state" class="form-label">Facility State <span class="text-danger">*</span></label>
                                 <input id="edit_hc_state" name="state" type="text" class="form-control"
                                     placeholder="e.g. Selangor" required>
                             </div>
@@ -505,7 +505,28 @@
     <script>
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addHealthcareProfessional'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.healthcare.update'));
+                const modalId = isEditing ? 'editHealthcareProfessional' : 'addHealthcareProfessional';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="email"]').val(@json(old('email', '')));
+                    $modal.find('select[name="profession"]').val(@json(old('profession', ''))).trigger('change');
+                    $modal.find('input[name="apc_expiry"]').val(@json(old('apc_expiry', '')));
+                    $modal.find('input[name="facility_name"]').val(@json(old('facility_name', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state_profile"]').val(@json(old('state_profile', '')));
+                }
+                
                 m.show();
             });
         @endif

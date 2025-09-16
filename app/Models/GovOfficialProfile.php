@@ -15,7 +15,7 @@ class GovOfficialProfile extends Model
     protected $fillable = [
         'ministry',        // e.g. KPWKM, KPM
         'department',      // e.g. JKM, JPNIN
-        'service_scheme',  // e.g. M, N, FA
+        'service_scheme',  // e.g. M, N, FA, Pegawai Pengusahan Kerajaan
         'grade',           // e.g. M41, N29
         'state',
     ];

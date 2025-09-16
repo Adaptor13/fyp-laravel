@@ -28,7 +28,12 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^\S+$/',
+            ],
         ], [
             'name.required' => 'Please enter your username.',
             'email.required' => 'Email is required!',
@@ -37,6 +42,7 @@ class AuthController extends Controller
             'password.required' => 'You must enter a password.',
             'password.min' => 'Password must be at least :min characters.',
             'password.confirmed' => 'Passwords do not match.',
+            'password.regex' => 'The password cannot contain spaces.',
         ]);
 
         $role = Role::where('name', 'public_user')->first(); // change to your role name if needed
@@ -132,7 +138,14 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^\S+$/',
+            ],
+        ], [
+            'password.regex' => 'The password cannot contain spaces.',
         ]);
 
         $status = Password::reset(

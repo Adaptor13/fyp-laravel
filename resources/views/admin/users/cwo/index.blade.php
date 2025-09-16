@@ -46,8 +46,8 @@
         @endif
 
         @if ($errors->any())
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>Validation Errors:</strong>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -175,8 +175,15 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
+                        @if ($errors->any() && !old('_method'))
+                            <div class="alert alert-danger mb-3">
+                                <strong>Error:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
 
                         {{-- Account Details --}}
@@ -198,12 +205,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_name" class="form-label">Name</label>
+                                <label for="add_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="add_name" name="name" type="text" class="form-control"
                                     value="{{ old('name') }}" placeholder="Full name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_email" class="form-label">Email</label>
+                                <label for="add_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="add_email" name="email" type="email" class="form-control"
                                     value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
@@ -211,7 +218,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_password" class="form-label">Password</label>
+                                <label for="add_password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password" name="password" type="password" class="form-control"
                                         placeholder="Password (min 8 chars)" minlength="8" required>
@@ -221,7 +228,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password_confirmation" name="password_confirmation" type="password"
                                         class="form-control" minlength="8" placeholder="Re-enter password" required>
@@ -239,7 +246,7 @@
                         <h6 class="mb-3">Child Welfare Officer Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_ministry" class="form-label">Ministry</label>
+                                <label for="add_ministry" class="form-label">Ministry <span class="text-danger">*</span></label>
                                 <select id="add_ministry" name="ministry" class="form-select" required>
                                     <option value="">Select Ministry</option>
                                     <option value="KPWKM" {{ old('ministry') === 'KPWKM' ? 'selected' : '' }}>
@@ -250,7 +257,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_department" class="form-label">Department</label>
+                                <label for="add_department" class="form-label">Department <span class="text-danger">*</span></label>
                                 <select id="add_department" name="department" class="form-select" required>
                                     <option value="">Select Department</option>
                                     <option value="JKM" {{ old('department') === 'JKM' ? 'selected' : '' }}>
@@ -276,7 +283,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_cwo_state" class="form-label">State</label>
+                                <label for="add_cwo_state" class="form-label">State <span class="text-danger">*</span></label>
                                 <input id="add_cwo_state" name="cwo_state" type="text" class="form-control"
                                     value="{{ old('cwo_state') }}" placeholder="e.g. Selangor" required>
                             </div>
@@ -354,8 +361,15 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
+                        @if ($errors->any() && old('_method') === 'PUT')
+                            <div class="alert alert-danger mb-3">
+                                <strong>Error:</strong>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
 
                         <h6 class="mb-3">Account Details</h6>
@@ -376,12 +390,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_cwo_name" class="form-label">Name</label>
+                                <label for="edit_cwo_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="edit_cwo_name" name="name" type="text" class="form-control" placeholder="Full name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_cwo_email" class="form-label">Email</label>
+                                <label for="edit_cwo_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="edit_cwo_email" name="email" type="email" class="form-control" readonly>
                             </div>
                         </div>
@@ -391,7 +405,7 @@
                         <h6 class="mb-3">Child Welfare Officer Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_ministry" class="form-label">Ministry</label>
+                                <label for="edit_ministry" class="form-label">Ministry <span class="text-danger">*</span></label>
                                 <select id="edit_ministry" name="ministry" class="form-select" required>
                                     <option value="">Select Ministry</option>
                                     <option value="KPWKM">Kementerian Pembangunan Wanita, Keluarga dan Masyarakat (KPWKM)</option>
@@ -400,7 +414,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_department" class="form-label">Department</label>
+                                <label for="edit_department" class="form-label">Department <span class="text-danger">*</span></label>
                                 <select id="edit_department" name="department" class="form-select" required>
                                     <option value="">Select Department</option>
                                     <option value="JKM">Jabatan Kebajikan Masyarakat (JKM)</option>
@@ -422,7 +436,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_cwo_state" class="form-label">State</label>
+                                <label for="edit_cwo_state" class="form-label">State <span class="text-danger">*</span></label>
                                 <input id="edit_cwo_state" name="cwo_state" type="text" class="form-control" placeholder="e.g. Selangor" required>
                             </div>
                         </div>
@@ -522,7 +536,29 @@
     <script>
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addChildWelfareOfficer'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.cwo.update'));
+                const modalId = isEditing ? 'editChildWelfareOfficer' : 'addChildWelfareOfficer';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="email"]').val(@json(old('email', '')));
+                    $modal.find('select[name="ministry"]').val(@json(old('ministry', ''))).trigger('change');
+                    $modal.find('select[name="department"]').val(@json(old('department', ''))).trigger('change');
+                    $modal.find('input[name="service_scheme"]').val(@json(old('service_scheme', '')));
+                    $modal.find('input[name="grade"]').val(@json(old('grade', '')));
+                    $modal.find('input[name="cwo_state"]').val(@json(old('cwo_state', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                }
+                
                 m.show();
             });
         @endif

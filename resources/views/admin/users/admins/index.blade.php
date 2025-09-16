@@ -167,7 +167,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('_method'))
                             <div class="alert alert-danger mb-3">
                                 <strong>Validation Errors:</strong>
                                 <ul class="mb-0">
@@ -197,12 +197,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_admin_name" class="form-label">Name</label>
+                                <label for="add_admin_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="add_admin_name" name="name" type="text" class="form-control"
                                     value="{{ old('name') }}" placeholder="Full name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_admin_email" class="form-label">Email</label>
+                                <label for="add_admin_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="add_admin_email" name="email" type="email" class="form-control"
                                     value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
@@ -210,7 +210,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_admin_password" class="form-label">Password</label>
+                                <label for="add_admin_password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_admin_password" name="password" type="password" class="form-control"
                                         placeholder="Password (min 8 chars)" minlength="8" required>
@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_admin_password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_admin_password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_admin_password_confirmation" name="password_confirmation" type="password"
                                         class="form-control" minlength="8" placeholder="Re-enter password" required>
@@ -238,12 +238,12 @@
                         <h6 class="mb-3">Admin Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_department" class="form-label">Department</label>
+                                <label for="add_department" class="form-label">Department <span class="text-danger">*</span></label>
                                 <input id="add_department" name="department" type="text" class="form-control"
                                     value="{{ old('department') }}" placeholder="e.g. IT Department" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_position" class="form-label">Position</label>
+                                <label for="add_position" class="form-label">Position <span class="text-danger">*</span></label>
                                 <input id="add_position" name="position" type="text" class="form-control"
                                     value="{{ old('position') }}" placeholder="e.g. System Admin" required>
                             </div>
@@ -318,7 +318,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && old('_method') === 'PUT')
                             <div class="alert alert-danger mb-3">
                                 <strong>Validation Errors:</strong>
                                 <ul class="mb-0">
@@ -348,13 +348,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_admin_name" class="form-label">Name</label>
+                                <label for="edit_admin_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="edit_admin_name" name="name" type="text" class="form-control"
                                     placeholder="Full name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_admin_email" class="form-label">Email</label>
+                                <label for="edit_admin_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="edit_admin_email" name="email" type="email" class="form-control" readonly>
                             </div>
                         </div>
@@ -365,12 +365,12 @@
                         <h6 class="mb-3">Admin Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_department" class="form-label">Department</label>
+                                <label for="edit_department" class="form-label">Department <span class="text-danger">*</span></label>
                                 <input id="edit_department" name="department" type="text" class="form-control"
                                     placeholder="e.g. IT Department" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="edit_position" class="form-label">Position</label>
+                                <label for="edit_position" class="form-label">Position <span class="text-danger">*</span></label>
                                 <input id="edit_position" name="position" type="text" class="form-control"
                                     placeholder="e.g. System Admin" required>
                             </div>
@@ -466,7 +466,26 @@
         }
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addAdmin'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.admin.update'));
+                const modalId = isEditing ? 'editAdmin' : 'addAdmin';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="email"]').val(@json(old('email', '')));
+                    $modal.find('input[name="department"]').val(@json(old('department', '')));
+                    $modal.find('input[name="position"]').val(@json(old('position', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                }
+                
                 m.show();
             });
         @endif

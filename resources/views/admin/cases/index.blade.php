@@ -187,13 +187,13 @@
                                 <h6 class="mb-3">Reporter Information</h6>
                                 
                                 <div class="mb-3">
-                                    <label for="reporter_name" class="form-label">Reporter Name *</label>
+                                    <label for="reporter_name" class="form-label">Reporter Name <span class="text-danger">*</span></label>
                                     <input type="text" name="reporter_name" id="reporter_name" class="form-control" 
                                            value="{{ old('reporter_name') }}" placeholder="Enter full name of the person reporting" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="reporter_email" class="form-label">Reporter Email *</label>
+                                    <label for="reporter_email" class="form-label">Reporter Email <span class="text-danger">*</span></label>
                                     <input type="email" name="reporter_email" id="reporter_email" class="form-control" 
                                            value="{{ old('reporter_email') }}" placeholder="reporter@example.com" required>
                                 </div>
@@ -264,7 +264,7 @@
                                 <h6 class="mb-3">Incident Details</h6>
                                 
                                 <div class="mb-3">
-                                    <label for="incident_description" class="form-label">Incident Description *</label>
+                                    <label for="incident_description" class="form-label">Incident Description <span class="text-danger">*</span></label>
                                     <textarea name="incident_description" id="incident_description" class="form-control" 
                                               rows="4" placeholder="Provide detailed description of the incident, including what happened, when, and any relevant circumstances..." required>{{ old('incident_description') }}</textarea>
                                 </div>
@@ -272,14 +272,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="incident_location" class="form-label">Incident Location *</label>
+                                            <label for="incident_location" class="form-label">Incident Location <span class="text-danger">*</span></label>
                                             <input type="text" name="incident_location" id="incident_location" class="form-control" 
                                                    value="{{ old('incident_location') }}" placeholder="Enter specific address or location where incident occurred" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="incident_date" class="form-label">Incident Date *</label>
+                                            <label for="incident_date" class="form-label">Incident Date <span class="text-danger">*</span></label>
                                             <input type="date" name="incident_date" id="incident_date" class="form-control" 
                                                    value="{{ old('incident_date') }}" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
                                             <small class="form-text text-muted">Cannot select future dates</small>
@@ -296,8 +296,9 @@
                                 <div class="mb-3">
                                     <label for="evidence" class="form-label">Evidence Files</label>
                                     <input type="file" name="evidence[]" id="evidence" class="form-control" multiple 
-                                           accept=".jpg,.jpeg,.png,.mp4,.pdf">
-                                    <small class="form-text text-muted">You can select multiple files (JPG, PNG, MP4, PDF up to 20MB each)</small>
+                                           accept=".jpg,.jpeg,.png,.mp4,.pdf" max="5">
+                                    <small class="form-text text-muted">You can select up to 5 files (JPG, PNG, MP4, PDF up to 20MB each)</small>
+                                    <div id="evidence-validation" class="invalid-feedback" style="display: none;"></div>
                                 </div>
                             </div>
                         </div>
@@ -312,7 +313,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="report_status" class="form-label">Status *</label>
+                                            <label for="report_status" class="form-label">Status <span class="text-danger">*</span></label>
                                             <select name="report_status" id="report_status" class="form-select" required>
                                                 <option value="">Select Status</option>
                                                 <option value="Submitted" {{ old('report_status') == 'Submitted' ? 'selected' : '' }}>Submitted</option>
@@ -325,7 +326,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="priority_level" class="form-label">Priority *</label>
+                                            <label for="priority_level" class="form-label">Priority <span class="text-danger">*</span></label>
                                             <select name="priority_level" id="priority_level" class="form-select" required>
                                                 <option value="">Select Priority</option>
                                                 <option value="Low" {{ old('priority_level') == 'Low' ? 'selected' : '' }}>Low</option>
@@ -618,16 +619,18 @@
                             `;
                         }
                         
-                        // Add View History button (always available for viewing)
-                        actionButtons += `
-                            <li>
-                                <a class="dropdown-item history-btn" href="javascript:void(0)"
-                                    data-id="${row.id}"
-                                    data-label="${label}">
-                                    <i class="ti ti-history text-info"></i> View History
-                                </a>
-                            </li>
-                        `;
+                        // Add View History button if user has view history permission
+                        if (hasPermission('cases.view_history')) {
+                            actionButtons += `
+                                <li>
+                                    <a class="dropdown-item history-btn" href="javascript:void(0)"
+                                        data-id="${row.id}"
+                                        data-label="${label}">
+                                        <i class="ti ti-history text-info"></i> View History
+                                    </a>
+                                </li>
+                            `;
+                        }
                         
                         // Add Export button if user has export permission
                         if (hasPermission('cases.export')) {
@@ -689,7 +692,7 @@
             });
         });
 
-        // Apply phone masking to dynamically loaded edit form content
+        // Apply phone masking and file validation to dynamically loaded edit form content
         $(document).on('DOMNodeInserted', '#editCaseContent', function() {
             $('#editCaseContent #reporter_phone').mask('000-0000000', {
                 placeholder: "000-0000000",
@@ -697,6 +700,11 @@
                 translation: {
                     '0': {pattern: /[0-9]/}
                 }
+            });
+            
+            // Apply file validation to dynamically loaded evidence input
+            $('#editCaseContent #evidence').on('change', function() {
+                validateEvidenceFiles(this);
             });
         });
 
@@ -869,6 +877,49 @@
              }
              return true;
          }
+
+         // File validation function for evidence files
+         function validateEvidenceFiles(input) {
+             const maxFiles = 5;
+             const selectedFiles = input.files;
+             const validationDiv = document.getElementById('evidence-validation');
+             
+             // Clear previous validation state
+             input.classList.remove('is-invalid');
+             validationDiv.style.display = 'none';
+             
+             if (selectedFiles.length > maxFiles) {
+                 showInlineError(validationDiv, `You can only select up to ${maxFiles} files. Please select fewer files.`);
+                 input.value = ''; // Clear the input
+                 return false;
+             }
+             
+             // Check individual file sizes (20MB limit)
+             const maxSize = 20 * 1024 * 1024; // 20MB in bytes
+             for (let i = 0; i < selectedFiles.length; i++) {
+                 if (selectedFiles[i].size > maxSize) {
+                     showInlineError(validationDiv, `File "${selectedFiles[i].name}" is too large. Maximum file size is 20MB.`);
+                     input.value = ''; // Clear the input
+                     return false;
+                 }
+             }
+             
+             // If validation passes, just hide any error messages
+             return true;
+         }
+
+         // Helper function to show inline error
+         function showInlineError(validationDiv, message) {
+             validationDiv.textContent = message;
+             validationDiv.style.display = 'block';
+         }
+
+         // Add event listener for file input validation
+         $(document).ready(function() {
+             $('#evidence').on('change', function() {
+                 validateEvidenceFiles(this);
+             });
+         });
      </script>
 
 

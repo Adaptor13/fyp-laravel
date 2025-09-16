@@ -36,10 +36,12 @@
                             <li class="nav-item border-bottom me-3">
                                 <a class="nav-link py-2" href="#how-it-works">How It Works</a>
                             </li>
-                            <li class="nav-item border-bottom me-3">
-                                <a class="nav-link py-2" href="{{ route('contact.show') }}">Contact</a>
-                            </li>
+                            
                         @endif
+
+                        <li class="nav-item border-bottom me-3">
+                                <a class="nav-link py-2" href="{{ route('contact.show') }}">Contact</a>
+                        </li>
 
                         <li class="nav-item border-bottom me-3">
                             <a class="nav-link py-2" href="{{ route('report') }}">Report Abuse</a>

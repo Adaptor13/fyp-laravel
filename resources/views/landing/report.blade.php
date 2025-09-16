@@ -174,8 +174,12 @@
                         <!-- Submit -->
                         <div class="col-12">
                             <div class="text-end">
-                                <button type="submit" class="btn btn-danger">Submit Report</button>
-                                <button type="reset" class="btn btn-secondary">Reset</button>
+                                
+                                <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
+                                <button type="submit" class="btn btn-danger" id="submitBtn">
+                                    <span id="submitText">Submit Report</span>
+                                    <span id="submitSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display: none;"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -191,11 +195,21 @@
             const messageDiv = document.getElementById('file-validation-message');
             
             if (files.length > maxFiles) {
-                messageDiv.textContent = `Maximum ${maxFiles} files allowed. Please select fewer files.`;
+                messageDiv.textContent = `Maximum ${maxFiles} files allowed. You selected ${files.length} files. Please select only ${maxFiles} files or fewer.`;
                 messageDiv.style.display = 'block';
-                input.value = ''; // Clear the selection
+                messageDiv.className = 'text-danger mt-1';
+                
+                // Clear the input to prevent submission
+                input.value = '';
                 return false;
+            } else if (files.length > 0) {
+                // Show success message for valid selection
+                messageDiv.textContent = `${files.length} file(s) selected. Maximum ${maxFiles} files allowed.`;
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'text-success mt-1';
+                return true;
             } else {
+                // No files selected
                 messageDiv.style.display = 'none';
                 return true;
             }
@@ -220,6 +234,17 @@
             const fileInput = document.getElementById('evidence');
             const dateInput = document.getElementById('incident_date');
             const abuseTypeCheckboxes = document.querySelectorAll('input[name="abuse_types[]"]:checked');
+            const messageDiv = document.getElementById('file-validation-message');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            // Check if form is already being submitted
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
             
             // Validate abuse types selection
             if (abuseTypeCheckboxes.length === 0) {
@@ -228,7 +253,16 @@
                 return false;
             }
             
-            // Validate file upload
+            // Validate file upload - check file count
+            if (fileInput.files.length > 5) {
+                messageDiv.textContent = 'Maximum 5 files allowed. Please select fewer files before submitting.';
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'text-danger mt-1';
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validate file upload - check individual file validation
             if (!validateFileUpload(fileInput)) {
                 e.preventDefault();
                 return false;
@@ -239,6 +273,11 @@
                 e.preventDefault();
                 return false;
             }
+            
+            // If all validations pass, disable submit button to prevent double submission
+            submitBtn.disabled = true;
+            submitText.textContent = 'Submitting...';
+            submitSpinner.style.display = 'inline-block';
         });
     </script>
 @endsection

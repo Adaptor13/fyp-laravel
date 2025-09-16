@@ -56,6 +56,14 @@ class Report extends Model
     }
 
     /**
+     * Get the user who last updated this report
+     */
+    public function lastUpdatedBy()
+    {
+        return $this->belongsTo(User::class, 'last_updated_by');
+    }
+
+    /**
      * Get all assignees for this case
      */
     public function assignees()

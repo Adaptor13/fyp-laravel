@@ -113,7 +113,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Profession</label>
+                                    <label class="form-label">Profession <span class="text-danger">*</span></label>
                                     <select name="profession" class="form-select @error('profession') is-invalid @enderror" required>
                                         <option value="">Select profession</option>
                                         <option value="Doctor" {{ old('profession', $user->healthcareProfile->profession ?? '') === 'Doctor' ? 'selected' : '' }}>Doctor</option>
@@ -136,7 +136,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Facility Name</label>
+                                    <label class="form-label">Facility Name <span class="text-danger">*</span></label>
                                     <input name="facility_name" type="text" class="form-control @error('facility_name') is-invalid @enderror"
                                         value="{{ old('facility_name', $user->healthcareProfile->facility_name ?? '') }}" placeholder="e.g. Hospital Kuala Lumpur" required>
                                     @error('facility_name')
@@ -145,7 +145,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Facility State</label>
+                                    <label class="form-label">Facility State <span class="text-danger">*</span></label>
                                     <input name="hc_state" type="text" class="form-control @error('hc_state') is-invalid @enderror"
                                         value="{{ old('hc_state', $user->healthcareProfile->state ?? '') }}" placeholder="e.g. Selangor" required>
                                     @error('hc_state')
@@ -205,7 +205,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Postcode</label>
                                     <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
-                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000">
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000" maxlength="5">
                                     @error('postcode')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

@@ -1162,13 +1162,15 @@ class UserController extends Controller
 
         $roleId = Role::where('name', 'gov_official')->value('id');
         if (!$roleId) {
+            \Log::error('CWO Creation: gov_official role not found');
             return back()
-                ->withErrors(['role' => 'The "gov_official" role is not configured.'])
+                ->withErrors(['role' => 'The "gov_official" role is not configured. Please run the database seeders.'])
                 ->withInput();
         }
 
         try {
             DB::transaction(function () use ($request, $validated, $roleId) {
+                \Log::info('CWO Creation: Starting transaction', ['role_id' => $roleId]);
 
                 // create user
                 $user = User::create([
@@ -1178,6 +1180,7 @@ class UserController extends Controller
                     'role_id'           => $roleId,
                     'email_verified_at' => now(),
                 ]);
+                \Log::info('CWO Creation: User created', ['user_id' => $user->id]);
 
                 $user->govOfficialProfile()->create([
                     'ministry'        => $validated['ministry'],
@@ -1186,6 +1189,7 @@ class UserController extends Controller
                     'grade'           => $validated['grade'] ?? null,
                     'state'           => $validated['cwo_state'], // <-- map from cwo_state
                 ]);
+                \Log::info('CWO Creation: GovOfficialProfile created');
 
                 // contact profile
                 $cleanPhone = !empty($validated['phone'])
@@ -1204,17 +1208,24 @@ class UserController extends Controller
                 if ($request->hasFile('avatar')) {
                     $path = $request->file('avatar')->store('avatars', 'public');
                     $profileData['avatar_path'] = $path;
+                    \Log::info('CWO Creation: Avatar uploaded', ['path' => $path]);
                 }
 
                 $user->profile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $profileData
                 );
+                \Log::info('CWO Creation: UserProfile created/updated');
             });
 
         } catch (\Throwable $e) {
+            \Log::error('CWO Creation Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->except(['password', 'password_confirmation'])
+            ]);
+            
             return back()
-                ->withErrors(['general' => 'Failed to create Child Welfare Officer. Please try again.'])
+                ->withErrors(['general' => 'Failed to create Child Welfare Officer: ' . $e->getMessage()])
                 ->withInput();
         }
 

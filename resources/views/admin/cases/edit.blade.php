@@ -50,13 +50,13 @@
         <h6 class="mb-3">Reporter Information</h6>
         
         <div class="mb-3">
-            <label for="reporter_name" class="form-label">Reporter Name *</label>
+            <label for="reporter_name" class="form-label">Reporter Name <span class="text-danger">*</span></label>
             <input type="text" name="reporter_name" id="reporter_name" class="form-control" 
                    value="{{ old('reporter_name', $report->reporter_name) }}" required>
         </div>
 
         <div class="mb-3">
-            <label for="reporter_email" class="form-label">Reporter Email *</label>
+            <label for="reporter_email" class="form-label">Reporter Email <span class="text-danger">*</span></label>
             <input type="email" name="reporter_email" id="reporter_email" class="form-control" 
                    value="{{ old('reporter_email', $report->reporter_email) }}" required>
         </div>
@@ -131,7 +131,7 @@
         <h6 class="mb-3">Incident Details</h6>
         
         <div class="mb-3">
-            <label for="incident_description" class="form-label">Incident Description *</label>
+            <label for="incident_description" class="form-label">Incident Description <span class="text-danger">*</span></label>
             <textarea name="incident_description" id="incident_description" class="form-control" 
                       rows="4" required>{{ old('incident_description', $report->incident_description) }}</textarea>
         </div>
@@ -139,17 +139,21 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label for="incident_location" class="form-label">Incident Location *</label>
+                    <label for="incident_location" class="form-label">Incident Location <span class="text-danger">*</span></label>
                     <input type="text" name="incident_location" id="incident_location" class="form-control" 
                            value="{{ old('incident_location', $report->incident_location) }}" required>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label for="incident_date" class="form-label">Incident Date *</label>
+                    <label for="incident_date" class="form-label">Incident Date <span class="text-danger">*</span></label>
                     <input type="date" name="incident_date" id="incident_date" class="form-control" 
-                           value="{{ old('incident_date', $report->incident_date) }}" required max="{{ date('Y-m-d') }}" onchange="validateIncidentDate(this)">
+                           value="{{ old('incident_date', $report->incident_date) }}" required max="{{ date('Y-m-d') }}" 
+                           onchange="validateIncidentDate(this)" oninput="validateIncidentDate(this)">
                     <small class="form-text text-muted">Cannot select future dates</small>
+                    <div id="date-validation-error" class="invalid-feedback" style="display: none;">
+                        Please select a date that is not in the future.
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,8 +167,9 @@
         <div class="mb-3">
             <label for="evidence" class="form-label">Evidence Files</label>
             <input type="file" name="evidence[]" id="evidence" class="form-control" multiple 
-                   accept=".jpg,.jpeg,.png,.mp4,.pdf">
-            <small class="form-text text-muted">You can select multiple files (JPG, PNG, MP4, PDF up to 20MB each)</small>
+                   accept=".jpg,.jpeg,.png,.mp4,.pdf" max="5">
+            <small class="form-text text-muted">You can select up to 5 files (JPG, PNG, MP4, PDF up to 20MB each)</small>
+            <div id="evidence-validation" class="invalid-feedback" style="display: none;"></div>
             
             @if(!empty($report->evidence))
                 <div class="mt-2">
@@ -199,7 +204,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="mb-3">
-                    <label for="report_status" class="form-label">Status *</label>
+                    <label for="report_status" class="form-label">Status <span class="text-danger">*</span></label>
                     <select name="report_status" id="report_status" class="form-select" required>
                         <option value="">Select Status</option>
                         <option value="Submitted" {{ old('report_status', $report->report_status) == 'Submitted' ? 'selected' : '' }}>Submitted</option>
@@ -212,7 +217,7 @@
             </div>
             <div class="col-md-4">
                 <div class="mb-3">
-                    <label for="priority_level" class="form-label">Priority *</label>
+                    <label for="priority_level" class="form-label">Priority <span class="text-danger">*</span></label>
                     <select name="priority_level" id="priority_level" class="form-select" required>
                         <option value="">Select Priority</option>
                         <option value="Low" {{ old('priority_level', $report->priority_level) == 'Low' ? 'selected' : '' }}>Low</option>
@@ -312,26 +317,20 @@ $(document).ready(function() {
     $(document).on('click', '.remove-evidence', function() {
         const fileToRemove = $(this).data('file');
         const $fileItem = $(this).closest('.evidence-file-item');
-        const fileName = $(this).siblings('span').text();
         
-        // Show confirmation dialog
-        if (confirm(`Are you sure you want to remove "${fileName}"? This action cannot be undone.`)) {
-            // Add to removed evidence list
-            let removedEvidence = $('#removed-evidence').val();
-            let removedArray = removedEvidence ? JSON.parse(removedEvidence) : [];
-            
-            if (!removedArray.includes(fileToRemove)) {
-                removedArray.push(fileToRemove);
-                $('#removed-evidence').val(JSON.stringify(removedArray));
-            }
-            
-            // Remove the file item from display
-            $fileItem.fadeOut(300, function() {
-                $(this).remove();
-            });
-            
-            // File removal handled silently - no alert needed
+        // Add to removed evidence list
+        let removedEvidence = $('#removed-evidence').val();
+        let removedArray = removedEvidence ? JSON.parse(removedEvidence) : [];
+        
+        if (!removedArray.includes(fileToRemove)) {
+            removedArray.push(fileToRemove);
+            $('#removed-evidence').val(JSON.stringify(removedArray));
         }
+        
+        // Remove the file item from display
+        $fileItem.fadeOut(300, function() {
+            $(this).remove();
+        });
     });
     
     // Handle evidence file viewing
@@ -423,15 +422,78 @@ $(document).ready(function() {
         const selectedDate = new Date(input.value);
         const today = new Date();
         today.setHours(23, 59, 59, 999); // Set to end of today to allow today's date
+        const errorDiv = document.getElementById('date-validation-error');
         
-        if (selectedDate > today) {
-            alert('Please select a date that is not in the future.');
-            input.value = ''; // Clear the invalid date
+        // Clear previous validation state
+        input.classList.remove('is-invalid');
+        errorDiv.style.display = 'none';
+        
+        if (input.value && selectedDate > today) {
+            // Show validation error
+            input.classList.add('is-invalid');
+            errorDiv.style.display = 'block';
+            
+            // Clear the invalid date
+            input.value = '';
             input.focus();
+            
+            // Show alert as well
+            alert('Please select a date that is not in the future.');
             return false;
         }
+        
         return true;
     }
+
+    // File validation function for evidence files in edit form
+    function validateEvidenceFiles(input) {
+        const maxFiles = 5;
+        const selectedFiles = input.files;
+        const validationDiv = document.getElementById('evidence-validation');
+        
+        // Clear previous validation state
+        input.classList.remove('is-invalid');
+        validationDiv.style.display = 'none';
+        
+        if (selectedFiles.length > maxFiles) {
+            showInlineError(validationDiv, `You can only select up to ${maxFiles} files. Please select fewer files.`);
+            input.value = ''; // Clear the input
+            return false;
+        }
+        
+        // Check individual file sizes (20MB limit)
+        const maxSize = 20 * 1024 * 1024; // 20MB in bytes
+        for (let i = 0; i < selectedFiles.length; i++) {
+            if (selectedFiles[i].size > maxSize) {
+                showInlineError(validationDiv, `File "${selectedFiles[i].name}" is too large. Maximum file size is 20MB.`);
+                input.value = ''; // Clear the input
+                return false;
+            }
+        }
+        
+        // If validation passes, just hide any error messages
+        return true;
+    }
+
+    // Helper function to show inline error
+    function showInlineError(validationDiv, message) {
+        validationDiv.textContent = message;
+        validationDiv.style.display = 'block';
+    }
+
+    // Add event listener for file input validation in edit form
+    $('#evidence').on('change', function() {
+        validateEvidenceFiles(this);
+    });
+    
+    // Add form submission validation to prevent future dates
+    $('form').on('submit', function(e) {
+        const dateInput = document.getElementById('incident_date');
+        if (dateInput && !validateIncidentDate(dateInput)) {
+            e.preventDefault();
+            return false;
+        }
+    });
 });
 </script>
 

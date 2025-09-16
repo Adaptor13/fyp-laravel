@@ -173,7 +173,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('_method'))
                             <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
                         @endif
 
@@ -196,12 +196,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_name" class="form-label">Name</label>
+                                <label for="add_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="add_name" name="name" type="text" class="form-control"
                                     value="{{ old('name') }}" placeholder="Full name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_email" class="form-label">Email</label>
+                                <label for="add_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="add_email" name="email" type="email" class="form-control"
                                     value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
@@ -209,7 +209,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_password" class="form-label">Password</label>
+                                <label for="add_password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password" name="password" type="password" class="form-control"
                                         placeholder="Password (min 8 chars)" minlength="8" required>
@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password_confirmation" name="password_confirmation" type="password"
                                         class="form-control" minlength="8" placeholder="Re-enter password" required>
@@ -238,7 +238,7 @@
                         <h6 class="mb-3">Law Enforcement Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_agency" class="form-label">Agency</label>
+                                <label for="add_agency" class="form-label">Agency <span class="text-danger">*</span></label>
                                 <select id="add_agency" name="agency" class="form-select" required>
                                     <option value="">Select Agency</option>
                                     <option value="PDRM" {{ old('agency') === 'PDRM' ? 'selected' : '' }}>
@@ -251,7 +251,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_badge_number" class="form-label">Badge Number</label>
+                                <label for="add_badge_number" class="form-label">Badge Number <span class="text-danger">*</span></label>
                                 <input id="add_badge_number" name="badge_number" type="text" class="form-control"
                                     value="{{ old('badge_number') }}" placeholder="e.g. 12345" required>
                             </div>
@@ -273,7 +273,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_le_state" class="form-label">Placement State</label>
+                                <label for="add_le_state" class="form-label">Placement State <span class="text-danger">*</span></label>
                                 <input id="add_le_state" name="le_state" type="text" class="form-control"
                                     value="{{ old('le_state') }}" placeholder="e.g. Selangor" required>
                             </div>
@@ -348,7 +348,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && old('_method') === 'PUT')
                             <div class="alert alert-danger mb-3">{{ $errors->first() }}</div>
                         @endif
 
@@ -372,13 +372,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_le_name" class="form-label">Name</label>
+                                <label for="edit_le_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="edit_le_name" name="name" type="text" class="form-control"
                                     placeholder="Full name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_le_email" class="form-label">Email</label>
+                                <label for="edit_le_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="edit_le_email" name="email" type="email" class="form-control" readonly>
                             </div>
                         </div>
@@ -388,7 +388,7 @@
                         <h6 class="mb-3">Law Enforcement Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_agency" class="form-label">Agency</label>
+                                <label for="edit_agency" class="form-label">Agency <span class="text-danger">*</span></label>
                                 <select id="edit_agency" name="agency" class="form-select" required>
                                     <option value="">Select Agency</option>
                                     <option value="PDRM">Polis Diraja Malaysia (PDRM)</option>
@@ -397,7 +397,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_badge_number" class="form-label">Badge Number</label>
+                                <label for="edit_badge_number" class="form-label">Badge Number <span class="text-danger">*</span></label>
                                 <input id="edit_badge_number" name="badge_number" type="text" class="form-control"
                                     placeholder="e.g. 12345" required>
                             </div>
@@ -419,7 +419,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_le_state" class="form-label">Placement State</label>
+                                <label for="edit_le_state" class="form-label">Placement State <span class="text-danger">*</span></label>
                                 <input id="edit_le_state" name="le_state" type="text" class="form-control"
                                     placeholder="e.g. Selangor" required>
                             </div>
@@ -526,7 +526,29 @@
     <script>
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addLawEnforcement'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.law.update'));
+                const modalId = isEditing ? 'editLawEnforcement' : 'addLawEnforcement';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="email"]').val(@json(old('email', '')));
+                    $modal.find('select[name="agency"]').val(@json(old('agency', ''))).trigger('change');
+                    $modal.find('input[name="badge_number"]').val(@json(old('badge_number', '')));
+                    $modal.find('input[name="rank"]').val(@json(old('rank', '')));
+                    $modal.find('input[name="station"]').val(@json(old('station', '')));
+                    $modal.find('input[name="le_state"]').val(@json(old('le_state', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                }
+                
                 m.show();
             });
         @endif

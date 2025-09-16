@@ -31,6 +31,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Edit Cases', 'slug' => 'cases.edit', 'description' => 'Can edit existing cases', 'module' => 'cases', 'action' => 'edit'],
             ['name' => 'Delete Cases', 'slug' => 'cases.delete', 'description' => 'Can delete cases', 'module' => 'cases', 'action' => 'delete'],
             ['name' => 'Export Cases', 'slug' => 'cases.export', 'description' => 'Can export case data', 'module' => 'cases', 'action' => 'export'],
+            ['name' => 'View Case History', 'slug' => 'cases.view_history', 'description' => 'Can view case history and audit trail', 'module' => 'cases', 'action' => 'view_history'],
             
             
             // Contact Query Management

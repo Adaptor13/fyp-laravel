@@ -169,24 +169,24 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('_method'))
                             <div class="alert alert-danger mb-3">
                                 {{ $errors->first() }}
                             </div>
                         @endif
 
                         <div class="mb-3">
-                            <label class="form-label">Name</label>
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
                             <input name="name" type="name" class="form-control" value="{{ old('name') }}" placeholder="Name" required>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
                             <input name="email" type="email" class="form-control" value="{{ old('email') }}" placeholder="example@gmail.com" required>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
+                            <label class="form-label">Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input id="password" name="password" type="password" class="form-control" placeholder="Password(8 minimum)" minlength="8"
                                     required>
@@ -198,7 +198,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Confirm Password</label>
+                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" minlength="8" placeholder="Password(8 minimum)" required>
                                 <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password_confirmation">
@@ -233,6 +233,11 @@
                     <div class="modal-body">
                         <input type="hidden" id="edit_id">
                         
+                        @if ($errors->any() && old('_method') === 'PUT')
+                            <div class="alert alert-danger mb-3">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
 
                         <!-- Account Details Section -->
                         <h6 class="mb-3">
@@ -524,7 +529,25 @@
 
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addPublicUser'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.public.update'));
+                const modalId = isEditing ? 'editPublicUser' : 'addPublicUser';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="display_name"]').val(@json(old('display_name', '')));
+                    $modal.find('input[name="allow_contact"]').prop('checked', @json(old('allow_contact', false)));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                }
+                
                 m.show();
             });
         @endif

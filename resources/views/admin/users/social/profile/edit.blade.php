@@ -239,7 +239,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Staff ID</label>
+                                    <label class="form-label">Staff ID <span class="text-danger">*</span></label>
                                     <input name="staff_id" type="text" class="form-control @error('staff_id') is-invalid @enderror"
                                         value="{{ old('staff_id', $user->socialWorkerProfile->staff_id ?? '') }}" placeholder="Staff ID" required>
                                     @error('staff_id')
@@ -248,7 +248,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3 floating">
-                                    <label class="form-label">Agency Name</label>
+                                    <label class="form-label">Agency Name <span class="text-danger">*</span></label>
                                     <select name="agency_name" class="form-select @error('agency_name') is-invalid @enderror" required>
                                         <option value="" data-code="">Select Agency</option>
                                         <option value="Jabatan Kebajikan Masyarakat" data-code="JKM" {{ old('agency_name', $user->socialWorkerProfile->agency_name ?? '') === 'Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
@@ -278,7 +278,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Agency Code</label>
+                                    <label class="form-label">Agency Code <span class="text-danger">*</span></label>
                                     <input name="agency_code" type="text" class="form-control @error('agency_code') is-invalid @enderror"
                                         value="{{ old('agency_code', $user->socialWorkerProfile->agency_code ?? '') }}" placeholder="Agency Code" required>
                                     @error('agency_code')
@@ -287,7 +287,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Placement State</label>
+                                    <label class="form-label">Placement State <span class="text-danger">*</span></label>
                                     <input name="placement_state" type="text" class="form-control @error('placement_state') is-invalid @enderror"
                                         value="{{ old('placement_state', $user->socialWorkerProfile->placement_state ?? '') }}" placeholder="State" required>
                                     @error('placement_state')
@@ -297,7 +297,7 @@
                             </div>
 
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Placement District</label>
+                                <label class="form-label">Placement District <span class="text-danger">*</span></label>
                                 <input name="placement_district" type="text" class="form-control @error('placement_district') is-invalid @enderror"
                                     value="{{ old('placement_district', $user->socialWorkerProfile->placement_district ?? '') }}" placeholder="District" required>
                                 @error('placement_district')
@@ -356,7 +356,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Postcode</label>
                                     <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
-                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000">
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000" maxlength="5">
                                     @error('postcode')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

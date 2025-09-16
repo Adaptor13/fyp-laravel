@@ -28,12 +28,6 @@
                                         </div>
                                         @endif
 
-                                        @if ($errors->hasBag('passwordReset'))
-                                        <div class="alert alert-danger mb-3" role="alert">
-                                            {{-- show a concise message; you can show the first error or list them --}}
-                                            {{ $errors->passwordReset->first('email') }}
-                                        </div>
-                                        @endif
 
 
                                         @if(session('success'))
@@ -122,10 +116,14 @@
                         <form method="POST" action="{{ route('password.email') }}">
                             @csrf
                             <div class="modal-body">
-                            <p class="mb-3">Enter your account email. We’ll send a password reset link.</p>
+                            <p class="mb-3">Enter your account email. We'll send a password reset link.</p>
 
                             <label for="resetEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control"  id="resetEmail" name="email" placeholder="name@example.com" required></div>
+                            <input type="email" class="form-control @error('email', 'passwordReset') is-invalid @enderror" id="resetEmail" name="email" placeholder="name@example.com" value="{{ old('email') }}" required>
+                            @error('email', 'passwordReset') 
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            </div>
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>

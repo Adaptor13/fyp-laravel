@@ -249,9 +249,9 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Department</label>
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
                                     <input name="department" type="text" class="form-control @error('department') is-invalid @enderror"
-                                        value="{{ old('department', $user->adminProfile->department ?? '') }}" placeholder="Enter department">
+                                        value="{{ old('department', $user->adminProfile->department ?? '') }}" placeholder="Enter department" required>
                                     @error('department')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -260,9 +260,9 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Position</label>
+                                    <label class="form-label">Position <span class="text-danger">*</span></label>
                                     <input name="position" type="text" class="form-control @error('position') is-invalid @enderror"
-                                        value="{{ old('position', $user->adminProfile->position ?? '') }}" placeholder="Enter position">
+                                        value="{{ old('position', $user->adminProfile->position ?? '') }}" placeholder="Enter position" required>
                                     @error('position')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -320,7 +320,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Postcode</label>
                                     <input name="postcode" type="text" class="form-control @error('postcode') is-invalid @enderror"
-                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000">
+                                        value="{{ old('postcode', $user->profile->postcode ?? '') }}" placeholder="43000" maxlength="5">
                                     @error('postcode')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

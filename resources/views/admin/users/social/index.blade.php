@@ -176,7 +176,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('_method'))
                             <div class="alert alert-danger mb-3">
                                 <strong>Validation Errors:</strong>
                                 <ul class="mb-0">
@@ -209,18 +209,18 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="add_name" class="form-label">Name</label>
+                                <label for="add_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id= "add_name" name="name" type="text" class="form-control" value="{{ old('name') }}" placeholder="Name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_email" class="form-label">Email</label>
+                                <label for="add_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="add_email" name="email" type="email" class="form-control"  value="{{ old('email') }}" placeholder="example@gmail.com" required>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_password" class="form-label">Password</label>
+                                <label for="add_password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password" name="password" type="password" class="form-control" placeholder="Password (8 minimum)" minlength="8" required>
                                     <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password">
@@ -229,7 +229,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_password_confirmation" class="form-label">Confirm Password</label>
+                                <label for="add_password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input id="add_password_confirmation" name="password_confirmation" type="password" class="form-control" minlength="8" placeholder="Re-enter Password" required>
                                     <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#add_password_confirmation">
@@ -245,19 +245,19 @@
                         <h6 class="mb-3">Social Worker Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_staff_id" class="form-label">Staff ID</label>
+                                <label for="add_staff_id" class="form-label">Staff ID <span class="text-danger">*</span></label>
                                 <input name="staff_id" id="add_staff_id" type="text" class="form-control" value="{{ old('staff_id') }}" placeholder="Staff ID" required>
                             </div>
 
                             <div class="col-md-6 mb-3 floating">
-                                <label for="add_agencyDropdown" class="form-label">Agency Name</label>
+                                <label for="add_agencyDropdown" class="form-label">Agency Name <span class="text-danger">*</span></label>
                                 <select id="add_agencyDropdown" name="agency_name" class="form-select" required>
                                     <option value="" data-code="">Select Agency</option>
                                     <option value="Jabatan Kebajikan Masyarakat" data-code="JKM" {{ old('agency_name')==='Jabatan Kebajikan Masyarakat' ? 'selected' : '' }}>
                                     Jabatan Kebajikan Masyarakat (JKM)
                                     </option>
-                                    <option value="Women’s Aid Organisation" data-code="WAO" {{ old('agency_name')==='Women’s Aid Organisation' ? 'selected' : '' }}>
-                                    Women’s Aid Organisation (WAO)
+                                    <option value="Women's Aid Organisation" data-code="WAO" {{ old('agency_name')==="Women's Aid Organisation" ? 'selected' : '' }}>
+                                    Women's Aid Organisation (WAO)
                                     </option>
                                     <option value="Malaysian Social Workers Association" data-code="MSWA" {{ old('agency_name')==='Malaysian Social Workers Association' ? 'selected' : '' }}>
                                     Malaysian Social Workers Association (MSWA)
@@ -273,17 +273,17 @@
   
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="add_agencyCodeInput" class="form-label">Agency Code</label>
+                                <label for="add_agencyCodeInput" class="form-label">Agency Code <span class="text-danger">*</span></label>
                                 <input  id="add_agencyCodeInput" name="agency_code" type="text" class="form-control" value="{{ old('agency_code') }}" placeholder="Agency Code" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="add_placement_state" class="form-label">Placement State</label>
+                                <label for="add_placement_state" class="form-label">Placement State <span class="text-danger">*</span></label>
                                 <input id="add_placement_state" name="placement_state" type="text" class="form-control" value="{{ old('placement_state') }}" placeholder="State" required>
                             </div>
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="add_placement_district" class="form-label">Placement District</label>
+                            <label for="add_placement_district" class="form-label">Placement District <span class="text-danger">*</span></label>
                             <input name="placement_district" id="add_placement_district" type="text" class="form-control" value="{{ old('placement_district') }}" placeholder="District" required>
                         </div>
 
@@ -357,7 +357,7 @@
                     </div>
 
                     <div class="modal-body">
-                        @if ($errors->any())
+                        @if ($errors->any() && old('_method') === 'PUT')
                             <div class="alert alert-danger mb-3">
                                 <strong>Validation Errors:</strong>
                                 <ul class="mb-0">
@@ -390,13 +390,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_name" class="form-label">Name</label>
+                                <label for="edit_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input id="edit_name" name="name" type="text" class="form-control"
                                     placeholder="Name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_email" class="form-label">Email</label>
+                                <label for="edit_email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input id="edit_email" name="email" type="email" class="form-control" readonly>
                             </div>
                         </div>
@@ -406,17 +406,17 @@
                         <h6 class="mb-3">Social Worker Profile</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_staff_id" class="form-label">Staff ID</label>
+                                <label for="edit_staff_id" class="form-label">Staff ID <span class="text-danger">*</span></label>
                                 <input id="edit_staff_id" name="staff_id" type="text" class="form-control"
                                     placeholder="Staff ID" required>
                             </div>
 
                             <div class="col-md-6 mb-3 floating">
-                                <label for="edit_agencyDropdown" class="form-label">Agency Name</label>
+                                <label for="edit_agencyDropdown" class="form-label">Agency Name <span class="text-danger">*</span></label>
                                 <select id="edit_agencyDropdown" name="agency_name" class="form-select" required>
                                     <option value="" data-code="">Select Agency</option>
                                     <option value="Jabatan Kebajikan Masyarakat" data-code="JKM">Jabatan Kebajikan Masyarakat (JKM)</option>
-                                    <option value="Women’s Aid Organisation" data-code="WAO">Women’s Aid Organisation (WAO)</option>
+                                    <option value="Women's Aid Organisation" data-code="WAO">Women's Aid Organisation (WAO)</option>
                                     <option value="Malaysian Social Workers Association" data-code="MSWA">Malaysian Social Workers Association (MSWA)</option>
                                     <option value="Other" data-code="">Other</option>
                                 </select>
@@ -430,20 +430,20 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit_agencyCodeInput" class="form-label">Agency Code</label>
+                                <label for="edit_agencyCodeInput" class="form-label">Agency Code <span class="text-danger">*</span></label>
                                 <input id="edit_agencyCodeInput" name="agency_code" type="text" class="form-control"
                                     placeholder="Agency Code" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="edit_placement_state" class="form-label">Placement State</label>
+                                <label for="edit_placement_state" class="form-label">Placement State <span class="text-danger">*</span></label>
                                 <input id="edit_placement_state" name="placement_state" type="text" class="form-control"
                                     placeholder="State" required>
                             </div>
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="edit_placement_district" class="form-label">Placement District</label>
+                            <label for="edit_placement_district" class="form-label">Placement District <span class="text-danger">*</span></label>
                             <input id="edit_placement_district" name="placement_district" type="text" class="form-control"
                                 placeholder="District" required>
                         </div>
@@ -771,7 +771,30 @@
 
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function() {
-                const m = new bootstrap.Modal(document.getElementById('addSocialWorker'));
+                // Check if we're editing (has old input data) or adding
+                const isEditing = @json(old('_method') === 'PUT' || request()->routeIs('users.social.update'));
+                const modalId = isEditing ? 'editSocialWorker' : 'addSocialWorker';
+                const m = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // If editing and there are validation errors, populate the edit form with old data
+                if (isEditing) {
+                    const $modal = $('#' + modalId);
+                    $modal.find('input[name="name"]').val(@json(old('name', '')));
+                    $modal.find('input[name="email"]').val(@json(old('email', '')));
+                    $modal.find('input[name="staff_id"]').val(@json(old('staff_id', '')));
+                    $modal.find('select[name="agency_name"]').val(@json(old('agency_name', ''))).trigger('change');
+                    $modal.find('input[name="agency_name_other"]').val(@json(old('agency_name_other', '')));
+                    $modal.find('input[name="agency_code"]').val(@json(old('agency_code', '')));
+                    $modal.find('input[name="placement_state"]').val(@json(old('placement_state', '')));
+                    $modal.find('input[name="placement_district"]').val(@json(old('placement_district', '')));
+                    $modal.find('input[name="phone"]').val(@json(old('phone', '')));
+                    $modal.find('input[name="address_line1"]').val(@json(old('address_line1', '')));
+                    $modal.find('input[name="address_line2"]').val(@json(old('address_line2', '')));
+                    $modal.find('input[name="city"]').val(@json(old('city', '')));
+                    $modal.find('input[name="postcode"]').val(@json(old('postcode', '')));
+                    $modal.find('input[name="state"]').val(@json(old('state', '')));
+                }
+                
                 m.show();
             });
         @endif

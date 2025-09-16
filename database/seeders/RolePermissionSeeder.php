@@ -35,7 +35,7 @@ class RolePermissionSeeder extends Seeder
         if ($socialWorkerRole) {
             $socialWorkerPermissions = $permissions->filter(function ($permission) {
                 return in_array($permission->module, ['cases', 'contact_queries']) ||
-                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view', 'cases.view_history']);
             });
             $socialWorkerRole->permissions()->sync($socialWorkerPermissions->pluck('id'));
         }
@@ -46,7 +46,7 @@ class RolePermissionSeeder extends Seeder
         if ($lawEnforcementRole) {
             $lawEnforcementPermissions = $permissions->filter(function ($permission) {
                 return in_array($permission->module, ['cases', 'contact_queries']) ||
-                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view', 'cases.view_history']);
             });
             $lawEnforcementRole->permissions()->sync($lawEnforcementPermissions->pluck('id'));
         }
@@ -56,7 +56,7 @@ class RolePermissionSeeder extends Seeder
         if ($healthcareRole) {
             $healthcarePermissions = $permissions->filter(function ($permission) {
                 return in_array($permission->module, ['cases', 'contact_queries']) ||
-                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view']);
+                       in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view', 'cases.view_history']);
             });
             $healthcareRole->permissions()->sync($healthcarePermissions->pluck('id'));
         }
@@ -68,6 +68,7 @@ class RolePermissionSeeder extends Seeder
                 return in_array($permission->slug, [
                     'cases.create',
                     'cases.view', // Only their own cases
+                    'cases.view_history', // Can view history of their own cases
                     'contact_queries.create', // Can create contact queries
                     'contact_queries.view', // Can view their own queries
                     'dashboard.view'

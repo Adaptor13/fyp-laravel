@@ -20,6 +20,7 @@
             </li>
 
             <!-- Cases -->
+            @permission('cases.view')
             <li>
                 <a data-bs-toggle="collapse" href="#caseManagement" aria-expanded="false">
                     <i class="ti ti-briefcase"></i>
@@ -29,8 +30,10 @@
                     <li><a href="{{ route('cases.index') }}"><i class="ti ti-list"></i> View Cases</a></li>
                 </ul>
             </li>
+            @endpermission
 
             <!-- Users -->
+            @permission('users.view')
             <li>
                 <a data-bs-toggle="collapse" href="#userManagement" aria-expanded="false">
                     <i class="ti ti-users"></i>
@@ -45,8 +48,10 @@
                     <li><a href="{{ route('users.health') }}"><i class="ti ti-stethoscope"></i> Healthcare Professionals</a></li>
                 </ul>
             </li>
+            @endpermission
 
             <!-- Roles & Permissions -->
+            @permission('roles.view')
             <li>
                 <a data-bs-toggle="collapse" href="#roleManagement" aria-expanded="false">
                     <i class="ti ti-lock"></i>
@@ -57,19 +62,23 @@
                     <li><a href="{{ route('permissions.index') }}"><i class="ti ti-key"></i> View Permissions</a></li>
                 </ul>
             </li>
+            @endpermission
 
             <!-- Communication -->
+            @permission('contact_queries.view')
             <li>
                 <a data-bs-toggle="collapse" href="#communication" aria-expanded="false">
                     <i class="ti ti-message-dots"></i>
                     Communication
                 </a>
                 <ul class="collapse" id="communication">
-                    <li><a href="{{ route('admin.contact-queries.index') }}"><i class="ti ti-mail"></i> Contact Queries</a></li>
+                    <li><a href="{{ route('admin.contact-queries.index') }}"><i class="ti 	ti-mail"></i> Contact Queries</a></li>
            <!--          <li><a href="#"><i class="ti ti-messages"></i> Secure Messaging</a></li> -->
                 </ul>
             </li>
+            @endpermission
 
+            @permission('activity_logs.view')
             <li>
                 <a data-bs-toggle="collapse" href="#auditLogs" aria-expanded="false">
                     <i class="ti ti-clipboard-list"></i>
@@ -79,6 +88,7 @@
                     <li><a href="{{ route('admin.activity-logs.index') }}"><i class="ti ti-activity"></i> Session Logs</a></li>
                 </ul>
             </li>
+            @endpermission
 
         </ul>
     </div>
@@ -88,6 +98,7 @@
         <span class="menu-previous"><i class="ti ti-chevron-left"></i></span>
         <span class="menu-next"><i class="ti ti-chevron-right"></i></span>
     </div>
+
 
 </nav>
 <!-- Menu Navigation ends -->
