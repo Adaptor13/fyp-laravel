@@ -536,7 +536,7 @@ class UserController extends Controller
             'staff_id'              => 'required|string|max:50',
             'agency_name'           => 'required|string|max:255',
             'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
-            'agency_code'           => 'nullable|string|max:10', // keep short
+            'agency_code'           => 'nullable|string|max:50', // allow longer codes
             'placement_state'       => 'required|string|max:100',
             'placement_district'    => 'required|string|max:100',
 
@@ -632,7 +632,7 @@ class UserController extends Controller
             'staff_id'              => 'required|string|max:50',
             'agency_name'           => 'required|string|max:255',
             'agency_name_other'     => 'nullable|required_if:agency_name,Other|string|max:255',
-            'agency_code'           => 'nullable|string|max:10',
+            'agency_code'           => 'nullable|string|max:50',
             'placement_state'       => 'required|string|max:100',
             'placement_district'    => 'required|string|max:100',
 

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Role;
+use Illuminate\Support\Str;
 
 class RoleSeeder extends Seeder
 {
@@ -19,7 +20,10 @@ class RoleSeeder extends Seeder
         ];
 
        foreach ($roles as $roleName) {
-            Role::firstOrCreate(['name' => $roleName]);
+            Role::firstOrCreate(
+                ['name' => $roleName],
+                ['id' => (string) Str::uuid()]
+            );
         }
 
     }

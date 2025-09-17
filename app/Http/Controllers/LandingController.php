@@ -25,10 +25,10 @@ class LandingController extends Controller
         $user = Auth::user()->loadMissing('publicUserProfile', 'profile');
 
         $prefillName  = optional($user->publicUserProfile)->display_name ?: $user->name;
-        $prefillEmail = $user->email;
+        $prefillEmail = $user->email; // Pre-populate email
         $prefillPhone = optional($user->profile)->phone;
 
-        $readonlyEmail = true;
+        // Keep email editable (not readonly) - users can modify it if needed
         // keep $readonlyPhone = false unless you want to lock it
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\HealthcareProfile;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 
 class HealthcareSeeder extends Seeder
@@ -21,44 +22,44 @@ class HealthcareSeeder extends Seeder
 
         $healthcareProfessionals = [
             [
-                'name' => 'Dr. Amanda Foster',
-                'email' => 'amanda.foster@healthcare.gov',
+                'name' => 'Dr. Aminah binti Hassan',
+                'email' => 'aminah.hassan@moh.gov.my',
                 'profession' => 'doctor',
                 'apc_expiry' => '2025-12-31',
-                'facility_name' => 'City General Hospital',
-                'state' => 'IL',
+                'facility_name' => 'Hospital Kuala Lumpur',
+                'state' => 'Kuala Lumpur',
             ],
             [
-                'name' => 'Dr. Kevin Patel',
-                'email' => 'kevin.patel@healthcare.gov',
+                'name' => 'Dr. Raj Kumar a/l Muthusamy',
+                'email' => 'raj.kumar@moh.gov.my',
                 'profession' => 'doctor',
                 'apc_expiry' => '2025-12-31',
-                'facility_name' => 'Mental Health Center',
-                'state' => 'IL',
+                'facility_name' => 'Hospital Sultanah Aminah',
+                'state' => 'Johor',
             ],
             [
-                'name' => 'Nurse Sarah Williams',
-                'email' => 'sarah.williams@healthcare.gov',
+                'name' => 'Sister Siti binti Rahman',
+                'email' => 'siti.rahman@moh.gov.my',
                 'profession' => 'nurse',
                 'apc_expiry' => '2025-12-31',
-                'facility_name' => 'Emergency Medical Center',
-                'state' => 'IL',
+                'facility_name' => 'Hospital Seberang Jaya',
+                'state' => 'Penang',
             ],
             [
-                'name' => 'Dr. Michael Chang',
-                'email' => 'michael.chang@healthcare.gov',
+                'name' => 'Dr. Lim Wei Ming',
+                'email' => 'lim.weiming@moh.gov.my',
                 'profession' => 'doctor',
                 'apc_expiry' => '2025-12-31',
-                'facility_name' => 'Forensic Medical Institute',
-                'state' => 'IL',
+                'facility_name' => 'Hospital Raja Permaisuri Bainun',
+                'state' => 'Perak',
             ],
             [
-                'name' => 'Dr. Lisa Anderson',
-                'email' => 'lisa.anderson@healthcare.gov',
+                'name' => 'Dr. Fatimah binti Abdullah',
+                'email' => 'fatimah.abdullah@moh.gov.my',
                 'profession' => 'doctor',
                 'apc_expiry' => '2025-12-31',
-                'facility_name' => 'Community Health Clinic',
-                'state' => 'IL',
+                'facility_name' => 'Hospital Sultanah Bahiyah',
+                'state' => 'Kedah',
             ],
         ];
 
@@ -70,6 +71,16 @@ class HealthcareSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'role_id' => $healthcareRole->id,
                 'email_verified_at' => now(),
+            ]);
+
+            // Create user profile
+            UserProfile::create([
+                'user_id' => $user->id,
+                'phone' => '03-12345678',
+                'address_line1' => 'Hospital',
+                'city' => $professionalData['facility_name'],
+                'state' => $professionalData['state'],
+                'postcode' => '50000',
             ]);
 
             // Create healthcare profile

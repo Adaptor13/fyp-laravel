@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\PublicUserProfile;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 
 class PublicUserSeeder extends Seeder
@@ -78,6 +79,16 @@ class PublicUserSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'role_id' => $publicUserRole->id,
                 'email_verified_at' => now(),
+            ]);
+
+            // Create user profile
+            UserProfile::create([
+                'user_id' => $user->id,
+                'phone' => '012-3456789',
+                'address_line1' => 'Residential Address',
+                'city' => 'Kuala Lumpur',
+                'state' => 'Selangor',
+                'postcode' => '50000',
             ]);
 
             // Create public user profile
