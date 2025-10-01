@@ -22,11 +22,12 @@ class ActivityLogController extends Controller
      */
     public function getData(Request $request)
     {
-
-     
+        // Clean up expired sessions first
+        $this->cleanupExpiredSessions();
         
         $query = DB::table('sessions')
             ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
+            ->whereNotNull('sessions.user_id') // Hide sessions where user_id is NULL
             ->select([
                 'sessions.id as session_id',
                 'sessions.user_id',
@@ -40,6 +41,25 @@ class ActivityLogController extends Controller
         // Apply filters
         if ($request->filled('user_id')) {
             $query->where('sessions.user_id', $request->user_id);
+        }
+
+        // Apply session type filter
+        $sessionType = $request->input('session_type', 'recent');
+        switch ($sessionType) {
+            case 'active':
+                // Only sessions from last 5 minutes
+                $activeThreshold = time() - (5 * 60);
+                $query->where('sessions.last_activity', '>', $activeThreshold);
+                break;
+            case 'all':
+                // Show all sessions (no time filter)
+                break;
+            case 'recent':
+            default:
+                // Show sessions from last 2 hours
+                $expiredThreshold = time() - (2 * 60 * 60);
+                $query->where('sessions.last_activity', '>', $expiredThreshold);
+                break;
         }
 
         if ($request->filled('date_from')) {
@@ -81,11 +101,12 @@ class ActivityLogController extends Controller
         foreach ($sessions as $session) {
             $data[] = [
                 'user_info' => $this->formatUserInfo($session),
-                'event_type_badge' => '<span class="badge bg-success">Active Session</span>',
+                'event_type_badge' => $this->getSessionStatusBadge($session),
                 'device_info' => $this->formatDeviceInfo($session),
                 'location_info' => $this->formatLocationInfo($session),
                 'formatted_time' => date('M d, Y g:i A', $session->last_activity),
-                'session_duration' => $this->formatDuration(time() - $session->last_activity)
+                'session_duration' => $this->formatDuration(time() - $session->last_activity),
+                'actions' => $this->formatActions($session)
             ];
         }
         
@@ -107,6 +128,38 @@ class ActivityLogController extends Controller
         return response()->json([
             'users' => $users
         ]);
+    }
+
+    /**
+     * Delete a session
+     */
+    public function deleteSession(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|string'
+        ]);
+
+        try {
+            // Delete the session from the sessions table
+            $deleted = DB::table('sessions')->where('id', $request->session_id)->delete();
+            
+            if ($deleted) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Session deleted successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session not found or already deleted'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting session: ' . $e->getMessage()
+            ]);
+        }
     }
 
 
@@ -225,5 +278,49 @@ class ActivityLogController extends Controller
         } else {
             return floor($seconds / 86400) . ' days ago';
         }
+    }
+
+    /**
+     * Clean up expired sessions
+     */
+    private function cleanupExpiredSessions()
+    {
+        // Delete sessions older than 2 hours
+        $expiredThreshold = time() - (2 * 60 * 60);
+        DB::table('sessions')->where('last_activity', '<', $expiredThreshold)->delete();
+    }
+
+    /**
+     * Get session status badge based on activity time
+     */
+    private function getSessionStatusBadge($session)
+    {
+        $timeSinceActivity = time() - $session->last_activity;
+        
+        if ($timeSinceActivity < 300) { // Less than 5 minutes
+            return '<span class="badge bg-success">Active Session</span>';
+        } elseif ($timeSinceActivity < 1800) { // Less than 30 minutes
+            return '<span class="badge bg-warning">Recent Session</span>';
+        } else { // More than 30 minutes
+            return '<span class="badge bg-secondary">Inactive Session</span>';
+        }
+    }
+
+    /**
+     * Format actions column with delete button
+     */
+    private function formatActions($session)
+    {
+        $userName = $session->name ?: 'Guest User';
+        return '
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-danger btn-sm delete-session" 
+                        data-session-id="' . htmlspecialchars($session->session_id) . '"
+                        data-user-name="' . htmlspecialchars($userName) . '"
+                        title="Delete Session">
+                    <i class="ti ti-trash"></i>
+                </button>
+            </div>
+        ';
     }
 }

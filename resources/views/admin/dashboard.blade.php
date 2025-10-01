@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-auto">
                             <div class="bg-success h-50 w-50 d-flex-center b-r-50">
-                                <i class="ti ti-tasks f-s-24 text-white"></i>
+                                <i class="ti ti-clipboard-check f-s-24 text-white"></i>
                             </div>
                         </div>
                     </div>

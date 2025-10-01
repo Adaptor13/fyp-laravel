@@ -56,6 +56,9 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Session Logs</h5>
                         <div>
+                            <button class="btn btn-success me-2" id="refreshTable">
+                                <i class="ti ti-refresh"></i> Refresh
+                            </button>
                             <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#filterSection">
                                 <i class="ti ti-filter"></i> Filters
                             </button>
@@ -66,17 +69,25 @@
                     <div class="collapse" id="filterSection">
                         <div class="card-body border-bottom">
                                                          <div class="row">
-                                 <div class="col-md-4">
+                                 <div class="col-md-3">
                                      <label for="userFilter" class="form-label">User</label>
                                      <select class="form-select" id="userFilter">
                                          <option value="">All Users</option>
                                      </select>
                                  </div>
-                                 <div class="col-md-4">
+                                 <div class="col-md-3">
+                                     <label for="sessionFilter" class="form-label">Session Type</label>
+                                     <select class="form-select" id="sessionFilter">
+                                         <option value="recent">Recent Sessions (Last 2 hours)</option>
+                                         <option value="all">All Sessions</option>
+                                         <option value="active">Active Only (Last 5 minutes)</option>
+                                     </select>
+                                 </div>
+                                 <div class="col-md-3">
                                      <label for="dateFromFilter" class="form-label">Date From</label>
                                      <input type="date" class="form-control" id="dateFromFilter">
                                  </div>
-                                 <div class="col-md-4">
+                                 <div class="col-md-3">
                                      <label for="dateToFilter" class="form-label">Date To</label>
                                      <input type="date" class="form-control" id="dateToFilter">
                                  </div>
@@ -105,6 +116,7 @@
                                          <th>Location</th>
                                          <th>Last Activity</th>
                                          <th>Duration</th>
+                                         <th>Actions</th>
                                      </tr>
                                  </thead>
                                 <tbody></tbody>
@@ -132,6 +144,7 @@
                      url: '{{ route("admin.activity-logs.data") }}',
                      data: function(d) {
                          d.user_id = $('#userFilter').val();
+                         d.session_type = $('#sessionFilter').val();
                          d.date_from = $('#dateFromFilter').val();
                          d.date_to = $('#dateToFilter').val();
                      }
@@ -142,7 +155,8 @@
                      {data: 'device_info', name: 'device_info'},
                      {data: 'location_info', name: 'location_info'},
                      {data: 'formatted_time', name: 'formatted_time'},
-                     {data: 'session_duration', name: 'session_duration'}
+                     {data: 'session_duration', name: 'session_duration'},
+                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                  ],
                 order: [[5, 'desc']], // Sort by date/time descending
                 responsive: true,
@@ -157,6 +171,11 @@
             // Load user filter options
             loadUserFilterOptions();
 
+            // Refresh button
+            $('#refreshTable').on('click', function() {
+                table.ajax.reload();
+            });
+
             // Apply filters
             $('#applyFilters').on('click', function() {
                 table.ajax.reload();
@@ -165,10 +184,39 @@
                          // Clear filters
              $('#clearFilters').on('click', function() {
                  $('#userFilter').val('');
+                 $('#sessionFilter').val('recent');
                  $('#dateFromFilter').val('');
                  $('#dateToFilter').val('');
                  table.ajax.reload();
              });
+
+            // Delete session handler
+            $(document).on('click', '.delete-session', function() {
+                var sessionId = $(this).data('session-id');
+                var userName = $(this).data('user-name');
+                
+                if (confirm('Are you sure you want to delete the session for ' + userName + '?')) {
+                    $.ajax({
+                        url: '{{ route("admin.activity-logs.delete") }}',
+                        type: 'DELETE',
+                        data: {
+                            session_id: sessionId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                table.ajax.reload();
+                                alert('Session deleted successfully!');
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function() {
+                            alert('Error deleting session. Please try again.');
+                        }
+                    });
+                }
+            });
 
             // Auto-remove session alerts after 4 seconds
             setTimeout(function() {

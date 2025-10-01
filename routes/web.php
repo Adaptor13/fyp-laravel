@@ -92,6 +92,9 @@ Route::middleware('web')->group(function () {
         Route::get('/activity-logs/filter-options', [ActivityLogController::class, 'getFilterOptions'])
             ->name('admin.activity-logs.filter-options')
             ->middleware('permission:activity_logs.view');
+        Route::delete('/activity-logs/delete', [ActivityLogController::class, 'deleteSession'])
+            ->name('admin.activity-logs.delete')
+            ->middleware('permission:activity_logs.delete');
 
         Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
 
