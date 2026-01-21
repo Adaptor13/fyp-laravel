@@ -34,7 +34,7 @@ class RolePermissionSeeder extends Seeder
         $socialWorkerRole = $roles->where('name', 'social_worker')->first();
         if ($socialWorkerRole) {
             $socialWorkerPermissions = $permissions->filter(function ($permission) {
-                return in_array($permission->module, ['cases', 'contact_queries']) ||
+                return in_array($permission->module, ['cases', 'contact_queries', 'users']) ||
                        in_array($permission->slug, ['dashboard.view', 'dashboard.export', 'analytics.view', 'cases.view_history']);
             });
             $socialWorkerRole->permissions()->sync($socialWorkerPermissions->pluck('id'));

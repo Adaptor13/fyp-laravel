@@ -96,7 +96,8 @@ Route::middleware('web')->group(function () {
             ->name('admin.activity-logs.delete')
             ->middleware('permission:activity_logs.delete');
 
-        Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins');
+        Route::get('/users/admins', [UserController::class, 'admins'])->name('users.admins')
+            ->middleware('permission:users.view');
 
         // Admin Profile Management
         Route::get('/admin/profile/edit', [AdminProfileController::class, 'edit'])
@@ -126,7 +127,8 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:users.delete');
 
         //Law
-        Route::get('/users/law-enforcement',[UserController::class, 'lawEnforcement'])->name('users.law');
+        Route::get('/users/law-enforcement',[UserController::class, 'lawEnforcement'])->name('users.law')
+            ->middleware('permission:users.view');
 
         Route::get('/users/law/data', [UserController::class, 'lawEnforcementData'])
             ->name('users.law.data');
@@ -144,7 +146,8 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:users.delete');
 
         // Government Child Welfare Officials (CWO)
-        Route::get('/users/cwo', [UserController::class, 'cwo'])->name('users.cwo');
+        Route::get('/users/cwo', [UserController::class, 'cwo'])->name('users.cwo')
+            ->middleware('permission:users.view');
 
         Route::get('/users/cwo/data', [UserController::class, 'childWelfareOfficerData'])
             ->name('users.cwo.data');
@@ -162,7 +165,8 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:users.delete');
 
         //Public User
-        Route::get('/users/public-users',  [UserController::class, 'publicUsers'])->name('users.public');
+        Route::get('/users/public-users',  [UserController::class, 'publicUsers'])->name('users.public')
+            ->middleware('permission:users.view');
 
         Route::get('/users/public-users/data', [UserController::class, 'publicUsersData'])
             ->name('users.public.data');
@@ -180,7 +184,8 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:users.delete');
 
         // Social Worker
-        Route::get('/users/social-workers',[UserController::class, 'socialWorkers'])->name('users.social');
+        Route::get('/users/social-workers',[UserController::class, 'socialWorkers'])->name('users.social')
+            ->middleware('permission:users.view');
 
         Route::get('/users/social-workers/data', [UserController::class, 'socialWorkersData'])
             ->name('users.social.data');
@@ -200,7 +205,8 @@ Route::middleware('web')->group(function () {
 
         
         //Healthcare
-        Route::get('/users/healthcare',    [UserController::class, 'healthcare'])->name('users.health');
+        Route::get('/users/healthcare',    [UserController::class, 'healthcare'])->name('users.health')
+            ->middleware('permission:users.view');
 
         Route::get('/users/healthcare/data', [UserController::class, 'healthcareData'])
             ->name('users.healthcare.data');
@@ -218,16 +224,24 @@ Route::middleware('web')->group(function () {
             ->middleware('permission:users.delete');
 
         // Roles Management
-        Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::get('/roles', [RoleController::class, 'index'])->name('roles.index')
+            ->middleware('permission:roles.view');
 
-        Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
-        Route::get('/roles/data', [RoleController::class, 'getData'])->name('roles.data');
-        Route::get('/roles/{role}', [RoleController::class, 'show'])->name('roles.show');
+        Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')
+            ->middleware('permission:roles.create');
+        Route::get('/roles/data', [RoleController::class, 'getData'])->name('roles.data')
+            ->middleware('permission:roles.view');
+        Route::get('/roles/{role}', [RoleController::class, 'show'])->name('roles.show')
+            ->middleware('permission:roles.view');
 
-        Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
-        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
-        Route::get('/roles/{role}/permissions', [RoleController::class, 'assignPermissions'])->name('roles.assign-permissions');
-        Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.update-permissions');
+        Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update')
+            ->middleware('permission:roles.edit');
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy')
+            ->middleware('permission:roles.delete');
+        Route::get('/roles/{role}/permissions', [RoleController::class, 'assignPermissions'])->name('roles.assign-permissions')
+            ->middleware('permission:roles.assign_permissions');
+        Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.update-permissions')
+            ->middleware('permission:roles.assign_permissions');
 
         // Permissions Management
         Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');

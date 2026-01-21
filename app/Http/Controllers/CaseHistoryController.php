@@ -17,8 +17,8 @@ class CaseHistoryController extends Controller
         $user = auth()->user();
         $role = strtolower(optional($user->role)->name);
 
-        // Admin and gov_official can view all cases
-        if (!in_array($role, ['admin', 'gov_official'])) {
+        // Admin, gov_official, and social_worker can view all cases
+        if (!in_array($role, ['admin', 'gov_official', 'social_worker'])) {
             // Other roles can only view cases assigned to them
             if (!$report->assignees->contains('id', $user->id)) {
                 abort(403, 'You do not have permission to view this case.');
@@ -44,8 +44,8 @@ class CaseHistoryController extends Controller
         $user = auth()->user();
         $role = strtolower(optional($user->role)->name);
 
-        // Admin and gov_official can view all cases
-        if (!in_array($role, ['admin', 'gov_official'])) {
+        // Admin, gov_official, and social_worker can view all cases
+        if (!in_array($role, ['admin', 'gov_official', 'social_worker'])) {
             // Other roles can only view cases assigned to them
             if (!$report->assignees->contains('id', $user->id)) {
                 return response()->json(['error' => 'Access denied'], 403);

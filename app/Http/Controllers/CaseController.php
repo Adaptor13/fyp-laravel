@@ -38,9 +38,9 @@ class CaseController extends Controller
         // Base query
         $query = Report::query();
 
-        // Visibility by role - Admin and Government Officials see all cases
-        if (!in_array($role, ['admin', 'gov_official'])) {
-            if (in_array($role, ['social_worker', 'law_enforcement', 'healthcare'])) {
+        // Visibility by role - Admin, Government Officials, and Social Workers see all cases
+        if (!in_array($role, ['admin', 'gov_official', 'social_worker'])) {
+            if (in_array($role, ['law_enforcement', 'healthcare'])) {
                 // These roles see only cases assigned to them
                 $query->assignedTo($user->id);
             } else {
@@ -91,9 +91,9 @@ class CaseController extends Controller
             ->whereNull('case_assignments.unassigned_at')
             ->groupBy('reports.id', 'reports.reporter_name', 'reports.reporter_email', 'reports.incident_description', 'reports.report_status', 'reports.priority_level', 'reports.updated_at');
 
-        // Visibility by role - Admin and Government Officials see all cases
-        if (!in_array($role, ['admin', 'gov_official'])) {
-            if (in_array($role, ['social_worker', 'law_enforcement', 'healthcare'])) {
+        // Visibility by role - Admin, Government Officials, and Social Workers see all cases
+        if (!in_array($role, ['admin', 'gov_official', 'social_worker'])) {
+            if (in_array($role, ['law_enforcement', 'healthcare'])) {
                 // These roles see only cases assigned to them
                 $query->where('case_assignments.user_id', $user->id);
             } else {
