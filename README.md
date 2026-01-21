@@ -32,12 +32,21 @@ The system aims to make child abuse reporting safer, more efficient, and more co
 
 ---
 
+
 ## Tech Stack (Local Host)
 - **Backend**: Laravel 12 (PHP 8.x)  
 - **Frontend**: Blade / Bootstrap (with responsive design)  
 - **Database**: MySQL with UUID primary keys  
 - **Authentication**: Laravel Breeze / custom role middleware  
 - **Other**: Mail (SMTP with Gmail), GitHub for version control
+
+---
+
+## Documentation
+
+Final Year Project (FYP) full documentation is available here in the docs.
+
+---
 
 ## Installation
 
