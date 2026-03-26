@@ -57,7 +57,7 @@ class AuthController extends Controller
         return redirect()->route('sign_in')->with('success', 'Account created successfully. Please log in.');
     }
 
-    public function login(Request $request)
+    public function login(Request $request) 
     {
         $request->validate([
             'email' => 'required|email',

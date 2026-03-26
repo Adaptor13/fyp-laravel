@@ -510,19 +510,25 @@
                 { 
                     data: 'case_id', 
                     name: 'case_id',
-                    render: function (caseId) {
+                    render: function (caseId, type) {
+                        if (type === 'sort' || type === 'type') return caseId;
                         return `<span class="badge bg-secondary">${caseId}</span>`;
                     }
                 },
                 
-                // Reporter column (name + email stacked)
                 { 
                     data: 'reporter', 
                     name: 'reporter',
-                    render: function (reporter) {
+                    render: function (reporter, type) {
                         if (!reporter) return '—';
                         const safeName  = reporter.name || '—';
                         const safeEmail = reporter.email || '';
+
+                        // Sorting: use a stable plain-text value instead of HTML.
+                        if (type === 'sort' || type === 'type') {
+                            return (reporter.name || reporter.email || '').toString();
+                        }
+
                         return `
                             <div>
                                 <h6 class="mb-0">${safeName}</h6>
@@ -536,8 +542,9 @@
                 { 
                     data: 'status', 
                     name: 'status', 
-                    render: function (d) {
+                    render: function (d, type) {
                         if (!d) return '—';
+                        if (type === 'sort' || type === 'type') return d;
                         let cls = 'secondary';
                         if (d === 'In Progress') cls = 'success';
                         else if (d === 'Closed' || d === 'Resolved') cls = 'danger';
@@ -551,8 +558,9 @@
                 { 
                     data: 'priority', 
                     name: 'priority', 
-                    render: function (d) {
+                    render: function (d, type) {
                         if (!d) return '—';
+                        if (type === 'sort' || type === 'type') return d;
                         let cls = 'secondary';
                         if (d === 'High') cls = 'danger';
                         else if (d === 'Medium') cls = 'warning';
@@ -565,7 +573,8 @@
                 { 
                     data: 'assigned', 
                     name: 'assigned', 
-                    render: function (d) {
+                    render: function (d, type) {
+                        if (type === 'sort' || type === 'type') return d || '';
                         return d 
                             ? `<span class="badge bg-primary">${d}</span>` 
                             : `<span class="badge bg-secondary">Unassigned</span>`;
@@ -576,8 +585,11 @@
                 {
                     data: 'updated',
                     name: 'updated',
-                    render: function (d) {
-                        return d ? new Date(d).toLocaleString() : '—';
+                    
+                    render: function (d, type) {
+                        if (!d) return '—';
+                        if (type === 'sort' || type === 'type') return d;
+                        return new Date(d).toLocaleString();
                     }
                 },
 
